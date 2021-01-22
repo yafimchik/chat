@@ -53,6 +53,7 @@ export default {
       }
     },
     onSend() {
+      console.log('ON SEND');
       if (this.newMessage) this.send();
       else {
         console.log('nothing to send');
@@ -61,10 +62,23 @@ export default {
     async send() {
       console.log('sending');
       const currentChat = this.chat.slice();
-      const result = await this.$store.state.chatClient
-        .sendText(this.virtualServer, currentChat, this.newMessage);
-      if (!result) return;
-      if (result.error) return;
+      let result;
+      try {
+        result = await this.$store.state.chatClient
+          .sendText(this.virtualServer, currentChat, this.newMessage);
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+
+      if (!result) {
+        console.log('no result from server');
+        return;
+      }
+      if (result.error) {
+        console.log('error result from server');
+        return;
+      }
 
       this.newMessage = '';
       this.$store.commit('updateUserStatus', undefined);
