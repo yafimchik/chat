@@ -45,7 +45,6 @@
         <b-button type="button" variant="outline-primary" @click="goSignUp">Sign Up</b-button>
       </div>
     </b-form>
-    <pre>{{ typeof chatClient }}</pre>
   </div>
 </template>
 
@@ -126,3 +125,6 @@ export default {
   },
 };
 </script>
+
+<style>
+</style>
