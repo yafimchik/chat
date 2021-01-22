@@ -51,7 +51,9 @@ class VirtualServer {
     this.clients.forEach(client => {
       console.log('sending to client ', client.user);
       if (client.user) {
-        console.log('auth user ', client);
+        console.log('auth user ', client.user);
+        console.log('connection user ', !!client.connection);
+        console.log('message text ', text);
         client.connection.send(text);
       } else {
         console.log('no auth of user', client);
