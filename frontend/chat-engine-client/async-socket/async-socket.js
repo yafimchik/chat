@@ -40,6 +40,7 @@ class AsyncSocket {
     return new Promise((resolve) => {
       const message = new WsMessage(data);
       this.addTask((event, eventType) => {
+        console.log('income ', event);
         if (eventType === EVENT_TYPES.error) {
           setTimeout(() => resolve(null), 0);
           return true;
@@ -53,6 +54,7 @@ class AsyncSocket {
         }
         return false;
       });
+      console.log('sending ', message);
       this.socket.send(message);
     });
   }
