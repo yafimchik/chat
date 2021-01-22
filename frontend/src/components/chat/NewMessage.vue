@@ -6,7 +6,7 @@
       </template>
       <b-form-textarea
         v-model="newMessage"
-        @keyup.enter="send"
+        @keyup.enter="onSend"
         @input="onInput"
         @change="onBlur"
       ></b-form-textarea>
@@ -54,8 +54,12 @@ export default {
     },
     onSend() {
       if (this.newMessage) this.send();
+      else {
+        console.log('nothing to send');
+      }
     },
     async send() {
+      console.log('sending');
       const currentChat = this.chat.slice();
       const result = await this.$store.state.chatClient
         .sendText(this.virtualServer, currentChat, this.newMessage);
