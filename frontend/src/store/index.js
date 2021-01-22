@@ -7,24 +7,26 @@ import ChatEngineClient from '../../chat-engine-client/chat-engine.client';
 
 Vue.use(Vuex);
 
+const DEFAULT_STATE = () => ({
+  user: undefined,
+  token: undefined,
+  virtualServers: {},
+  chats: {},
+  chatHistory: [],
+  status: {},
+  contacts: [],
+  contactsOnline: {},
+  chatClient: undefined,
+  online: false,
+  userStatus: undefined, // chat id where user writes a message or undefined
+  draft: {},
+  currentChatId: undefined,
+  unreadMessages: {},
+  currentVirtualServerId: undefined,
+});
+
 export default new Vuex.Store({
-  state: {
-    user: undefined,
-    token: undefined,
-    virtualServers: {},
-    chats: {},
-    chatHistory: [],
-    status: {},
-    contacts: [],
-    contactsOnline: {},
-    chatClient: undefined,
-    online: false,
-    userStatus: undefined, // chat id where user writes a message or undefined
-    draft: {},
-    currentChatId: undefined,
-    unreadMessages: {},
-    currentVirtualServerId: undefined,
-  },
+  state: DEFAULT_STATE(),
   mutations: {
     setCurrentVirtualServer(state, virtualServerId) {
       if (state.currentVirtualServerId === virtualServerId) return;
@@ -116,8 +118,11 @@ export default new Vuex.Store({
     createChatEngine(state, { apiUrl, onUpdateCallback }) {
       state.chatClient = new ChatEngineClient(apiUrl, onUpdateCallback);
     },
-    deleteChatEngine(state) {
-      state.chatClient = undefined;
+    setToDefaultsAll(state) {
+      const newState = DEFAULT_STATE();
+      Object.entries(newState).forEach(([key, value]) => {
+        state[key] = value;
+      });
     },
     updateLinkStatus(state, isOnline) {
       state.online = isOnline;
@@ -167,6 +172,10 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    async logout({ commit, state }) {
+      const result = await state.chatClient.disconnect();
+      if (result) commit('setToDefaultsAll');
+    },
     async initializeAllChatUI({ commit, state }) {
       const contacts = await state.chatClient.getContacts();
       if (contacts) commit('updateContacts', contacts);

@@ -1,7 +1,7 @@
 import store from './store';
 
 export default function onUpdateCallback({ message, virtualServer }) {
-  console.log('update ! ! ! ', message);
+  // console.log('update ! ! ! ', message);
   if (message.error) {
     console.log('error!!! ', message.error);
     // TODO modal form send about Error

@@ -48,9 +48,6 @@ export default {
         .map((word) => word.toUpperCase()[0]).splice(0, 2).join('');
     },
   },
-  mounted() {
-    console.log('id = ', this.messageId);
-  },
 };
 </script>
 

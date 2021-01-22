@@ -28,10 +28,15 @@
           <b-nav-item-dropdown right>
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <em>{{ userName }}</em>
+              <em>{{ userButtonTitle }}</em>
             </template>
 <!--            <b-dropdown-item href="#">Profile</b-dropdown-item>-->
-            <b-dropdown-item href="#">{{ userButtonAction }}</b-dropdown-item>
+            <b-dropdown-item
+              href="#"
+              @click="onUserButtonAction"
+            >
+              {{ userButtonAction }}
+            </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-collapse>
@@ -51,14 +56,27 @@ export default {
     };
   },
   computed: {
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn;
+    },
     userName() {
-      return this.$store.state.user ? this.$store.state.user.userName : undefined;
+      return this.isLoggedIn ? this.$store.state.user.username : undefined;
     },
     userButtonTitle() {
       return this.userName ? this.userName : 'user';
     },
     userButtonAction() {
-      return this.userName ? 'sign out' : 'sign in';
+      return this.isLoggedIn ? 'sign out' : 'sign in';
+    },
+  },
+  methods: {
+    async onUserButtonAction() {
+      if (this.isLoggedIn) {
+        this.$store.dispatch('logout');
+        await this.$router.push({ name: 'signIn' });
+      } else {
+        await this.$router.push({ name: 'signIn' });
+      }
     },
   },
 };
