@@ -41,7 +41,7 @@ export default {
   methods: {
     scrollHistoryToEnd() {
       const history = document.querySelector('div.chat-history__wrapper');
-      history.scrollTop = this.historyHeight;
+      history.scrollTop = this.historyHeight + 10000;
     },
   },
   updated() {
