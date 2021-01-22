@@ -27,6 +27,7 @@ class VirtualServer {
     this.clients.forEach((client) => {
       if (client.isAlive === false) return client.connection.terminate();
       client.isAlive = false;
+      console.log('ping ', client.user);
       client.connection.ping(() => {});
     });
   }

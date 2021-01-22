@@ -20,6 +20,7 @@ class VirtualServerClient {
   }
 
   onPong() {
+    console.log('PONG');
     this.isAlive = !!this.user;
   }
 
@@ -131,7 +132,8 @@ class VirtualServerClient {
     // this.virtualServer.broadcastContacts();
   }
 
-  async onClose() {
+  async onClose(event) {
+    console.log(event);
     this.virtualServer.clients = this.virtualServer.clients.filter(client => client !== this);
     await this.virtualServer.broadcastContactsOnline();
   }

@@ -21,6 +21,7 @@ class ChatEngineClientConnection {
   }
 
   async connectToServer(reconnect = false) {
+    console.log('server ws Url ', this.serverUrl);
     if (!this.serverUrl) return false;
 
     this.socket = new AsyncSocket({
