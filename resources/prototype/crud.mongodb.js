@@ -78,7 +78,9 @@ class CrudMongodb extends Crud {
 
     let result = await CrudMongodb.safeWrite(newRecord.save());
 
-    if (!result || !result.error) return undefined;
+    console.log('result ', result);
+
+    // if (!result || !result.error) return undefined;
 
     return result ? result.toObject() : result;
   }
@@ -99,23 +101,25 @@ class CrudMongodb extends Crud {
     try {
       return await action;
     } catch (err) {
-      return CrudMongodb.handleMongodbErrors(err);
+      return err;
     }
   }
 
   static handleMongodbErrors(result) {
     if (result && result.driver && result.code === 11000) {
-      throw new BadRequestError(
-        `${Object.keys(result.keyValue)
-          .join(', ')
-          .toUpperCase()} must be unique`,
-      );
+      // throw new BadRequestError(
+      //   `${Object.keys(result.keyValue)
+      //     .join(', ')
+      //     .toUpperCase()} must be unique`,
+      // );
+      return null;
     }
     if (result.errors) {
-      console.log(result);
-      throw new BadRequestError(
-        result._message,
-      );
+      // console.log(result);
+      // throw new BadRequestError(
+      //   result._message,
+      // );
+      return null;
     }
     return result;
   }
