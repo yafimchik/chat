@@ -20,7 +20,6 @@ class VirtualServerClient {
   }
 
   onPong() {
-    console.log('PONG');
     this.isAlive = !!this.user;
   }
 
