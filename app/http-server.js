@@ -37,7 +37,7 @@ class HttpServer {
   initExpress(routes) {
     this.expressApp = express();
     this.expressApp.use(express.json());
-    this.expressApp.use(express.static(path.resolve(__dirname, '..', 'frontend', 'dist')));
+    this.expressApp.use(express.static(path.resolve(__dirname, '..', '..', 'frontend', 'dist')));
     this.expressApp.use(express.urlencoded({ extended: true }));
 
     // const sessionStore = new MongoStore({
