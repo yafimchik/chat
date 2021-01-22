@@ -1,4 +1,4 @@
-export default {
+export const Actions = {
   // checkLink: 'check-link',
   // broadcast: 'broadcast',
   text: 'text',
