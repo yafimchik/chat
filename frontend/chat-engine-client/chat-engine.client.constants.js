@@ -1,4 +1,4 @@
-export const Actions = {
+export const ACTIONS = {
   // checkLink: 'check-link',
   // broadcast: 'broadcast',
   text: 'text',
