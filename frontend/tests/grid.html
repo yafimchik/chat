@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        * {
+            /*border-style: dotted;*/
+            /*border-color: black;*/
+            /*border-width: -5px;*/
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            height:100vh;
+            margin: 0;
+            padding: 0;
+        }
+        footer, header, #edit, #status {
+            min-height: 50px;
+            background-color: blue;
+        }
+        main {
+            flex: 1 1;
+            /*height: 100%;*/
+            background-color: green;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            align-content: stretch;
+        }
+        main>* {
+            flex: 0 1 100%;
+        }
+        section {
+            height: 100%;
+            display: flex;
+            flex-flow: column;
+        }
+        article {
+            width: 100%;
+        }
+
+        #history {
+            flex: 1 0 auto;
+            position: relative;
+        }
+
+        nav {
+            height: 100%;
+            width: 100%;
+            overflow-y: scroll;
+            position: absolute;
+        }
+
+        #edit {
+            min-height: 100px;
+        }
+
+        div {
+            height: 150px;
+            width: 300px;
+            background-color: red;
+        }
+
+        /*article {*/
+        /*    width: 100%;*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*}*/
+
+        /*#history {*/
+        /*    height: 100%;*/
+        /*    overflow-y:scroll;*/
+        /*}*/
+    </style>
+</head>
+<body>
+    <header></header>
+    <main>
+        <aside>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </aside>
+        <section>
+            <article id="history">
+                <nav>
+                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div><div></div>
+                                    <div></div>
+                                    <div></div>
+                </nav>
+
+            </article>
+            <article id="edit">
+                <div>sadfasdf</div>
+                <div>asdf</div>
+                <div>asdf</div>
+            </article>
+        </section>
+<!--        <aside>-->
+<!--            <div>-->
+<!--            </div>-->
+<!--            <div></div>-->
+<!--        </aside>-->
+<!--        <article>-->
+<!--            <section id="history">-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div><div></div>-->
+<!--                <div></div>-->
+<!--                <div></div>-->
+<!--                <div></div><div></div>-->
+<!--            </section>-->
+<!--            <section id="edit"></section>-->
+<!--            <section id="status"></section>-->
+<!--        </article>-->
+    </main>
+<!--<footer></footer>-->
+</body>
+</html>

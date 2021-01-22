@@ -1,0 +1,57 @@
+<div class="">
+
+  <main>
+    <div class="row">
+      <aside class="col-xl-2 col-md-3 col-12">
+        <section class="chat-list">
+          <ul>
+            <li class="chat-name active">chat 1</li>
+            <li class="chat-name">chat 2</li>
+          </ul>
+        </section>
+      </aside>
+      <div class="current-chat col-xl-10 col-md-9 col-12">
+        <section class="chat-messages">
+          <ul>
+            <li>
+              <div class="message alert alert-dark" role="alert">
+                <strong>WsMessage 1!</strong> You successfully read this
+                important alert message.
+              </div>
+            </li>
+            <li>
+              <div class="message this-user-message alert alert-dark" role="alert">
+                <strong>WsMessage 2!</strong> You successfully read this
+                important alert message.
+              </div>
+            </li>
+            <li>
+              <div class="message alert alert-dark" role="alert">
+                <strong>WsMessage 3!</strong> You successfully read this
+                important alert message.
+              </div>
+            </li>
+          </ul>
+        </section>
+        <section class="message-editor">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">edit message:</span>
+            </div>
+            <textarea name="message" id="editor" class="form-control" aria-label="With textarea"></textarea>
+            <button type="button" class="btn btn-secondary" id="send">Send message</button>
+          </div>
+        </section>
+        <section class="chat-status">
+          <p id="status"></p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>2021</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+          crossorigin="anonymous"></script>
+</div>
