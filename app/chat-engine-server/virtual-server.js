@@ -50,10 +50,12 @@ class VirtualServer {
     console.log('try to send all clients', messageObject);
     const text = JSON.stringify(messageObject);
     this.clients.forEach(client => {
-      console.log('sending to client ', client);
+      console.log('sending to client ', client.user);
       if (client.user) {
         console.log('auth user ', client);
         client.connection.send(text);
+      } else {
+        console.log('no auth of user', client);
       }
     });
   }
