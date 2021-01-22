@@ -12,7 +12,7 @@
       ></b-form-textarea>
 
       <template #append>
-        <b-button variant="info" @click="send">send</b-button>
+        <b-button variant="info" @click="onSend">send</b-button>
       </template>
     </b-input-group>
   </section>
@@ -51,6 +51,9 @@ export default {
         this.$store.commit('updateUserStatus', this.chat);
         this.$store.state.chatClient.sendStatus(this.virtualServer, this.chat);
       }
+    },
+    onSend() {
+      if (this.newMessage) this.send();
     },
     async send() {
       const currentChat = this.chat.slice();

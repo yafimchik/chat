@@ -86,6 +86,9 @@ export default {
         this.show = true;
       });
     },
+    onSignIn() {
+      this.signIn();
+    },
     async signIn() {
       this.$store.commit('updateLinkStatus', true);
       if (!this.$store.state.chatClient) {
@@ -98,10 +101,17 @@ export default {
         return;
       }
 
-      const result = await this.$store.state.chatClient.login(
-        this.form.username,
-        this.form.password,
-      );
+      let result;
+      try {
+        result = await this.$store.state.chatClient.login(
+          this.form.username,
+          this.form.password,
+        );
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+
       if (!result) {
         // TODO LOGIN ERROR modal form
         return;
@@ -110,7 +120,14 @@ export default {
       this.$store.commit('saveToken', result.token);
       this.$store.commit('setVirtualServers', result.virtualServers);
       console.log('try to connect');
-      const connected = await this.$store.state.chatClient.connect();
+      let connected;
+      try {
+        connected = await this.$store.state.chatClient.connect();
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+
       if (!connected) {
         console.log('connect error');
         // TODO connection ERROR modal form
