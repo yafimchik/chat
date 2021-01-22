@@ -7,7 +7,7 @@ const ROUTES = [
     router: apiRouter,
   },
   {
-    path: '/app',
+    path: '/',
     router: spaRouter,
   },
 ];
