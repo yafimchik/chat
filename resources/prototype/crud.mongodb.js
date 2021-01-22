@@ -78,7 +78,7 @@ class CrudMongodb extends Crud {
 
     let result = await CrudMongodb.safeWrite(newRecord.save());
 
-    result = CrudMongodb.handleMongodbErrors(result);
+    if (!result || !result.error) return undefined;
 
     return result ? result.toObject() : result;
   }
