@@ -56,6 +56,7 @@ class AsyncSocket {
       });
       console.log('sending ', message);
       this.socket.send(message);
+      console.log('starting to listen ', message);
     });
   }
 

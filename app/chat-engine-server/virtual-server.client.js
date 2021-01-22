@@ -107,15 +107,18 @@ class VirtualServerClient {
   }
 
   async onTextMessage(messageObj) {
+    console.log('text', messageObj);
     const messageService = serviceFabric.create('message');
 
     const textMessage = { ...(messageObj.payload) };
 
     if (await messageService.create(textMessage)) {
+      console.log('save to db', messageObj);
       const answer = { ...messageObj };
       answer.payload.user = answer.payload.user.toString();
       this.virtualServer.broadcastMessage(answer);
     } else {
+      console.log('can not save to db', messageObj);
       const answer = {
         ...messageObj,
       };
