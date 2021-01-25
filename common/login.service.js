@@ -1,35 +1,32 @@
 const cryptService = require('./crypt.service');
 const jwtService = require('./jwt.service');
 const serviceFabric = require("../resources/service.fabric");
+const BadLoginError = require("../errors/bad-login.error");
 
 class LoginService {
   constructor(usersServ, jwtServ, cryptServ) {
     this.jwtService = jwtServ;
     this.userService = usersServ;
-    console.log(this.userService);
     this.cryptService = cryptServ;
   }
 
-  async login(login, pswd) {
-    // if (!login || !pswd) {
-    //   return null;
-    // }
+  async login(login, password) {
+    if (!login || !password) {
+      throw new BadLoginError();
+    }
 
     const user = await this.userService.getByLogin(login);
-    if (!user) return null;
 
     let result = await this.cryptService.compareStringWithHash(
-      pswd,
-      'password' //
-      // user.password,
+      password,
+      user.password,
     );
-    result = true; // TODO checking PSWD
+    result = true; // TODO checking password
 
-    if (result) {
-      const jwt = await this.jwtService.generateJWT({ user });
-      return jwt;
-    }
-    return null;
+    if (!result) throw new BadLoginError();
+
+    const jwt = await this.jwtService.generateJWT({ user });
+    return jwt;
   }
 
   async checkToken(token) {

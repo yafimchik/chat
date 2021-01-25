@@ -2,6 +2,7 @@ const Crud = require("./crud");
 const relationTypes = require("./relation.types");
 const relationActionTypes = require("./relation-action.types");
 const mongoose = require("mongoose");
+const BadMongoModelError = require("../../errors/bad-mongo-model.error");
 
 class MongodbRepository extends Crud {
   constructor(crud, Model, modelName, modelConfig, processedModels, fnCreateRepository) {
@@ -16,6 +17,7 @@ class MongodbRepository extends Crud {
 
     this.getAll = this.crud.getAll.bind(this.crud);
     this.getWhere = this.crud.getWhere.bind(this.crud);
+    this.getWhereByOrderLimitOffset = this.crud.getWhereByOrderLimitOffset.bind(this.crud);
     this.getById = this.crud.getById.bind(this.crud);
 
     Object.keys(this.crud).forEach(key => {
@@ -49,44 +51,67 @@ class MongodbRepository extends Crud {
   async deleteById(id) {
     if (!id) return false;
     if (typeof id !== 'string') id = id.toString();
+
     const { populatedProperties } = this.modelConfig;
+
     for (let property of populatedProperties) {
       if (this.processedModels.includes(property.modelName)) continue;
-      let relatedRepository = this.createRepository(property.modelName, this.processedModels.concat(this.modelName));
-      if (property.onDelete !== relationActionTypes.cascade && property.onDelete !== relationActionTypes.null) continue;
+
+      let relatedRepository = this.createRepository(
+        property.modelName,
+        this.processedModels.concat(this.modelName),
+      );
+
+      const isOnDeleteCascade = property.onDelete === relationActionTypes.cascade;
+      const isOnDeleteNull = property.onDelete === relationActionTypes.null;
+
+      if (!isOnDeleteCascade && !isOnDeleteNull) continue;
+
       const thisRecord = await this.getById(id, []);
 
-      if (property.onDelete === relationActionTypes.cascade) {
-        if (property.relation === relationTypes.oneToMany || property.relation === relationTypes.oneToOne) {
-          if (!property.relatedProperty) throw new Error(`wrong config of "${this.modelName}" MongoDb model`);
+      const isRelationOneToMany = property.relation === relationTypes.oneToMany;
+      const isRelationOneToOne = property.relation === relationTypes.oneToOne;
+      const isRelationManyToMany = property.relation === relationTypes.manyToMany;
+
+      if (isOnDeleteCascade) {
+        if (isRelationOneToMany || isRelationOneToOne) {
+          if (!property.relatedProperty) throw new BadMongoModelError(this.modelName);
           const condition = {[property.relatedProperty]: id};
           const idsToDelete = (await relatedRepository.getWhere(condition, [])).map(rec => rec._id);
           await relatedRepository.deleteMany(idsToDelete);
         }
-        if (property.relation === relationTypes.oneToOne && property.name) {
+        if (isRelationOneToOne && property.name) {
           await relatedRepository.deleteById(thisRecord[property.name]);
         }
       } else {
-        if (property.relation === relationTypes.oneToMany || property.relation === relationTypes.oneToOne) {
+        if (isRelationOneToMany || isRelationOneToOne) {
           if (!property.relatedProperty) continue;
+
           const condition = {[property.relatedProperty]: mongoose.Types.ObjectId(id)};
-          const relatedRecordIds = (await relatedRepository
-            .getWhere(condition, []))
-            .map(relatedRecord => relatedRecord._id.toString());
+
+          const relatedRecordIds = (await relatedRepository.getWhere(condition, []))
+            .map(relatedRecord => relatedRecord._id);
+
           const updateObject = {[property.relatedProperty]: null};
           await relatedRepository.updateMany(relatedRecordIds, updateObject);
         }
-        if (property.relation === relationTypes.manyToMany) {
+        if (isRelationManyToMany) {
           if (!property.relatedProperty) continue;
-          const relatedDocuments = (await relatedRepository.getAll([])).filter(record => {
-            if (!record[property.relatedProperty]) return false;
-            return (record[property.relatedProperty].some(objectId => objectId && objectId.toString() === id.toString()));
+
+          const relatedDocuments = (await relatedRepository.getAll([]))
+            .filter((record) => {
+              if (!record[property.relatedProperty]) return false;
+              return (record[property.relatedProperty].some(
+                (relatedId) => relatedId === id,
+              ));
           });
+
           await Promise.all(relatedDocuments.map(relatedDocument => {
-            const idToUpdate = relatedDocument._id.toString();
+            const idToUpdate = relatedDocument._id;
+
             const updateObject = {
               [property.relatedProperty]: relatedDocument[property.relatedProperty]
-                .filter(objectId => (objectId && objectId.toString() !== id)),
+                .filter((relatedId) => (relatedId !== id)),
             };
             return relatedRepository.update(idToUpdate, updateObject);
           }));

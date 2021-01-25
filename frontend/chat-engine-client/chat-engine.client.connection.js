@@ -99,8 +99,8 @@ class ChatEngineClientConnection {
     return this.socket.sendAsync({ chat, token: this.token, action: ACTIONS.getHistory });
   }
 
-  async getChats() {
-    return this.socket.sendAsync({ token: this.token, action: ACTIONS.getChats });
+  async getChats(offset) {
+    return this.socket.sendAsync({ offset, token: this.token, action: ACTIONS.getChats });
   }
 
   async getContactsOnline() {

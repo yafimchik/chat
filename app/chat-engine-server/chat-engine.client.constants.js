@@ -14,6 +14,15 @@ const ACTIONS = {
   userInfo: 'user-info'
 };
 
-module.exports = ACTIONS;
+const BROADCAST_ANSWERS = [
+  ACTIONS.text,
+  ACTIONS.status,
+  ACTIONS.getContactsOnline,
+];
+
+module.exports = {
+  ACTIONS,
+  BROADCAST_ANSWERS,
+};
 
 

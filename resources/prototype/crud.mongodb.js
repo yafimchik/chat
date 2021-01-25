@@ -1,7 +1,7 @@
 const BadRequestError = require('../../errors/bad-request.error');
 const Crud = require("./crud");
-const mongoose = require("mongoose");
 const relationTypes = require("./relation.types");
+const DatabaseError = require("../../errors/database.error");
 
 class CrudMongodb extends Crud {
   constructor({Model, properties, populatedProperties }, ModelsAll) {
@@ -27,16 +27,60 @@ class CrudMongodb extends Crud {
   }
 
   async getAll(populateProps) {
-    return this.getWhere(undefined, populateProps);
+    return this.getWhereByOrderLimitOffset(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      populateProps,
+    );
   }
 
   async getWhere(condition, populateProps) {
+    return this.getWhereByOrderLimitOffset(
+      condition,
+      undefined,
+      undefined,
+      undefined,
+      populateProps,
+    );
+  }
+
+  async getWhereByOrderLimitOffset(condition, order, limit, offset, populateProps) {
     const query = this.Model
-      .find(condition)
-      .select(this.props);
+      .find(condition);
+    if (order) {
+      query.order(order);
+    }
+    if (limit !== undefined) {
+      query.limit(limit);
+    }
+    if (offset !== undefined) {
+      query.skip(offset);
+    }
+    query.select(this.props);
+
     this.populateProps(query, populateProps);
 
-    return query.populate().lean().exec();
+    const result = await query.lean().exec();
+    return this.convertIdsToString(result);
+  }
+
+  convertIdsToString(record) {
+    const result = { ...record };
+    result._id = record.toString();
+    this.populatePropsArray.forEach((property) => {
+      const key = property.name;
+      if (!key) return;
+      if (!result[key]) return;
+      if (result[key] instanceof Array) {
+        result[key] = result[key].map((id) => id ? id.toString() : null);
+        result[key] = result[key].filter((id) => id);
+      } else {
+        result[key] = (result[key]._id) ? result[key]._id.toString() : result[key].toString();
+      }
+    });
+    return result;
   }
 
   async getById(id, populateProps) {
@@ -46,7 +90,8 @@ class CrudMongodb extends Crud {
 
     this.populateProps(query, populateProps);
 
-    return query.lean().exec();
+    const result = await query.lean().exec();
+    return this.convertIdsToString(result);
   }
 
   async populatePropertiesInObject(obj, populateProps) {
@@ -58,10 +103,12 @@ class CrudMongodb extends Crud {
       if (!prop.name) continue;
       if (!obj[prop.name]) continue;
       if (obj[prop.name] instanceof Array) {
-        result[prop.name] = await Promise.all(obj[prop.name].map(id => this.ModelsAll[prop.modelName].findById(id).exec()));
+        result[prop.name] = await Promise.all(obj[prop.name].map(
+          (id) => this.ModelsAll[prop.modelName].findById(id).exec()
+        ));
         result[prop.name] = result[prop.name].filter(item => item);
       } else {
-        result[prop.name] = (await this.ModelsAll[prop.modelName].findById(obj[prop.name]).exec());
+        result[prop.name] = await this.ModelsAll[prop.modelName].findById(obj[prop.name]).exec();
         if (!result[prop.name]) delete result[prop.name];
       }
     }
@@ -71,57 +118,52 @@ class CrudMongodb extends Crud {
 
   async create(obj, populateProps) {
     if (typeof obj !== 'object') {
-      return null;
+      throw new BadRequestError('bad entity to save in db');
     }
 
     const newRecord = new this.Model(await this.populatePropertiesInObject(obj, populateProps));
+    const result = await CrudMongodb.safeWrite(newRecord.save());
 
-    let result = await CrudMongodb.safeWrite(newRecord.save());
-
-    console.log('result ', result);
-
-    // if (!result || !result.error) return undefined;
-
-    return result ? result.toObject() : result;
+    return this.convertIdsToString(result.toObject());
   }
 
   async update(id, obj, populateProps) {
     const result = await CrudMongodb.safeWrite(
-      this.Model.findByIdAndUpdate(id, await this.populatePropertiesInObject(obj, populateProps)).lean().exec(),
+      this.Model.findByIdAndUpdate(
+        id,
+        await this.populatePropertiesInObject(obj, populateProps)
+      ).lean().exec(),
     );
-    return result;
+
+    return this.convertIdsToString(result.toObject());
   }
 
   async deleteById(id, populateProps) {
-    const result = await this.Model.findByIdAndDelete(id).exec();
-    return result;
+    return this.Model.findByIdAndDelete(id).exec();
   }
 
   static async safeWrite(action) {
     try {
       return await action;
     } catch (err) {
-      return err;
+      CrudMongodb.handleMongodbErrors(err);
     }
   }
 
   static handleMongodbErrors(result) {
     if (result && result.driver && result.code === 11000) {
-      // throw new BadRequestError(
-      //   `${Object.keys(result.keyValue)
-      //     .join(', ')
-      //     .toUpperCase()} must be unique`,
-      // );
-      return null;
+      throw new BadRequestError(
+        `${Object.keys(result.keyValue)
+          .join(', ')
+          .toUpperCase()} must be unique`
+      );
     }
     if (result.errors) {
-      // console.log(result);
-      // throw new BadRequestError(
-      //   result._message,
-      // );
-      return null;
+      throw new DatabaseError(
+        result._message,
+      );
     }
-    return result;
+    throw new DatabaseError();
   }
 }
 

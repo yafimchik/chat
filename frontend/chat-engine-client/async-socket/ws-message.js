@@ -14,13 +14,13 @@ class WsMessage {
     return JSON.stringify({ payload: this.payload, uuid: this.uuid });
   }
 
-  static clone(messageObj) {
-    return new WsMessage(messageObj.payload, messageObj.uuid);
+  static clone(messageObject) {
+    return new WsMessage(messageObject.payload, messageObject.uuid);
   }
 
   static fromString(string) {
-    const messageObj = JSON.parse(string);
-    return WsMessage.clone(messageObj);
+    const messageObject = JSON.parse(string);
+    return WsMessage.clone(messageObject);
   }
 
   static fromEvent(event) {

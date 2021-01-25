@@ -44,9 +44,9 @@ class ChatEngineClient {
     this.token = authResponse.token;
 
     this.servers = {};
-    authResponse.user.virtualServers.forEach((vs) => { // eslint-disable-next-line
+    authResponse.user.virtualServers.forEach((vs) => {
       const url = `${this.apiUrl}/wss/${vs._id}`
-        .replace('http', 'ws'); // eslint-disable-next-line
+        .replace('http', 'ws');
       const id = vs._id;
       this.servers[id] = {
         url,
@@ -156,10 +156,10 @@ class ChatEngineClient {
     return (await connection.getHistory(chat)).history;
   }
 
-  async getChats(virtualServer) {
+  async getChats(virtualServer, offset) {
     const connection = this.getClient(virtualServer);
     if (!connection) return [];
-    return (await connection.getChats()).chats;
+    return (await connection.getChats(offset)).chats;
   }
 
   async getContactsOnline(virtualServer) {
