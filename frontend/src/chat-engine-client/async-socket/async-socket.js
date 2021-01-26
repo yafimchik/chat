@@ -29,7 +29,6 @@ class AsyncSocket {
   }
 
   send(data) {
-    console.log('send ', data);
     // TODO sort data types for string and binary
     if (this.status === STATUSES.open) {
       const message = new WsMessage(data);
@@ -38,7 +37,6 @@ class AsyncSocket {
   }
 
   async sendAsync(data) {
-    console.log('async send ', data);
     // TODO sort data types for string and binary
     return new Promise((resolve) => {
       const message = new WsMessage(data);
@@ -91,7 +89,6 @@ class AsyncSocket {
 
   onMessage(event) {
     this.startTasks(event, EVENT_TYPES.message);
-
     const message = WsMessage.fromEvent(event);
     if (this.onMessageCallback) this.onMessageCallback(message.payload);
   }

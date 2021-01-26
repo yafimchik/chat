@@ -19,13 +19,11 @@ class WsMessage {
   }
 
   static fromString(string) {
-    console.log('from string ', string);
     const messageObject = JSON.parse(string);
     return WsMessage.clone(messageObject);
   }
 
   static fromEvent(event) {
-    console.log('from event', event.data);
     if (typeof event.data === 'string') {
       return WsMessage.fromString(event.data);
     }

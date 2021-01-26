@@ -44,7 +44,7 @@ class AnswerGenerator {
   }
 
   static isBroadcast(answer) {
-    return BROADCAST_ANSWERS.includes(answer);
+    return BROADCAST_ANSWERS.includes(answer.payload.action);
   }
 
   async fromMessage(messageObject) {
@@ -64,7 +64,8 @@ class AnswerGenerator {
       default:
         answer = WsMessage.clone(messageObject);
     }
-    console.log(answer);
+    console.log('answer ', answer);
+    // console.log('answer string ', answer.toString());
 
     return answer;
   }
@@ -73,10 +74,8 @@ class AnswerGenerator {
     const textMessage = { ...(messageObject.payload) };
     const date = new Date();
     textMessage.date = date;
-    const answer = {
-      ...messageObject,
-      date,
-    };
+    const answer = WsMessage.clone(messageObject);
+    answer.payload.date = date;
 
     const messageIsSavedInDB = await serviceFabric.create('message').create(textMessage);
 

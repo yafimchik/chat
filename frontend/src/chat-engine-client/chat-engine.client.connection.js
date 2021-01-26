@@ -50,7 +50,7 @@ class ChatEngineClientConnection {
 
   async onError(event) {
     this.errorsCount += 1;
-    console.log(event);
+    console.log('on error', event);
 
     // TODO test reconnection on multiple errors.
     let isConnectionBad;
@@ -96,7 +96,12 @@ class ChatEngineClientConnection {
   }
 
   async getHistory(chat, offset) {
-    return this.socket.sendAsync({ offset, chat, token: this.token, action: ACTIONS.getHistory });
+    return this.socket.sendAsync({
+      offset,
+      chat,
+      token: this.token,
+      action: ACTIONS.getHistory,
+    });
   }
 
   async getChats() {

@@ -86,16 +86,13 @@ export default {
         this.show = true;
       });
     },
-    onSignIn() {
-      this.signIn();
-    },
     async signIn() {
       this.$store.commit('updateLinkStatus', true);
       if (!this.$store.state.chatClient) {
         this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
       }
       if (!this.$store.state.chatClient) {
-        console.log('error');
+        console.log('error!');
         // TODO LOGIN ERROR modal form
         return;
       }
@@ -112,13 +109,14 @@ export default {
       }
 
       if (!result) {
+        console.log('error!');
         // TODO LOGIN ERROR modal form
         return;
       }
       this.$store.commit('saveUser', result.user);
       this.$store.commit('saveToken', result.token);
       this.$store.commit('setVirtualServers', result.virtualServers);
-      console.log('try to connect');
+
       let connected;
       try {
         connected = await this.$store.state.chatClient.connect();
@@ -132,7 +130,7 @@ export default {
         // TODO connection ERROR modal form
         return;
       }
-      console.log('try to redirect');
+
       await this.$router.push({ name: 'home' });
     },
     async goSignUp() {

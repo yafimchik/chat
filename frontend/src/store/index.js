@@ -23,6 +23,7 @@ const DEFAULT_STATE = () => ({
   currentChatId: undefined,
   unreadMessages: {},
   currentVirtualServerId: undefined,
+  historyLoaded: {},
 });
 
 export default new Vuex.Store({
@@ -34,17 +35,9 @@ export default new Vuex.Store({
 
       state.currentChatId = state.chats[virtualServerId].length // set first chat
         ? state.chats[virtualServerId][0]._id.slice() : undefined;
-
-      const unreadMessages = { ...state.unreadMessages }; // update unread messages count
-      unreadMessages[state.currentChatId] = 0;
-      state.unreadMessages = unreadMessages;
     },
     setCurrentChat(state, chatId) {
       state.currentChatId = chatId.slice();
-
-      const unreadMessages = { ...state.unreadMessages };
-      unreadMessages[chatId] = 0;
-      state.unreadMessages = unreadMessages;
     },
     updateDraft(state, draftText = '') {
       state.draft[state.currentChatId] = draftText.slice();
@@ -80,15 +73,19 @@ export default new Vuex.Store({
       state.chatHistory = [...chatHistory];
     },
     addChatHistoryChunk(state, chatHistory) {
-      const newChatHistory = state.chatHistory.concat(chatHistory);
-      state.chatHistory = newChatHistory;
+      if (!chatHistory.length) {
+        const historyLoaded = { ...state.historyLoaded };
+        historyLoaded[state.currentChatId] = true;
+        state.historyLoaded = historyLoaded;
+      } else {
+        const newChatHistory = state.chatHistory.concat(chatHistory);
+        state.chatHistory = newChatHistory;
+      }
     },
     addMessage(state, message) {
       const newHistory = [...state.chatHistory];
-      newHistory.push(message);
+      newHistory.unshift(message);
       state.chatHistory = newHistory;
-
-      if (message.chat === state.currentChatId) return;
 
       const unreadMessages = { ...state.unreadMessages };
       unreadMessages[message.chat] += 1;
@@ -98,6 +95,11 @@ export default new Vuex.Store({
       const newStatus = { ...state.status };
       newStatus[virtualServer] = status;
       state.status = { ...newStatus };
+    },
+    clearUnreadMessagesCount(state) {
+      const unreadMessages = { ...state.unreadMessages };
+      unreadMessages[state.currentChatId] = 0;
+      state.unreadMessages = unreadMessages;
     },
     updateContactsOnline(state, { virtualServer, contactsOnline }) {
       const newContactsOnline = { ...state.contactsOnline };
@@ -174,6 +176,9 @@ export default new Vuex.Store({
     },
     userById(state) {
       return (userId) => state.contacts.find((user) => user._id === userId);
+    },
+    isHistoryFull(state) {
+      return !!state.historyLoaded[state.currentChatId];
     },
   },
   actions: {

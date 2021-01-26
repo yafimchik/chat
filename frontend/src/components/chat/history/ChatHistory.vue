@@ -24,20 +24,28 @@ export default {
       scrollTop: this.historyHeight,
       userScrolling: false,
       userScrollingTimeout: undefined,
-      lazyUploadingDelay: false,
-      lazyUploadingTimeout: undefined,
+      fullHistoryLoaded: false,
+      previousHistorySize: null,
     };
   },
   computed: {
     historyHeight() {
-      const history = document.querySelector('div.chat-history__wrapper');
-      return history.scrollHeight + 10000;
+      return this.historyElement.scrollHeight + 10000;
     },
     currentChat() {
       return this.$store.state.currentChatId;
     },
     chatHistory() {
       return this.$store.getters.currentChatHistory;
+    },
+    isHistoryFull() {
+      return this.$store.getters.isHistoryFull;
+    },
+    historySize() {
+      return this.chatHistory.length;
+    },
+    historyElement() {
+      return document.querySelector('div.chat-history__wrapper');
     },
   },
   components: {
@@ -46,37 +54,41 @@ export default {
   methods: {
     scrollHistoryToEnd() {
       if (this.userScrolling) return;
-      console.log('history update scroll');
-      const history = document.querySelector('div.chat-history__wrapper');
-      history.scrollTop = this.historyHeight + 10000;
+      this.historyElement.children[this.historySize - 1].scrollIntoView();
+      // this.historyElement.scrollTop = this.historyHeight + 10000;
     },
     async onScroll() {
+      const unScrolledSize = this.historyElement.scrollHeight - this.historyElement.scrollTop;
+      if (unScrolledSize === this.historyElement.clientHeight) {
+        this.$store.commit('clearUnreadMessagesCount');
+      }
+      if (this.isHistoryFull) return;
       this.userScrolling = true;
       if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
       this.userScrollingTimeout = setTimeout(() => {
         this.userScrolling = false;
       }, scrollingDelay);
 
-      const history = document.querySelector('div.chat-history__wrapper');
-      if (history.scrollTop === 0) {
-        await this.lazyUploadHistory();
+      if (this.historyElement.scrollTop === 0) {
+        this.previousHistorySize = this.chatHistory.length;
+        await this.$store.dispatch('getHistoryChunk');
       }
-    },
-    async lazyUploadHistory() {
-      if (this.lazyUploadingDelay) return;
-      this.lazyUploadingDelay = true;
-      this.lazyUploadingTimeout = setTimeout(() => {
-        this.lazyUploadingDelay = false;
-      }, scrollingDelay);
-      await this.$store.dispatch('getHistoryChunk');
     },
   },
   updated() {
-    this.scrollHistoryToEnd();
+    const unScrolledSize = this.historyElement.scrollHeight - this.historyElement.scrollTop;
+    if (unScrolledSize === this.historyElement.clientHeight) {
+      this.$store.commit('clearUnreadMessagesCount');
+    }
+    if (this.previousHistorySize !== null) {
+      this.historyElement.children[this.historySize - this.previousHistorySize].scrollIntoView();
+      this.previousHistorySize = null;
+    } else {
+      this.scrollHistoryToEnd();
+    }
   },
   destroyed() {
     if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
-    if (this.lazyUploadingTimeout) clearTimeout(this.lazyUploadingTimeout);
   },
 };
 </script>
@@ -88,7 +100,8 @@ export default {
     .chat-history__wrapper {
       padding: 10px;
       position: absolute;
-      overflow-y:scroll;
+      scroll-behavior: smooth;
+      overflow-y: scroll;
     }
   }
 </style>

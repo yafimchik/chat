@@ -17,7 +17,6 @@ export default {
     },
     statusArray() {
       const statusArray = this.$store.getters.currentVirtualServerStatus;
-      console.log('status Array', statusArray);
       if (!statusArray) return [];
       return statusArray
         .filter((status) => status.value === this.chat && status.user !== this.user);

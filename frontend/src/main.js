@@ -5,7 +5,7 @@ import { BootstrapVue, IconsPlugin, SidebarPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import App from './App.vue';
-import './registerServiceWorker';
+// import './registerServiceWorker'; //PWA
 import router from './router';
 import store from './store';
 
