@@ -38,7 +38,6 @@ class MongodbRepositoryFabric {
   }
 
   getModel(name) {
-    console.log(name);
     return this.modelConfigs[name].Model;
   }
 }

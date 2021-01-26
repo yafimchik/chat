@@ -1,5 +1,5 @@
-const VirtualServer = require("./virtual-server");
-const serviceFabric = require("../../resources/service.fabric");
+const VirtualServer = require("./virtual-server/virtual-server");
+// const serviceFabric = require("../../resources/service.fabric");
 
 class ChatEngineServer {
   constructor(server) {

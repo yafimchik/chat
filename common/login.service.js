@@ -16,12 +16,14 @@ class LoginService {
     }
 
     const user = await this.userService.getByLogin(login);
+    console.log('user id type', typeof user._id);
+    console.log('user id', user._id);
 
-    let result = await this.cryptService.compareStringWithHash(
-      password,
-      user.password,
-    );
-    result = true; // TODO checking password
+    // let result = await this.cryptService.compareStringWithHash(
+    //   password,
+    //   user.password,
+    // );
+    let result = true; // TODO checking password
 
     if (!result) throw new BadLoginError();
 

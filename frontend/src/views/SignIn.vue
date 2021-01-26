@@ -96,7 +96,6 @@ export default {
       }
       if (!this.$store.state.chatClient) {
         console.log('error');
-        console.log(this.$store.state.chatClient);
         // TODO LOGIN ERROR modal form
         return;
       }

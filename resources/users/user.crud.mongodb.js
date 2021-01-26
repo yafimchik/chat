@@ -9,7 +9,7 @@ class UserCrudMongodb extends CrudMongodb {
       const query = this.Model
         .findOne({username})
       const user = await query.lean().exec();
-      return user;
+      return this.convertIdsToString(user);
     }
   }
 }

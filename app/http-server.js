@@ -9,7 +9,14 @@ const errorHandler = require("./middlewares/error-handler.middleware");
 const CHAT_ENGINE_CONSTANTS = require("./chat-engine-server/chat-engine.constants");
 
 class HttpServer {
-  constructor(connectionType = CHAT_ENGINE_CONSTANTS.CONNECTION_TYPES.http, keyPath, certPath, port = 80, routes, mongodbString) {
+  constructor(
+    connectionType = CHAT_ENGINE_CONSTANTS.CONNECTION_TYPES.http,
+    keyPath,
+    certPath,
+    port = 80,
+    routes,
+    mongodbString,
+  ) {
     this.connectionType = connectionType;
     this.initExpress(routes);
     this.keyPath = keyPath;
@@ -33,7 +40,6 @@ class HttpServer {
     this.expressApp = express();
     this.expressApp.use(express.json());
     this.expressApp.use(express.static(path.resolve(__dirname, '..', 'frontend', 'dist')));
-    console.log(path.resolve(__dirname, '..', 'frontend', 'dist'));
     this.expressApp.use(express.urlencoded({ extended: true }));
     this.expressApp.get('/', function(req, res) {
       res.redirect('/app');

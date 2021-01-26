@@ -8,17 +8,12 @@ class MessageService extends CrudService {
   }
 
   async getHistory(chat, offset = 0) {
-    const result = await this.repo.getWhereByOrderLimitOffset(
-      { chat },
-      { date: 'desc' },
-      CHAT_ENGINE_CONSTANTS.HISTORY_LIMIT,
-      offset,
-      [],
-    );
+    const result = await this.repo.getChatHistory(chat, offset);
 
-    if (!result) {
+    if (result === undefined) {
       throw new DatabaseError();
     }
+    return result;
   }
 }
 

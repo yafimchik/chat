@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 // import ChatData from './chat-data';
 // import ChatEngine from './chat-engine';
 // import UI from './ui';
-import ChatEngineClient from '../../chat-engine-client/chat-engine.client';
+import ChatEngineClient from '../chat-engine-client/chat-engine.client';
 
 Vue.use(Vuex);
 
@@ -60,7 +60,6 @@ export default new Vuex.Store({
     setVirtualServers(state, virtualServersArray) {
       const virtualServers = {};
       virtualServersArray.forEach((vs) => {
-        // eslint-disable-next-line
         virtualServers[vs._id] = { ...vs };
       });
       state.virtualServers = virtualServers;
@@ -79,6 +78,10 @@ export default new Vuex.Store({
     },
     updateChatHistory(state, chatHistory) {
       state.chatHistory = [...chatHistory];
+    },
+    addChatHistoryChunk(state, chatHistory) {
+      const newChatHistory = state.chatHistory.concat(chatHistory);
+      state.chatHistory = newChatHistory;
     },
     addMessage(state, message) {
       const newHistory = [...state.chatHistory];
@@ -102,11 +105,13 @@ export default new Vuex.Store({
       state.contactsOnline = newContactsOnline;
 
       let newContacts = Object.values(newContactsOnline).flat();
-      newContacts = newContacts
-        .filter((user, index) => newContacts.indexOf(user) === index);
+      newContacts = newContacts.filter(
+        (user, index) => newContacts.indexOf(user) === index,
+      );
 
-      newContacts = newContacts // eslint-disable-next-line
-        .filter((userOnline) => !state.contacts.some((user) => user._id === userOnline._id));
+      newContacts = newContacts.filter(
+        (userOnline) => !state.contacts.some((user) => user._id === userOnline._id),
+      );
       if (newContacts.length) {
         newContacts = state.contacts.concat(newContacts);
         state.contacts = [...newContacts];
@@ -150,10 +155,10 @@ export default new Vuex.Store({
       const curChatHistory = state.chatHistory
         .filter((message) => message.chat === state.currentChatId);
       if (!curChatHistory) return [];
-      return [...curChatHistory];
+      return curChatHistory.reverse();
     },
     usernameById(state) {
-      return (id) => { // eslint-disable-next-line
+      return (id) => {
         const user = state.contacts.find((contact) => contact._id === id);
         return user ? user.username : '';
       };
@@ -167,8 +172,8 @@ export default new Vuex.Store({
     currentDraft(state) {
       return state.draft[state.currentChatId];
     },
-    userById(state) { // eslint-disable-next-line
-      return (userId) => state.contacts.find(user => user._id === userId);
+    userById(state) {
+      return (userId) => state.contacts.find((user) => user._id === userId);
     },
   },
   actions: {
@@ -180,9 +185,6 @@ export default new Vuex.Store({
       const contacts = await state.chatClient.getContacts();
       if (contacts) commit('updateContacts', contacts);
 
-      // const contactsOnline = await state.chatClient.getContactsOnline();
-      // if (contactsOnline) commit('updateContactsOnline', contactsOnline);
-
       const chats = await state.chatClient.getAllChats();
       if (chats) {
         commit('updateChats', chats);
@@ -193,6 +195,17 @@ export default new Vuex.Store({
 
       if (Object.values(state.virtualServers).length) {
         commit('setCurrentVirtualServer', Object.keys(state.virtualServers)[0]);
+      }
+    },
+    async getHistoryChunk({ commit, state }) {
+      const historySize = state.chatHistory
+        .filter((message) => message.chat === state.currentChatId).length;
+      try {
+        const historyChunk = await state.chatClient
+          .getHistory(state.currentVirtualServerId, state.currentChatId, historySize);
+        if (historyChunk) commit('addChatHistoryChunk', historyChunk);
+      } catch (error) {
+        // TODO toast error
       }
     },
   },

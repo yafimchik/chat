@@ -30,6 +30,7 @@ class UserService extends CrudService {
 
   static deletePasswords(users) {
     if (!users) return users;
+    if (!users.length) return users;
     return users.map((user) => {
       const contact = { ...user };
       delete contact.password;

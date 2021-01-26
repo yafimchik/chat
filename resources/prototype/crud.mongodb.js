@@ -50,7 +50,7 @@ class CrudMongodb extends Crud {
     const query = this.Model
       .find(condition);
     if (order) {
-      query.order(order);
+      query.sort(order);
     }
     if (limit !== undefined) {
       query.limit(limit);
@@ -62,13 +62,14 @@ class CrudMongodb extends Crud {
 
     this.populateProps(query, populateProps);
 
-    const result = await query.lean().exec();
-    return this.convertIdsToString(result);
+    let result = await query.lean().exec();
+    if (result) result = result.map((record) => this.convertIdsToString(record));
+    return result;
   }
 
   convertIdsToString(record) {
     const result = { ...record };
-    result._id = record.toString();
+    result._id = record._id.toString();
     this.populatePropsArray.forEach((property) => {
       const key = property.name;
       if (!key) return;
