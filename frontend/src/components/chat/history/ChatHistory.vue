@@ -26,6 +26,7 @@ export default {
       userScrollingTimeout: undefined,
       fullHistoryLoaded: false,
       previousHistorySize: null,
+      autoScroll: false,
     };
   },
   computed: {
@@ -52,32 +53,38 @@ export default {
     appMessage: Message,
   },
   methods: {
+    isScrolledToEnd() {
+      const unScrolledSize = this.historyElement.scrollHeight - this.historyElement.scrollTop;
+      return unScrolledSize <= this.historyElement.clientHeight;
+    },
     scrollHistoryToEnd() {
       if (this.userScrolling) return;
       this.historyElement.children[this.historySize - 1].scrollIntoView();
-      // this.historyElement.scrollTop = this.historyHeight + 10000;
+      this.autoScroll = true;
     },
     async onScroll() {
-      const unScrolledSize = this.historyElement.scrollHeight - this.historyElement.scrollTop;
-      if (unScrolledSize === this.historyElement.clientHeight) {
+      if (this.isScrolledToEnd()) {
         this.$store.commit('clearUnreadMessagesCount');
       }
-      if (this.isHistoryFull) return;
-      this.userScrolling = true;
-      if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
-      this.userScrollingTimeout = setTimeout(() => {
-        this.userScrolling = false;
-      }, scrollingDelay);
 
-      if (this.historyElement.scrollTop === 0) {
-        this.previousHistorySize = this.chatHistory.length;
-        await this.$store.dispatch('getHistoryChunk');
+      if (!this.autoScroll) {
+        this.userScrolling = true;
+        if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
+        this.userScrollingTimeout = setTimeout(() => {
+          this.userScrolling = false;
+        }, scrollingDelay);
+
+        if (this.historyElement.scrollTop === 0 && !this.isHistoryFull) {
+          this.previousHistorySize = this.chatHistory.length;
+          await this.$store.dispatch('getHistoryChunk');
+        }
+      } else if (this.isScrolledToEnd()) {
+        this.autoScroll = false;
       }
     },
   },
   updated() {
-    const unScrolledSize = this.historyElement.scrollHeight - this.historyElement.scrollTop;
-    if (unScrolledSize === this.historyElement.clientHeight) {
+    if (this.isScrolledToEnd()) {
       this.$store.commit('clearUnreadMessagesCount');
     }
     if (this.previousHistorySize !== null) {

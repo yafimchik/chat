@@ -1,9 +1,9 @@
-import ClientError from './client.error';
+import ServerError from './server.error';
 
-export default class BadResponseError extends ClientError {
+export default class BadResponseError extends ServerError {
   constructor(
     message = 'Error on server!',
-    status = 401
+    status = 401,
   ) {
     super(message, status);
   }

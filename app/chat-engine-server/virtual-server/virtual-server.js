@@ -41,7 +41,6 @@ class VirtualServer {
   }
 
   broadcastMessage(messageObject) {
-    console.log('broadcast ', messageObject);
     this.clients.forEach(client => {
       if (client.user) client.sendToClient(messageObject);
     });
