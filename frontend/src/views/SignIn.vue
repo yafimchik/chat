@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import onUpdateCallback from '@/callbacks';
+import onUpdateCallback from '@/vue-utils/chat-callbacks';
 import { apiUrl } from '../configs/chat-connection.config';
 
 export default {

@@ -1,6 +1,11 @@
 import Vue from 'vue';
 import moment from 'moment';
-import { BootstrapVue, IconsPlugin, SidebarPlugin } from 'bootstrap-vue';
+import {
+  BootstrapVue,
+  IconsPlugin,
+  SidebarPlugin,
+  ToastPlugin,
+} from 'bootstrap-vue';
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -14,6 +19,7 @@ Vue.use(BootstrapVue);
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin);
 Vue.use(SidebarPlugin);
+Vue.use(ToastPlugin);
 
 Vue.config.productionTip = false;
 

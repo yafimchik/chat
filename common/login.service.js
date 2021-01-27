@@ -16,8 +16,6 @@ class LoginService {
     }
 
     const user = await this.userService.getByLogin(login);
-    console.log('user id type', typeof user._id);
-    console.log('user id', user._id);
 
     // let result = await this.cryptService.compareStringWithHash(
     //   password,

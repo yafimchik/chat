@@ -38,10 +38,10 @@ class AsyncSocket {
 
   async sendAsync(data) {
     // TODO sort data types for string and binary
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const message = new WsMessage(data);
       const watchDogTimeout = setTimeout(() => {
-        throw new TimeoutError();
+        reject(new TimeoutError());
       }, ASYNC_TIME_LIMIT);
       this.addTask((event, eventType) => {
         if (eventType === EVENT_TYPES.error) {
@@ -121,12 +121,17 @@ class AsyncSocket {
 
   connectAsync(url) {
     return new Promise((resolve) => {
+      const watchDogTimeout = setTimeout(() => {
+        resolve(false);
+      }, ASYNC_TIME_LIMIT);
       this.addTask((event, eventType) => {
         if (eventType === EVENT_TYPES.error) {
+          clearTimeout(watchDogTimeout);
           setTimeout(() => resolve(false), 0);
           return true;
         }
         if (eventType === EVENT_TYPES.open) {
+          clearTimeout(watchDogTimeout);
           setTimeout(() => resolve(true), 0);
           return true;
         }
@@ -142,12 +147,17 @@ class AsyncSocket {
 
   disconnectAsync(code, reason) {
     return new Promise((resolve) => {
+      const watchDogTimeout = setTimeout(() => {
+        resolve(true);
+      }, ASYNC_TIME_LIMIT);
       this.addTask((event, eventType) => {
         if (eventType === EVENT_TYPES.error) {
-          setTimeout(() => resolve(false), 0);
+          clearTimeout(watchDogTimeout);
+          setTimeout(() => resolve(true), 0);
           return true;
         }
         if (eventType === EVENT_TYPES.close) {
+          clearTimeout(watchDogTimeout);
           setTimeout(() => resolve(true), 0);
           return true;
         }

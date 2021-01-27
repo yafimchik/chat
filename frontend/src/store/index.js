@@ -24,6 +24,7 @@ const DEFAULT_STATE = () => ({
   unreadMessages: {},
   currentVirtualServerId: undefined,
   historyLoaded: {},
+  notification: undefined,
 });
 
 export default new Vuex.Store({
@@ -134,6 +135,9 @@ export default new Vuex.Store({
     updateLinkStatus(state, isOnline) {
       state.online = isOnline;
     },
+    postNotification(state, notification) {
+      state.notification = { ...notification };
+    },
   },
   getters: {
     usersOnline(state) {
@@ -187,9 +191,10 @@ export default new Vuex.Store({
       if (result) commit('setToDefaultsAll');
     },
     async initializeAllChatUI({ commit, state }) {
+      console.log('init chat');
       const contacts = await state.chatClient.getContacts();
       if (contacts) commit('updateContacts', contacts);
-
+      console.log('contacts ', contacts);
       const chats = await state.chatClient.getAllChats();
       if (chats) {
         commit('updateChats', chats);
@@ -197,10 +202,12 @@ export default new Vuex.Store({
         const chatHistory = await state.chatClient.getAllHistory(chatsArray);
         if (chatHistory) commit('updateChatHistory', chatHistory);
       }
+      console.log('chats history', chats);
 
       if (Object.values(state.virtualServers).length) {
         commit('setCurrentVirtualServer', Object.keys(state.virtualServers)[0]);
       }
+      console.log('current server');
     },
     async getHistoryChunk({ commit, state }) {
       const historySize = state.chatHistory

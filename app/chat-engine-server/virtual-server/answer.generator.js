@@ -64,9 +64,6 @@ class AnswerGenerator {
       default:
         answer = WsMessage.clone(messageObject);
     }
-    console.log('answer ', answer);
-    // console.log('answer string ', answer.toString());
-
     return answer;
   }
 

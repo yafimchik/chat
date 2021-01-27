@@ -13,3 +13,10 @@ export const ACTIONS = {
   status: 'status',
   userInfo: 'user-info',
 };
+
+export const CONNECTION_STATUSES = {
+  CLOSED: 'closed',
+  OPENING: 'opening',
+  OPENED: 'opened',
+  CLOSING: 'CLOSING',
+};

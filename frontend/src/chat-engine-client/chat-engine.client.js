@@ -1,4 +1,7 @@
+import ClientError from './errors/client.error';
 import ChatEngineClientConnection from './chat-engine.client.connection';
+import ServerError from './errors/server.error';
+import ConnectionError from './errors/connection.error';
 
 class ChatEngineClient {
   constructor(apiUrl, onUpdateCallback) {
@@ -11,30 +14,41 @@ class ChatEngineClient {
 
   async login(username) {
     const body = JSON.stringify({ username, password: 'sss' }); // MOCK PSWD
-    const response = await fetch(`${this.apiUrl}/users/login`, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-    const result = await response.json();
 
-    return this.initializeAuth(result);
+    try {
+      const response = await fetch(`${this.apiUrl}/users/login`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+      const result = await response.json();
+
+      return this.initializeAuth(result);
+    } catch (e) {
+      this.onException(e);
+      return undefined;
+    }
   }
 
   async register(username) {
     const body = JSON.stringify({ username, password: 'sss' }); // MOCK PSWD
-    const response = await fetch(`${this.apiUrl}/users/register`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'post',
-      body,
-    });
-    const result = await response.json();
+    try {
+      const response = await fetch(`${this.apiUrl}/users/register`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'post',
+        body,
+      });
+      const result = await response.json();
 
-    return this.initializeAuth(result);
+      return this.initializeAuth(result);
+    } catch (e) {
+      this.onException(e);
+      return undefined;
+    }
   }
 
   initializeAuth(authResponse) {
@@ -68,90 +82,154 @@ class ChatEngineClient {
   }
 
   async connect() {
-    const serversArray = Object.values(this.servers);
-    if (!serversArray.length) return false;
-    const results = await Promise.all(
-      serversArray.map((server) => server.client.connectToServer()),
-    );
-    return !results.some((result) => !result);
+    try {
+      const serversArray = Object.values(this.servers);
+      if (!serversArray.length) return false;
+      const results = await Promise.all(
+        serversArray.map((server) => server.client.connectToServer()),
+      );
+      return !results.some((result) => !result);
+    } catch (e) {
+      this.onException(e);
+      return false;
+    }
   }
 
   async disconnect() {
-    const serversArray = Object.values(this.servers);
-    await Promise.all(serversArray.map((server) => server.client.disconnect()));
+    try {
+      const serversArray = Object.values(this.servers);
+      const results = await Promise.all(serversArray.map((server) => server.client.disconnect()));
+      return results.some((result) => !result);
+    } catch (e) {
+      this.onException(e);
+      return false;
+    }
   }
 
   async getAllChats() {
-    const results = await Promise.all(this.virtualServers.map((vsId) => this.getChats(vsId)));
-    const chatsFromServer = results.flat();
-    const chats = {};
-    chatsFromServer.forEach((chat) => {
-      if (!chats[chat.virtualServer]) chats[chat.virtualServer] = [];
-      chats[chat.virtualServer].push(chat);
-    });
-    return chats;
+    try {
+      const results = await Promise.all(this.virtualServers.map((vsId) => this.getChats(vsId)));
+      const chatsFromServer = results.flat();
+      const chats = {};
+      chatsFromServer.forEach((chat) => {
+        if (!chats[chat.virtualServer]) chats[chat.virtualServer] = [];
+        chats[chat.virtualServer].push(chat);
+      });
+      return chats;
+    } catch (e) {
+      this.onException(e);
+      return {};
+    }
   }
 
   async getAllHistory(chatsArray) {
-    const result = await Promise.all(
-      chatsArray.map((chat) => this.getHistory(chat.virtualServer, chat._id, 0)));
-    if (!result) return undefined;
-
-    return result.flat();
+    try {
+      const result = await Promise.all(
+        chatsArray.map((chat) => this.getHistory(chat.virtualServer, chat._id, 0)),
+      );
+      if (!result) return [];
+      return result.flat();
+    } catch (e) {
+      this.onException(e);
+      return [];
+    }
   }
 
   onMessage(virtualServer, message) {
     if (message.error) {
-      this.onError(virtualServer, message);
+      const event = { ...message };
+      event.serverError = true;
+      this.onError(virtualServer, event);
       return;
     }
     const answer = { message, virtualServer };
-
-    this.onUpdateCallback(answer);
+    if (this.onUpdateCallback) this.onUpdateCallback(answer);
   }
 
   onError(virtualServer, event) {
-    console.log(this.apiUrl);
-    console.log('server ', virtualServer);
-    console.log('error ', event);
+    console.log('client error vs: ', virtualServer);
+    console.log('client error event: ', event);
+
+    if (this.onUpdateCallback) {
+      this.onUpdateCallback({
+        virtualServer,
+        message: {
+          error: event,
+        },
+      });
+    }
   }
 
   sendStatus(virtualServer, status) {
+    const result = undefined;
     const connection = this.getClient(virtualServer);
-    if (connection) return connection.sendStatus(status);
-    return undefined;
+    if (!connection) return result;
+    try {
+      return connection.sendStatus(status);
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
   }
 
   async sendToken(virtualServer) {
+    const result = undefined;
     const connection = this.getClient(virtualServer);
-    if (connection) return connection.sendToken();
-    return undefined;
+    if (!connection) return result;
+    try {
+      return await connection.sendToken();
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
   }
 
   async sendText(virtualServer, chat, text) {
+    const result = undefined;
     const connection = this.getClient(virtualServer);
-    if (connection) return connection.sendText(chat, text);
-    return undefined;
+    if (!connection) return result;
+    try {
+      return await connection.sendText(chat, text);
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
   }
 
   async getHistory(virtualServer, chat, offset) {
+    const result = [];
     const connection = this.getClient(virtualServer);
-    if (!connection) return [];
-    return (await connection.getHistory(chat, offset)).history;
+    if (!connection) return result;
+    try {
+      return (await connection.getHistory(chat, offset)).history;
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
   }
 
   async getChats(virtualServer) {
+    const result = [];
     const connection = this.getClient(virtualServer);
-    if (!connection) return [];
-    return (await connection.getChats()).chats;
+    if (!connection) return result;
+    try {
+      return (await connection.getChats()).chats;
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
   }
 
   async getContacts() {
-    const serversArray = Object.values(this.servers);
-    if (serversArray) {
-      return (await serversArray[0].client.getContacts()).contacts;
+    const result = [];
+    const connection = this.getRandomClient();
+    if (!connection) return result;
+    try {
+      return (await connection.getContacts()).contacts;
+    } catch (e) {
+      this.onException(e);
+      return result;
     }
-    return undefined;
   }
 
   // async sendInvitesToServer(virtualServer, contacts) {
@@ -186,6 +264,27 @@ class ChatEngineClient {
 
   getClient(virtualServer) {
     return this.servers[virtualServer].client;
+  }
+
+  getRandomClient() {
+    const serversArray = Object.values(this.servers);
+    if (!serversArray) return undefined;
+    const index = Math.round(Math.random() * (serversArray.length - 1));
+    return serversArray[index].client;
+  }
+
+  onException(error, fromClient = false) {
+    let clientError = error instanceof ClientError;
+    const serverError = error instanceof ServerError;
+    const connectionError = error instanceof ConnectionError;
+    if (fromClient) clientError = true;
+    const event = {
+      error,
+      clientError,
+      serverError,
+      connectionError,
+    };
+    this.onError(undefined, event);
   }
 }
 

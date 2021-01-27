@@ -53,17 +53,14 @@ export default {
       }
     },
     onSend() {
-      console.log('ON SEND');
       if (this.newMessage) this.send();
       else {
         console.log('nothing to send');
       }
     },
     async send() {
-      console.log('sending');
       const currentChat = this.chat.slice();
       let result;
-      console.log('try to send');
       try {
         result = await this.$store.state.chatClient
           .sendText(this.virtualServer, currentChat, this.newMessage);
