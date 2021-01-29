@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-// import ChatData from './chat-data';
-// import ChatEngine from './chat-engine';
-// import UI from './ui';
+import audioStore from '@/audio-recorder/store/audio.store';
 import ChatEngineClient from '../chat-engine-client/chat-engine.client';
 
 Vue.use(Vuex);
@@ -222,5 +220,6 @@ export default new Vuex.Store({
     },
   },
   modules: {
+    audio: audioStore,
   },
 });

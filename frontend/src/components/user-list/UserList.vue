@@ -1,7 +1,7 @@
 <template>
   <div class="chat-list">
     <b-list-group>
-      <app-user-name v-for="user in users" :user="user" :key="index"></app-user-name>
+      <app-user-name v-for="(user, index) in users" :user="user" :key="index"></app-user-name>
     </b-list-group>
   </div>
 </template>

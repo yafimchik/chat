@@ -97,7 +97,11 @@ class ChatEngineClientConnection {
   // }
 
   sendStatus(status) {
-    return this.socket.send({ status, token: this.token, action: ACTIONS.status });
+    return this.socket.send({
+      status,
+      token: this.token,
+      action: ACTIONS.status,
+    });
   }
 
   async sendToken() {

@@ -11,8 +11,10 @@ module.exports = {
     parser: 'babel-eslint',
   },
   rules: {
+    'no-param-reassign': 'warn',
+    'class-methods-use-this': 'warn',
     'import/prefer-default-export': 'warn',
-    'no-underscore-dangle': 'warn',
+    'no-underscore-dangle': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
   },

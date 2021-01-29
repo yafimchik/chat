@@ -10,17 +10,25 @@
         @input="onInput"
         @change="onBlur"
       ></b-form-textarea>
-
-      <template #append>
-        <b-button variant="info" @click="onSend">send</b-button>
-      </template>
+      <b-input-group-append>
+        <b-button variant="outline-info" @click="onSend">send</b-button>
+        <app-mic></app-mic>
+        <app-play></app-play>
+      </b-input-group-append>
     </b-input-group>
   </section>
 </template>
 
 <script>
+import Microphone from '@/audio-recorder/components/Microphone.vue';
+import Play from '@/audio-recorder/components/Play.vue';
+
 export default {
   name: 'NewMessage',
+  components: {
+    appMic: Microphone,
+    appPlay: Play,
+  },
   data() {
     return {
       newMessage: this.draft ? this.draft : '',

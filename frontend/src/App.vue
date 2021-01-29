@@ -8,7 +8,7 @@
 
 <script>
 import Header from './components/Header.vue';
-import Toaster from '@/components/Toaster.vue';
+import Toaster from './components/Toaster.vue';
 
 export default {
   components: {

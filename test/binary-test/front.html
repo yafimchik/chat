@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input class="file" type="file">
+<button class="connect" type="button">connect</button>
+<button class="send" type="button">send</button>
+</body>
+<script>
+    let ws;
+
+    function connect() {
+
+        ws = new WebSocket("ws://127.0.0.1");
+
+        // ws.binaryType = "arraybuffer";
+
+        ws.onopen = function() {
+            console.log('Connected.');
+        };
+
+        ws.onmessage = function(evt) {
+            console.log('message ', evt);
+        };
+
+        ws.onclose = function() {
+            console.log('Connection is closed...');
+        };
+
+        ws.onerror = function(e) {
+            console.log('error ', e.msg);
+        }
+
+    }
+
+    function sendFile() {
+        const files = document.querySelector('input.file').files;
+        console.log(files);
+
+        const reader = new FileReader();
+
+        let rawData; // = new ArrayBuffer();
+
+        reader.loadend = function() {
+            console.log('load ended');
+        }
+
+        reader.onload = function(e) {
+            console.log('load... successfull');
+            rawData = e.target.result;
+
+            ws.send(rawData);
+
+            console.log("the File has been transferred.")
+        }
+
+        reader.readAsArrayBuffer(files[0]);
+    }
+
+    const buttonConnect = document.querySelector('button.connect');
+    buttonConnect.addEventListener('click', connect);
+
+    const buttonSend = document.querySelector('button.send');
+    buttonSend.addEventListener('click', sendFile);
+
+
+
+
+    const myAudio = document.querySelector('audio');
+
+    const magResponseOutput = new Float32Array(5);
+    const phaseResponseOutput = new Float32Array(5);
+    // getUserMedia block - grab stream
+    // put it into a MediaStreamAudioSourceNode
+    // also output the visuals into a video element
+    if (navigator.mediaDevices) {
+        console.log('getUserMedia supported.');
+        navigator.mediaDevices.getUserMedia ({ audio: true })
+            .then(function(stream) {
+                // Create a MediaStreamAudioSourceNode
+                // Feed the HTMLMediaElement into it
+                const audioCtx = new AudioContext();
+                const source = audioCtx.createMediaStreamSource(stream);
+            })
+            .catch(function(err) {
+                console.log('The following gUM error occured: ' + err);
+            });
+    } else {
+        console.log('getUserMedia not supported on your browser!');
+    }
+
+
+
+
+</script>
+</html>
