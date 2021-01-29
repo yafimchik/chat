@@ -69,14 +69,44 @@ class AnswerGenerator {
 
   async fromTextMessage(messageObject) {
     const textMessage = { ...(messageObject.payload) };
-    const date = new Date();
-    textMessage.date = date;
+    textMessage.date = new Date();
     const answer = WsMessage.clone(messageObject);
-    answer.payload.date = date;
 
-    const messageIsSavedInDB = await serviceFabric.create('message').create(textMessage);
+    let { audios } = textMessage;
+    let { files } = textMessage;
+    if (textMessage.audios) delete textMessage.audios;
+    if (textMessage.files) delete textMessage.files;
 
-    if (messageIsSavedInDB) {
+    const messageSavedInDB = await serviceFabric.create('message').create(textMessage);
+
+    if (messageSavedInDB) {
+      if (audios) {
+        // TODO saving audios
+        audios = audios.forEach((record) => record.message = messageSavedInDB._id);
+        const audiosSavedInDB = await serviceFabric.create('audio').createMany(audios);
+        audios = undefined;
+        if (audiosSavedInDB) audios = audiosSavedInDB.map((audioRecord) => ({
+          _id: audioRecord._id,
+          message: audioRecord.message,
+          size: audioRecord.audio.size,
+          type: audioRecord.type,
+        }));
+        textMessage.audios = audios;
+      }
+      if (files) {
+        // TODO saving files
+        files = files.forEach((record) => record.message = messageSavedInDB._id);
+        const filesSavedInDB = await serviceFabric.create('file').createMany(files);
+        files = undefined;
+        if (filesSavedInDB) files = filesSavedInDB.map((fileRecord) => ({
+          _id: fileRecord._id,
+          message: fileRecord.message,
+          size: fileRecord.file.size,
+          filename: fileRecord.filename,
+        }));
+        textMessage.files = files;
+      }
+      answer.payload = textMessage;
       return answer;
     } else {
       throw new DatabaseError('Message was not saved');

@@ -4,9 +4,9 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const ChatEngine = require("./chat-engine-server/chat-engine.server");
-const errorHandler = require("./middlewares/error-handler.middleware");
-const CHAT_ENGINE_CONSTANTS = require("./chat-engine-server/chat-engine.constants");
+const ChatEngine = require('./chat-engine-server/chat-engine.server');
+const errorHandler = require('./middlewares/error-handler.middleware');
+const CHAT_ENGINE_CONSTANTS = require('./chat-engine-server/chat-engine.constants');
 
 class HttpServer {
   constructor(

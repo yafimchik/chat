@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const chatModelConfig = require("../chats/chat.model");
-const userModelConfig = require("../users/user.model");
 const relations = require("../prototype/relation.types");
 const relationActionTypes = require("../prototype/relation-action.types");
 

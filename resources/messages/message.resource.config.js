@@ -1,6 +1,6 @@
-const MessageCrudMongodb = require("./message.crud.mongodb");
-const messageModelConfig = require("./message.model");
-const MessageService = require("./message.service");
+const MessageCrudMongodb = require('./message.crud.mongodb');
+const messageModelConfig = require('./message.model');
+const MessageService = require('./message.service');
 
 const messageResourceConfig = {
   modelConfig: messageModelConfig,

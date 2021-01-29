@@ -1,6 +1,6 @@
-const CrudMongodb = require("../prototype/crud.mongodb");
-const mongoose = require("mongoose");
-const CHAT_ENGINE_CONSTANTS = require("../../app/chat-engine-server/chat-engine.constants");
+const CrudMongodb = require('../prototype/crud.mongodb');
+const mongoose = require('mongoose');
+const CHAT_ENGINE_CONSTANTS = require('../../app/chat-engine-server/chat-engine.constants');
 
 class MessageCrudMongodb extends CrudMongodb {
   constructor(...props) {

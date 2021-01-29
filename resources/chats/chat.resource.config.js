@@ -1,6 +1,6 @@
-const chatModelConfig = require("./chat.model");
-const ChatCrudMongoDb = require("./chat.crud.mongodb");
-const ChatService = require("./chat.service");
+const chatModelConfig = require('./chat.model');
+const ChatCrudMongoDb = require('./chat.crud.mongodb');
+const ChatService = require('./chat.service');
 
 const chatResourceConfig = {
   modelConfig: chatModelConfig,
