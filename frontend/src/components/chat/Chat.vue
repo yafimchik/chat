@@ -8,7 +8,7 @@
 
 <script>
 import ChatHistory from '@/components/chat/history/ChatHistory.vue';
-import NewMessage from '@/components/chat/NewMessage.vue';
+import NewMessage from '@/components/chat/new-message/NewMessage.vue';
 import Status from '@/components/chat/Status.vue';
 
 export default {

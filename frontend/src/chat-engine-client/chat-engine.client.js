@@ -196,6 +196,18 @@ class ChatEngineClient {
     }
   }
 
+  async sendFullMessage(virtualServer, chat, messageObject) {
+    const result = undefined;
+    const connection = this.getClient(virtualServer);
+    if (!connection) return result;
+    try {
+      return await connection.sendFullMessage(chat, messageObject);
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
+  }
+
   async getHistory(virtualServer, chat, offset) {
     const result = [];
     const connection = this.getClient(virtualServer);

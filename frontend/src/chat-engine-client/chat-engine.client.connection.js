@@ -1,5 +1,6 @@
 import AsyncSocket from './async-socket/async-socket';
 import { ACTIONS, CONNECTION_STATUSES } from './chat-engine.client.constants';
+import SendMessageError from './errors/send.message.error';
 
 class ChatEngineClientConnection {
   constructor(
@@ -91,11 +92,6 @@ class ChatEngineClientConnection {
     await this.onError(event);
   }
 
-  // TODO AFTER sending files
-  // async sendFile(image, { virtualServer, chat }) {
-  //   const startbin
-  // }
-
   sendStatus(status) {
     return this.socket.send({
       status,
@@ -114,6 +110,74 @@ class ChatEngineClientConnection {
       chat,
       token: this.token,
       action: ACTIONS.text,
+    });
+  }
+
+  async sendFullMessage(chat, messageObject) {
+    if (!messageObject.audio && !messageObject.files) {
+      return this.sendText(chat, messageObject.text);
+    }
+    const message = await this.sendMessageHeader(chat, messageObject);
+    if (message.error) {
+      console.debug(message.error);
+      throw new SendMessageError();
+    }
+    if (messageObject.audio) {
+      await this.sendAudio(messageObject.audio);
+    }
+    if (messageObject.files) {
+      const tasksChain = messageObject.files
+        .reduce((acc, file) => acc.then(this.sendFile(file)), Promise.resolve());
+
+      await tasksChain;
+      // for (let file of messageObject.files) {
+      //   await this.sendFile(file);
+      // }
+    }
+    return this.sendMessageFooter(chat, messageObject);
+  }
+
+  async sendFile(fileRecord) {
+    const info = { ...fileRecord };
+    delete info.file;
+    return this.sendBinary(info, fileRecord.file, ACTIONS.fileInfo);
+  }
+
+  async sendAudio(audioRecord) {
+    const info = { ...audioRecord };
+    delete info.audio;
+    return this.sendBinary(info, audioRecord.audio);
+  }
+
+  async sendBinary(info, data, action = ACTIONS.audioInfo) {
+    const infoResult = await this.sendBinaryInfo(info, action);
+    if (infoResult.error) throw new SendMessageError();
+    const binaryResult = await this.socket.sendBinaryAsync(data);
+    if (binaryResult.error) throw new SendMessageError();
+    return binaryResult;
+  }
+
+  async sendBinaryInfo(binaryInfo, action = ACTIONS.audioInfo) {
+    return this.socket.sendAsync({
+      binaryInfo,
+      token: this.token,
+      action,
+    });
+  }
+
+  async sendMessageHeader(chat, messageObject) {
+    return this.socket.sendAsync({
+      message: messageObject,
+      chat,
+      token: this.token,
+      action: ACTIONS.messageHeader,
+    });
+  }
+
+  async sendMessageFooter() {
+    return this.socket.sendAsync({
+      token: this.token,
+      action: ACTIONS.messageFooter,
     });
   }
 

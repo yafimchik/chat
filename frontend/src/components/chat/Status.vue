@@ -32,10 +32,10 @@ export default {
       return `${names.join(', ')} ${many ? 'are writing' : 'is writing'} now. . .`;
     },
     chat() {
-      return this.$store.state.currentChatId;
+      return this.$store.state.chatData.currentChatId;
     },
     user() { // eslint-disable-next-line
-      return this.$store.state.user._id;
+      return this.$store.state.chatData.user._id;
     },
   },
 };

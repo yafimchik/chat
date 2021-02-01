@@ -1,4 +1,4 @@
-import { ASYNC_TIME_LIMIT, EVENT_TYPES, STATUSES } from './socket-constants';
+import {ASYNC_BINARY_TIME_LIMIT, ASYNC_TIME_LIMIT, EVENT_TYPES, STATUSES} from './socket-constants';
 import WsMessage from './ws-message';
 import TimeoutError from '../errors/timeout.error';
 
@@ -29,11 +29,35 @@ class AsyncSocket {
   }
 
   send(data) {
-    // TODO sort data types for string and binary
     if (this.status === STATUSES.open) {
       const message = new WsMessage(data);
       this.socket.send(message);
     } else throw new Error('connection is not opened!');
+  }
+
+  async sendBinaryAsync(data) {
+    return new Promise((resolve, reject) => {
+      const watchDogTimeout = setTimeout(() => {
+        reject(new TimeoutError());
+      }, ASYNC_BINARY_TIME_LIMIT);
+      this.addTask((event, eventType) => {
+        if (eventType === EVENT_TYPES.error) {
+          clearTimeout(watchDogTimeout);
+          setTimeout(() => resolve(null), 0);
+          return true;
+        }
+        if (eventType === EVENT_TYPES.message) {
+          if (typeof event.data !== 'string') return false;
+          const answer = WsMessage.fromEvent(event);
+          if (!answer.binarySent) return false;
+          clearTimeout(watchDogTimeout);
+          setTimeout(() => resolve(answer.payload), 0);
+          return true;
+        }
+        return false;
+      });
+      this.socket.send(data);
+    });
   }
 
   async sendAsync(data) {

@@ -1,11 +1,12 @@
 const audioRouter = require('express').Router();
 const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
-const { hasToken } = require('../../app/middlewares/auth.middleware');
 const mime = require('mime-types');
+const BadPermissionError = require('../../errors/bad-permission.error');
+const { verifyToken } = require('../../app/middlewares/auth.middleware');
 
 audioRouter.route('/:id').post(
-  asyncHandler(hasToken),
+  asyncHandler(verifyToken),
   asyncHandler(
     async (req, res, next) => {
       const { id } = req.params;
@@ -13,14 +14,10 @@ audioRouter.route('/:id').post(
 
       const audioRecord = await serviceFabric.create('audio').getById(id);
 
-      // TODO user chat security
-      /*
-      * get user virtualServers.
-      * get chats of all servers.
-      * get message of audio
-      * check chat in chat-list
-      * TODO file_length, content_type ???
-      */
+      const message = await serviceFabric.create('message').getById(audioRecord.message);
+      const chat = await serviceFabric.create('chat').getById(message.chat);
+      if (!req.user.virtualServers.includes(chat.virtualServer)) throw new BadPermissionError();
+
       const type = audioRecord.type;
       let contentType = mime.lookup(type);
       if (!contentType) contentType = 'audio/mpeg';

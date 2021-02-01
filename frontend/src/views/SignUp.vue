@@ -65,6 +65,11 @@ export default {
       show: true,
     };
   },
+  computed: {
+    chatClient() {
+      return this.$store.state.chatEngine.chatClient;
+    },
+  },
   methods: {
     async goSignIn() {
       await this.$router.push({ name: 'signIn' });
@@ -85,15 +90,15 @@ export default {
       });
     },
     async signUp() {
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
       }
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         // TODO LOGIN ERROR modal form
         console.log('chat client error');
         return;
       }
-      const result = await this.$store.state.chatClient.register(
+      const result = await this.chatClient.register(
         this.form.username,
         this.form.password,
       );
@@ -106,7 +111,7 @@ export default {
       this.$store.commit('saveToken', result.token);
       this.$store.commit('setVirtualServers', result.virtualServers);
 
-      const connected = await this.$store.state.chatClient.connect();
+      const connected = await this.chatClient.connect();
       if (!connected) {
         console.log('connection error');
         // TODO connection ERROR modal form

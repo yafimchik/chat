@@ -2,8 +2,8 @@ const VirtualServerClient = require("./virtual-server.client");
 const { PING_TIMEOUT } = require("../chat-engine.constants");
 const { v4: uuidV4 } = require('uuid');
 const WebSocket = require('ws');
-const serviceFabric = require("../../../resources/service.fabric");
-const AnswerGenerator = require("./answer.generator");
+const serviceFabric = require('../../../resources/service.fabric');
+const AnswerGeneratorServer = require('./answer.generator.server');
 
 class VirtualServer {
   constructor(virtualServerId = uuidV4()) {
@@ -15,7 +15,7 @@ class VirtualServer {
     this.pingTimeout = PING_TIMEOUT;
     this.clients = [];
     this.startPingClientsInterval = undefined;
-    this.answerGenerator = new AnswerGenerator(this.id);
+    this.answerGenerator = new AnswerGeneratorServer(this.id);
   }
 
   ping() {

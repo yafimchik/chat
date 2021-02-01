@@ -67,7 +67,7 @@ export default {
   },
   computed: {
     chatClient() {
-      return this.$store.state.online;
+      return this.$store.state.chatEngine.chatClient;
     },
   },
   methods: {
@@ -88,10 +88,10 @@ export default {
     },
     async signIn() {
       this.$store.commit('updateLinkStatus', true);
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
       }
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         console.log('error!');
         // TODO LOGIN ERROR modal form
         return;
@@ -99,7 +99,7 @@ export default {
 
       let result;
       try {
-        result = await this.$store.state.chatClient.login(
+        result = await this.chatClient.login(
           this.form.username,
           this.form.password,
         );
@@ -119,7 +119,7 @@ export default {
 
       let connected;
       try {
-        connected = await this.$store.state.chatClient.connect();
+        connected = await this.chatClient.connect();
       } catch (e) {
         console.log(e);
         return;

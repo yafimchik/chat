@@ -1,11 +1,11 @@
 const fileRouter = require('express').Router();
 const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
-const { hasToken } = require('../../app/middlewares/auth.middleware');
+const { verifyToken } = require('../../app/middlewares/auth.middleware');
 const mime = require('mime-types');
 
 fileRouter.route('/:id').post(
-  asyncHandler(hasToken),
+  asyncHandler(verifyToken),
   asyncHandler(
     async (req, res) => {
       const { id } = req.params;
@@ -13,14 +13,9 @@ fileRouter.route('/:id').post(
 
       const fileRecord = await serviceFabric.create('file').getById(id);
 
-      // TODO user chat security
-      /*
-      * get user virtualServers.
-      * get chats of all servers.
-      * get message of audio
-      * check chat in chat-list
-      * TODO file_length, content_type ???
-      */
+      const message = await serviceFabric.create('message').getById(fileRecord.message);
+      const chat = await serviceFabric.create('chat').getById(message.chat);
+      if (!req.user.virtualServers.includes(chat.virtualServer)) throw new BadPermissionError();
 
       let contentType = mime.lookup(fileRecord.filename);
       if (!contentType) contentType = 'application/octet-stream';

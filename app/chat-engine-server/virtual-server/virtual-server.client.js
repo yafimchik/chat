@@ -1,6 +1,6 @@
 const BadTokenError = require('../../../errors/bad-token.error');
 const BadPermissionError = require('../../../errors/bad-permission.error');
-const AnswerGenerator = require('./answer.generator');
+const AnswerGeneratorClient = require('./answer.generator.client');
 const serviceFabric = require('../../../resources/service.fabric');
 const loginService = require('../../../common/login.service');
 const WsMessage = require('./ws-message');
@@ -10,6 +10,7 @@ class VirtualServerClient {
     this.connection = wsConnection;
     this.user = undefined;
     this.virtualServer = virtualServer;
+    this.answerGenerator = this.virtualServer.answerGenerator.createClient();
     this.isAlive = true;
     this.initConnection();
   }
@@ -25,8 +26,19 @@ class VirtualServerClient {
     this.isAlive = !!this.user;
   }
 
+  onBinaryMessage(data) {
+    try {
+      this.sendToClient(this.answerGenerator.fromBinary(data));
+    } catch (error) {
+      this.sendErrorToClient(new WsMessage({}, undefined, true), error);
+    }
+  }
+
   async onMessage(message) {
-    if (typeof message !== 'string') return; // TODO  AFTER processing of arrayBuffer
+    if (typeof message !== 'string') {
+      this.onBinaryMessage(message);
+      return;
+    }
 
     const messageObject = WsMessage.fromString(message);
     const token = messageObject.payload.token;
@@ -48,9 +60,9 @@ class VirtualServerClient {
         await this.virtualServer.broadcastContactsOnline();
       }
 
-      const answer = await this.virtualServer.answerGenerator.fromMessage(messageObject);
+      const answer = await this.answerGenerator.fromMessage(messageObject);
 
-      if (AnswerGenerator.isBroadcast(answer)) {
+      if (AnswerGeneratorClient.isBroadcast(answer)) {
         this.virtualServer.broadcastMessage(answer);
       } else {
         this.sendToClient(answer);

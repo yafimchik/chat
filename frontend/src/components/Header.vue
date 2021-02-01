@@ -60,7 +60,7 @@ export default {
       return this.$store.getters.isLoggedIn;
     },
     userName() {
-      return this.isLoggedIn ? this.$store.state.user.username : undefined;
+      return this.isLoggedIn ? this.$store.state.chatData.user.username : undefined;
     },
     userButtonTitle() {
       return this.userName ? this.userName : 'user';

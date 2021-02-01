@@ -1,17 +1,16 @@
 const ACTIONS = {
-  // checkLink: 'check-link',
-  // broadcast: 'broadcast',
   text: 'text',
+  messageHeader: 'message-header',
+  audioInfo: 'audio-info',
+  fileInfo: 'file-info',
+  binaryOk: 'binary-ok',
+  messageFooter: 'message-footer',
   getHistory: 'get-history',
   getChats: 'get-chats',
   getContacts: 'get-contacts',
   getContactsOnline: 'get-contacts-online',
-  // invite: 'invite',
-  // friendshipInvite: 'friendship-invite',
-  // confirmInvite: 'confirmInvite',
-  // leaveServer: 'leave-server',
   status: 'status',
-  userInfo: 'user-info'
+  userInfo: 'user-info',
 };
 
 const BROADCAST_ANSWERS = [

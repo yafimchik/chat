@@ -32,7 +32,9 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$refs);
+  },
+  beforeDestroy() {
+    this.stop();
   },
   computed: {
     audioSource() {
@@ -69,14 +71,20 @@ export default {
       }
 
       if (this.isPlaying) {
-        this.$refs.player.load();
-        this.$store.commit('setPlayerState', false);
+        this.stop();
       } else {
         setTimeout(() => {
-          this.$store.commit('setPlayerState', true);
-          this.$refs.player.play();
+          this.play();
         }, 0);
       }
+    },
+    play() {
+      this.$refs.player.load();
+      this.$store.commit('setPlayerState', false);
+    },
+    stop() {
+      this.$store.commit('setPlayerState', true);
+      this.$refs.player.play();
     },
     _resetProgress() {
       if (this.isPlaying) {

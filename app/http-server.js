@@ -70,7 +70,7 @@ class HttpServer {
 
     this.server.listen(port, err => {
       if (err) {
-        console.log('Well, this didn\'t work...');
+        console.log(`Well, this didn't work...`);
         process.exit();
       }
       this.chatEngine = new ChatEngine(this.server);

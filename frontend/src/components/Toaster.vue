@@ -9,7 +9,7 @@ export default {
   },
   computed: {
     notification() {
-      return this.$store.state.notification;
+      return this.$store.state.ui.notification;
     },
   },
   watch: {

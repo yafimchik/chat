@@ -11,6 +11,7 @@ const modelType = {
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
   chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat' },
   date: Date,
+  attached: { type: Boolean, default: false },
 };
 
 const modelSchema = new mongoose.Schema(modelType, { id: false });

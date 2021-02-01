@@ -1,15 +1,15 @@
 const ServerError = require('../../errors/server-error.error');
 
 // eslint-disable-next-line no-unused-vars
-function errorHandler(err, req, res, next) {
-  if (err instanceof ServerError) {
-    res.status(err.responseStatus).json({ message: err.shortMsg });
-    return;
+function errorHandler(error, req, res, next) {
+  if (error instanceof ServerError) {
+    res.status(error.responseStatus);
+    res.status(error.responseStatus).json({ error });
+  } else {
+    res.status(500);
+    console.error(error);
+    res.status(error.responseStatus).json({ error: new ServerError() });
   }
-  console.error(err);
-  res.status(500).json({
-    message: 'Internal Server Error',
-  });
 }
 
 module.exports = errorHandler;

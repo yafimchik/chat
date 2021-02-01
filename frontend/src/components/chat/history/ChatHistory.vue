@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import Message from '@/components/chat/history/Message.vue';
+import Message from '@/components/chat/history/message/Message.vue';
 import { scrollingDelay } from '@/configs/chat-connection.config';
 
 export default {
@@ -34,7 +34,7 @@ export default {
       return this.historyElement.scrollHeight + 10000;
     },
     currentChat() {
-      return this.$store.state.currentChatId;
+      return this.$store.state.chatData.currentChatId;
     },
     chatHistory() {
       return this.$store.getters.currentChatHistory;
