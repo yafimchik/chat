@@ -16,6 +16,15 @@ class CrudMongodb extends Crud {
     return this.propsArray.join(' ');
   }
 
+  getSelectors(filterProps) {
+    let select = this.propsArray;
+    if (filterProps) {
+      select = select.filter((prop) => !filterProps.some((filter) => filter === prop));
+    }
+    select = select.join(' ');
+    return select;
+  }
+
   populateProps(query, populateProps) {
     const populate = (populateProps !== undefined) ? populateProps : this.populatePropsArray;
     if (populate) {
@@ -26,27 +35,29 @@ class CrudMongodb extends Crud {
     return query;
   }
 
-  async getAll(populateProps) {
+  async getAll(populateProps, filterProps) {
     return this.getWhereByOrderLimitOffset(
       undefined,
       undefined,
       undefined,
       undefined,
       populateProps,
+      filterProps,
     );
   }
 
-  async getWhere(condition, populateProps) {
+  async getWhere(condition, populateProps, filterProps) {
     return this.getWhereByOrderLimitOffset(
       condition,
       undefined,
       undefined,
       undefined,
       populateProps,
+      filterProps,
     );
   }
 
-  async getWhereByOrderLimitOffset(condition, order, limit, offset, populateProps) {
+  async getWhereByOrderLimitOffset(condition, order, limit, offset, populateProps, filterProps) {
     const query = this.Model
       .find(condition);
     if (order) {
@@ -58,7 +69,8 @@ class CrudMongodb extends Crud {
     if (offset !== undefined) {
       query.skip(offset);
     }
-    query.select(this.props);
+
+    query.select(this.getSelectors(filterProps));
 
     this.populateProps(query, populateProps);
 
@@ -84,10 +96,11 @@ class CrudMongodb extends Crud {
     return result;
   }
 
-  async getById(id, populateProps) {
+  async getById(id, populateProps, filterProps) {
     const query = this.Model
-      .findById(id)
-      .select(this.props);
+      .findById(id);
+
+    query.select(this.getSelectors(filterProps));
 
     this.populateProps(query, populateProps);
 

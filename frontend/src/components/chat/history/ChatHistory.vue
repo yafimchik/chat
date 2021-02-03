@@ -3,7 +3,7 @@
     class="flex-grow-1"
     id="chat-history"
   >
-    <div class="chat-history__wrapper h-100 w-100" :scrolltop="scrollTop" @scroll="onScroll">
+    <div class="chat-history__wrapper h-100 w-100 p-4" :scrolltop="scrollTop" @scroll="onScroll">
       <app-message
         v-for="(message, index) in chatHistory"
         :message="message"
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import Message from '@/components/chat/history/Message.vue';
+import Message from '@/components/chat/history/message/Message.vue';
 import { scrollingDelay } from '@/configs/chat-connection.config';
 
 export default {
@@ -34,7 +34,7 @@ export default {
       return this.historyElement.scrollHeight + 10000;
     },
     currentChat() {
-      return this.$store.state.currentChatId;
+      return this.$store.state.chatData.currentChatId;
     },
     chatHistory() {
       return this.$store.getters.currentChatHistory;

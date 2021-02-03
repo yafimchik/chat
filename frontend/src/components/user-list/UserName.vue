@@ -1,8 +1,10 @@
 <template>
-  <b-list-group-item class="mx-2 d-flex flex-row align-items-center">
-    <h6 class="alert-heading">{{ name }}</h6>
-    <b-avatar class="ml-2" variant="primary" :text="initials"></b-avatar>
-  </b-list-group-item>
+  <div class="my-2 d-flex flex-row align-items-center justify-content-end">
+    <h6 class="alert-heading mb-0">{{ name }}</h6>
+    <div class="pl-3">
+      <b-avatar variant="primary" :text="initials"></b-avatar>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
-const chatModelConfig = require("../chats/chat.model");
-const userModelConfig = require("../users/user.model");
-const relations = require("../prototype/relation.types");
+const relations = require('../prototype/relation.types');
+const relationActionTypes = require('../prototype/relation-action.types');
 
 const modelType = {
   text: {
     type: String,
-    required: true,
+    required: false,
     unique: false,
   },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: userModelConfig.Model },
-  chat: { type: mongoose.Schema.Types.ObjectId, ref: chatModelConfig.Model },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+  chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat' },
   date: Date,
+  attached: { type: Boolean, default: false },
 };
 
 const modelSchema = new mongoose.Schema(modelType, { id: false });
@@ -32,6 +32,22 @@ const messageModelConfig = {
       modelName: 'user',
       relation: relations.manyToOne,
       relatedProperty: undefined,
+    },
+    {
+      name: undefined,
+      modelName: 'audio',
+      relation: relations.oneToMany,
+      onDelete: relationActionTypes.cascade,
+      onUpdate: relationActionTypes.nothing,
+      relatedProperty: 'message',
+    },
+    {
+      name: undefined,
+      modelName: 'file',
+      relation: relations.oneToMany,
+      onDelete: relationActionTypes.cascade,
+      onUpdate: relationActionTypes.nothing,
+      relatedProperty: 'message',
     },
   ],
   Model: mongoose.model(modelName, modelSchema),

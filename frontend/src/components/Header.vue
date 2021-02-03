@@ -28,14 +28,15 @@
           <b-nav-item-dropdown right>
             <!-- Using 'button-content' slot -->
             <template #button-content>
-              <em>{{ userButtonTitle }}</em>
+              <b-icon v-if="!isLoggedIn" icon="person-circle" scale="2"></b-icon>
+              <em v-if="isLoggedIn">{{ userButtonTitle }}</em>
             </template>
 <!--            <b-dropdown-item href="#">Profile</b-dropdown-item>-->
             <b-dropdown-item
               href="#"
               @click="onUserButtonAction"
             >
-              {{ userButtonAction }}
+              {{ userAction }}
             </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
@@ -53,6 +54,7 @@ export default {
   data() {
     return {
       mainTitle: this.title ? this.title : 'Chat',
+      userAction: '',
     };
   },
   computed: {
@@ -60,23 +62,36 @@ export default {
       return this.$store.getters.isLoggedIn;
     },
     userName() {
-      return this.isLoggedIn ? this.$store.state.user.username : undefined;
+      return this.isLoggedIn ? this.$store.state.chatData.user.username : undefined;
     },
     userButtonTitle() {
-      return this.userName ? this.userName : 'user';
-    },
-    userButtonAction() {
-      return this.isLoggedIn ? 'sign out' : 'sign in';
+      return this.userName ? this.userName : 'Menu';
     },
   },
+  mounted() {
+    this.userAction = this.userButtonAction();
+  },
   methods: {
+    userButtonAction() {
+      const signInUp = (this.$router.currentRoute.name === 'signIn') ? 'Sign Up' : 'Sign In';
+      return this.isLoggedIn ? 'sign out' : signInUp;
+    },
     async onUserButtonAction() {
       if (this.isLoggedIn) {
-        this.$store.dispatch('logout');
         await this.$router.push({ name: 'signIn' });
+        await this.$store.dispatch('logout');
+      } else if (this.$router.currentRoute.name === 'signIn') {
+        await this.$router.push({ name: 'signUp' });
       } else {
         await this.$router.push({ name: 'signIn' });
       }
+
+      this.userAction = this.userButtonAction();
+    },
+  },
+  watch: {
+    isLoggedIn() {
+      this.userAction = this.userButtonAction();
     },
   },
 };

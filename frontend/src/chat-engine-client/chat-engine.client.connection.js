@@ -1,5 +1,6 @@
 import AsyncSocket from './async-socket/async-socket';
 import { ACTIONS, CONNECTION_STATUSES } from './chat-engine.client.constants';
+import SendMessageError from './errors/send.message.error';
 
 class ChatEngineClientConnection {
   constructor(
@@ -91,13 +92,13 @@ class ChatEngineClientConnection {
     await this.onError(event);
   }
 
-  // TODO AFTER sending files
-  // async sendFile(image, { virtualServer, chat }) {
-  //   const startbin
-  // }
-
   sendStatus(status) {
-    return this.socket.send({ status, token: this.token, action: ACTIONS.status });
+    console.log('send status ', status);
+    return this.socket.send({
+      status,
+      token: this.token,
+      action: ACTIONS.status,
+    });
   }
 
   async sendToken() {
@@ -110,6 +111,81 @@ class ChatEngineClientConnection {
       chat,
       token: this.token,
       action: ACTIONS.text,
+    });
+  }
+
+  async sendFullMessage(chat, messageObject) {
+    if (!messageObject.audio && !messageObject.files) {
+      return this.sendText(chat, messageObject.text);
+    }
+    const message = await this.sendMessageHeader(chat, messageObject);
+    if (message.error) {
+      console.debug(message.error);
+      throw new SendMessageError();
+    }
+    if (messageObject.audio) {
+      await this.sendAudio(messageObject.audio);
+    }
+    if (messageObject.files) {
+      let tasksChain = Promise.resolve();
+      messageObject.files.forEach((file) => {
+        tasksChain = tasksChain.then(() => this.sendFile(file));
+      });
+
+      await tasksChain;
+      // for (let file of messageObject.files) {
+      //   await this.sendFile(file);
+      // }
+    }
+    return this.sendMessageFooter(chat, messageObject);
+  }
+
+  async sendFile(fileRecord) {
+    const info = { ...fileRecord };
+    delete info.file;
+    return this.sendBinary(info, fileRecord.file, ACTIONS.fileInfo);
+  }
+
+  async sendAudio(audioRecord) {
+    const info = { ...audioRecord };
+    delete info.audio;
+    return this.sendBinary(info, audioRecord.audio);
+  }
+
+  async sendBinary(info, data, action = ACTIONS.audioInfo) {
+    console.log('binary type ', data);
+    const infoResult = await this.sendBinaryInfo(info, action);
+    if (infoResult.error) throw new SendMessageError();
+    const binaryResult = await this.socket.sendBinaryAsync(data);
+    if (binaryResult.error) throw new SendMessageError();
+    return binaryResult;
+  }
+
+  async sendBinaryInfo(binaryInfo, action = ACTIONS.audioInfo) {
+    console.log('info ', binaryInfo);
+    return this.socket.sendAsync({
+      binaryInfo,
+      token: this.token,
+      action,
+    });
+  }
+
+  async sendMessageHeader(chat, messageObject) {
+    const header = {
+      text: messageObject.text,
+    };
+    return this.socket.sendAsync({
+      ...header,
+      chat,
+      token: this.token,
+      action: ACTIONS.messageHeader,
+    });
+  }
+
+  async sendMessageFooter() {
+    return this.socket.sendAsync({
+      token: this.token,
+      action: ACTIONS.messageFooter,
     });
   }
 

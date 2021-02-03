@@ -1,50 +1,52 @@
 <template>
   <div class="flex-grow-1">
-    <b-form
-      class="h-100 d-flex flex-column justify-content-center align-items-stretch"
-      @submit="onSubmit"
-      @reset="onReset"
-      v-if="show"
-    >
-      <!--      <b-form-group-->
-      <!--        id="input-group-1"-->
-      <!--        label="Email address:"-->
-      <!--        label-for="input-1"-->
-      <!--        description="We'll never share your email with anyone else."-->
-      <!--      >-->
-      <!--        <b-form-input-->
-      <!--          id="input-1"-->
-      <!--          v-model="form.email"-->
-      <!--          type="email"-->
-      <!--          placeholder="Enter email"-->
-      <!--          required-->
-      <!--        ></b-form-input>-->
-      <!--      </b-form-group>-->
+    <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+      <b-form
+        class="h-100 d-flex flex-column justify-content-center align-items-stretch"
+        @submit="onSubmit"
+        @reset="onReset"
+        v-if="show"
+      >
+        <!--      <b-form-group-->
+        <!--        id="input-group-1"-->
+        <!--        label="Email address:"-->
+        <!--        label-for="input-1"-->
+        <!--        description="We'll never share your email with anyone else."-->
+        <!--      >-->
+        <!--        <b-form-input-->
+        <!--          id="input-1"-->
+        <!--          v-model="form.email"-->
+        <!--          type="email"-->
+        <!--          placeholder="Enter email"-->
+        <!--          required-->
+        <!--        ></b-form-input>-->
+        <!--      </b-form-group>-->
 
-      <b-form-group id="input-group-2" label="Your Name:" label-for="input-2">
-        <b-form-input
-          id="input-2"
-          v-model="form.username"
-          placeholder="Enter name"
-          required
-        ></b-form-input>
-      </b-form-group>
+        <b-form-group id="input-group-2" label="Your Name:" label-for="input-2">
+          <b-form-input
+            id="input-2"
+            v-model="form.username"
+            placeholder="Enter name"
+            required
+          ></b-form-input>
+        </b-form-group>
 
-<!--      <b-form-group id="input-group-3" label="password:" label-for="input-3">-->
-<!--        <b-form-input-->
-<!--          id="input-3"-->
-<!--          v-model="form.password"-->
-<!--          placeholder="Enter password"-->
-<!--          type="password"-->
-<!--        ></b-form-input>-->
-<!--      </b-form-group>-->
+        <!--      <b-form-group id="input-group-3" label="password:" label-for="input-3">-->
+        <!--        <b-form-input-->
+        <!--          id="input-3"-->
+        <!--          v-model="form.password"-->
+        <!--          placeholder="Enter password"-->
+        <!--          type="password"-->
+        <!--        ></b-form-input>-->
+        <!--      </b-form-group>-->
 
-      <div class="buttons">
-        <b-button type="reset" variant="danger">Reset</b-button>
-        <b-button class="mx-2" type="submit" variant="primary">Sign Up</b-button>
-        <b-button type="button" variant="outline-primary" @click="goSignIn">Sign In</b-button>
-      </div>
-    </b-form>
+        <div class="buttons">
+          <b-button type="reset" variant="danger">Reset</b-button>
+          <b-button class="ml-2" type="submit" variant="primary">Sign Up</b-button>
+<!--          <b-button type="button" variant="outline-primary" @click="goSignIn">Sign In</b-button>-->
+        </div>
+      </b-form>
+    </div>
   </div>
 </template>
 
@@ -64,6 +66,11 @@ export default {
       },
       show: true,
     };
+  },
+  computed: {
+    chatClient() {
+      return this.$store.state.chatEngine.chatClient;
+    },
   },
   methods: {
     async goSignIn() {
@@ -85,15 +92,15 @@ export default {
       });
     },
     async signUp() {
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
       }
-      if (!this.$store.state.chatClient) {
+      if (!this.chatClient) {
         // TODO LOGIN ERROR modal form
         console.log('chat client error');
         return;
       }
-      const result = await this.$store.state.chatClient.register(
+      const result = await this.chatClient.register(
         this.form.username,
         this.form.password,
       );
@@ -106,7 +113,7 @@ export default {
       this.$store.commit('saveToken', result.token);
       this.$store.commit('setVirtualServers', result.virtualServers);
 
-      const connected = await this.$store.state.chatClient.connect();
+      const connected = await this.chatClient.connect();
       if (!connected) {
         console.log('connection error');
         // TODO connection ERROR modal form
@@ -119,6 +126,9 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
+form {
+  width: 80%;
+  max-width: 600px;
+}
 </style>

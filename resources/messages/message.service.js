@@ -1,6 +1,5 @@
-const CrudService = require("../prototype/crud.service");
-const CHAT_ENGINE_CONSTANTS = require("../../app/chat-engine-server/chat-engine.constants");
-const DatabaseError = require("../../errors/database.error");
+const CrudService = require('../prototype/crud.service');
+const DatabaseError = require('../../errors/database.error');
 
 class MessageService extends CrudService {
   async getAll() {

@@ -9,7 +9,7 @@ export default {
   },
   computed: {
     notification() {
-      return this.$store.state.notification;
+      return this.$store.state.ui.notification;
     },
   },
   watch: {
@@ -19,7 +19,7 @@ export default {
         if (value.serverError) {
           this.showError('Server Error!');
         } else {
-          this.showError('Connection Error!');
+          this.showError(value.message, value.title);
         }
         return;
       }
@@ -27,28 +27,30 @@ export default {
     },
   },
   methods: {
-    showError(message, title) {
+    showError(message = 'ConnectionError', title) {
       this.showToast({
         message,
         title,
         variant: 'danger',
-        autoHideDelay: 2500
+        autoHideDelay: 2500,
       });
     },
     showNotification(message, title) {
       this.showToast({
         message,
         title,
-        variant: 'secondary'
+        variant: 'secondary',
       });
     },
-    showToast({
-                message = 'text',
-                title = 'Attention!',
-                variant = 'secondary',
-                solid = true,
-                autoHideDelay = 1500,
-    }) {
+    showToast(
+      {
+        message = 'text',
+        title = 'Attention!',
+        variant = 'secondary',
+        solid = true,
+        autoHideDelay = 1500,
+      },
+    ) {
       this.$bvToast.toast(message, {
         title,
         variant,
@@ -57,5 +59,5 @@ export default {
       });
     },
   },
-}
+};
 </script>

@@ -1,4 +1,4 @@
-const CrudService = require("../prototype/crud.service");
+const CrudService = require('../prototype/crud.service');
 
 class ChatService extends CrudService {
   async getChatsOfVirtualServer(virtualServer) {

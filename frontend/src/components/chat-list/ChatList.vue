@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-list">
+  <div class="chat-list p-3">
     <b-list-group>
       <app-chat-name v-for="chat in chats" :chatObject="chat" :key="chat._id"></app-chat-name>
     </b-list-group>

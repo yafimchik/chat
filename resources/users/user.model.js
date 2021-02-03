@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const virtualServerModelConfig = require("../virtual-servers/virtual-server.model");
 const relations = require("../prototype/relation.types");
 const relationActionTypes = require("../prototype/relation-action.types");
 
@@ -9,7 +8,7 @@ const modelType = {
     required: true,
     unique: true,
   },
-  virtualServers: [ { type: mongoose.Schema.Types.ObjectId, ref: virtualServerModelConfig.Model } ],
+  virtualServers: [ { type: mongoose.Schema.Types.ObjectId, ref: 'virtualServer' } ],
 };
 
 const modelSchema = new mongoose.Schema(modelType, { id: false });

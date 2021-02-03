@@ -5,6 +5,9 @@ import {
   IconsPlugin,
   SidebarPlugin,
   ToastPlugin,
+  FormFilePlugin,
+  BadgePlugin,
+  TooltipPlugin,
 } from 'bootstrap-vue';
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -16,10 +19,12 @@ import store from './store';
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue);
-// Optionally install the BootstrapVue icon components plugin
+Vue.use(FormFilePlugin);
 Vue.use(IconsPlugin);
 Vue.use(SidebarPlugin);
 Vue.use(ToastPlugin);
+Vue.use(BadgePlugin);
+Vue.use(TooltipPlugin);
 
 Vue.config.productionTip = false;
 

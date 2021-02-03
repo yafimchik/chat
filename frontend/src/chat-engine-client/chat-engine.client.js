@@ -99,7 +99,7 @@ class ChatEngineClient {
     try {
       const serversArray = Object.values(this.servers);
       const results = await Promise.all(serversArray.map((server) => server.client.disconnect()));
-      return results.some((result) => !result);
+      return !results.some((result) => !result);
     } catch (e) {
       this.onException(e);
       return false;
@@ -190,6 +190,18 @@ class ChatEngineClient {
     if (!connection) return result;
     try {
       return await connection.sendText(chat, text);
+    } catch (e) {
+      this.onException(e);
+      return result;
+    }
+  }
+
+  async sendFullMessage(virtualServer, chat, messageObject) {
+    const result = undefined;
+    const connection = this.getClient(virtualServer);
+    if (!connection) return result;
+    try {
+      return await connection.sendFullMessage(chat, messageObject);
     } catch (e) {
       this.onException(e);
       return result;

@@ -18,10 +18,11 @@ export default function onUpdateCallback({ message, virtualServer }) {
       contactsOnline: message.contactsOnline,
     });
   }
-  if (message.text) {
+  if ((message.text || message.files || message.audio) && message.date) {
     store.commit('addMessage', message);
   }
   if (message.status) {
+    console.log(message.status);
     store.commit('updateStatus', {
       virtualServer,
       status: message.status,

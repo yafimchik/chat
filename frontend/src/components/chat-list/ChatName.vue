@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     isActive() {
-      return (this.chat._id === this.$store.state.currentChatId);
+      return (this.chat._id === this.$store.state.chatData.currentChatId);
     },
     unreadMessages() {
       return this.$store.getters.unreadMessagesByChatId(this.chat._id);
@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     onClick() {
-      this.$store.commit('setCurrentChat', this.chat._id);
+      this.$store.dispatch('setCurrentChat', this.chat._id);
       // TODO active status (from $store)
     },
   },

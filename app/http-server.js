@@ -4,9 +4,9 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const ChatEngine = require("./chat-engine-server/chat-engine.server");
-const errorHandler = require("./middlewares/error-handler.middleware");
-const CHAT_ENGINE_CONSTANTS = require("./chat-engine-server/chat-engine.constants");
+const ChatEngine = require('./chat-engine-server/chat-engine.server');
+const errorHandler = require('./middlewares/error-handler.middleware');
+const CHAT_ENGINE_CONSTANTS = require('./chat-engine-server/chat-engine.constants');
 
 class HttpServer {
   constructor(
@@ -70,7 +70,7 @@ class HttpServer {
 
     this.server.listen(port, err => {
       if (err) {
-        console.log('Well, this didn\'t work...');
+        console.log(`Well, this didn't work...`);
         process.exit();
       }
       this.chatEngine = new ChatEngine(this.server);

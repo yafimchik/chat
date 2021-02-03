@@ -3,17 +3,20 @@
     <app-header></app-header>
     <router-view/>
     <app-toaster></app-toaster>
+    <app-player></app-player>
   </div>
 </template>
 
 <script>
 import Header from './components/Header.vue';
-import Toaster from '@/components/Toaster.vue';
+import Toaster from './components/Toaster.vue';
+import Player from '@/audio-recorder/components/Player.vue';
 
 export default {
   components: {
     appHeader: Header,
     appToaster: Toaster,
+    appPlayer: Player,
   },
 };
 </script>

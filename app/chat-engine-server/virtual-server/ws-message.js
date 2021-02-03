@@ -1,9 +1,10 @@
 const { v4: uuidV4 } = require('uuid');
 
 class WsMessage {
-  constructor(payload, uuid = uuidV4()) {
+  constructor(payload, uuid = uuidV4(), binarySent = false) {
     this.payload = payload;
     this.uuid = uuid;
+    this.binarySent = binarySent;
   }
 
   get type() {
@@ -11,11 +12,11 @@ class WsMessage {
   }
 
   toString() {
-    return JSON.stringify({ payload: this.payload, uuid: this.uuid });
+    return JSON.stringify({ payload: this.payload, uuid: this.uuid, binarySent: this.binarySent });
   }
 
   static clone(messageObject) {
-    return new WsMessage(messageObject.payload, messageObject.uuid);
+    return new WsMessage(messageObject.payload, messageObject.uuid, messageObject.binarySent);
   }
 
   static fromString(string) {
