@@ -7,7 +7,7 @@
     >
       <p class="mb-0" v-if="!isOnPlayer">{{ size }} Mb</p>
       <p class="mb-0" v-if="isOnPlayer">{{ playedTime }} / {{ audio.duration }}</p>
-      <b-icon class="ml-2" icon="soundwave" scale="2"></b-icon>
+      <b-icon class="ml-3" icon="soundwave" scale="2"></b-icon>
     </b-button>
   </div>
 </template>

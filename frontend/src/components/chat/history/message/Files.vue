@@ -8,7 +8,7 @@
       >Attached files</b-button>
     </div>
     <div class="files d-flex flow-column align-items-stretch">
-      <b-collapse v-model="visibility" class="mt-2">
+      <b-collapse v-model="visibility" class="mt-2 w-100">
         <b-card>
           <app-file v-for="(fileItem, index) of files" :file="fileItem" :key="index"></app-file>
         </b-card>

@@ -1,21 +1,27 @@
 <template>
-  <div
-    class="file d-flex flex-row flex-nowrap justify-content-between align-items-center mb-2"
-  >
-    <div class="d-flex flex-row flex-nowrap align-items-center">
+  <div>
+    <div
+      class="file row mb-2"
+    >
       <p
-        class="mb-0 flex-grow-1"
+        class="file-name mb-0 col-8 p-0"
         v-b-tooltip.hover
         :title="file.filename"
       >
-        {{ shortName }}
+        {{ file.filename }}
       </p>
-      <a ref="downloadAnchor" href="" v-b-visible="false"></a>
-      <p class="mb-0"><b>size: {{ size }} Mb</b></p>
+      <p class="mb-0 col-3 p-0"><b>{{ size }} Mb</b></p>
+      <div class="col-1 p-0">
+        <b-button
+          class="d-flex align-items-center justify-content-center p-1"
+          variant="outline-info"
+          @click="download"
+        >
+          <b-icon icon="download" scale="1"></b-icon>
+        </b-button>
+      </div>
     </div>
-    <b-button class="file ml-2" variant="outline-info" @click="download">
-      <b-icon icon="download" scale="1"></b-icon>
-    </b-button>
+    <a ref="downloadAnchor" href="" v-b-visible="false"></a>
   </div>
 </template>
 
@@ -85,8 +91,15 @@ export default {
 };
 </script>
 
-<style scoped>
-button > p {
-  word-wrap: break-word;
+<style scoped lang="scss">
+div.file {
+  p {
+    white-space: nowrap;
+  }
+  p.file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
+
 </style>
