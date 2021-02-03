@@ -30,6 +30,7 @@
 import AttachingAudio from '@/components/chat/new-message/AttachingAudio.vue';
 import AttachingFiles from '@/components/chat/new-message/attaching-files/AttachingFiles.vue';
 import readFileAsync from '@/vue-utils/utils';
+import { maxFileSize } from '@/configs/chat-connection.config';
 
 export default {
   name: 'NewMessage',
@@ -71,6 +72,26 @@ export default {
     },
     currentRecord() {
       return this.$store.state.audio.currentRecord;
+    },
+  },
+  watch: {
+    attachedFiles(files) {
+      if (files && files.length) {
+        const bigFiles = files.filter((file) => file.size > (maxFileSize * 1024 * 1024));
+        if (bigFiles.length) {
+          bigFiles.forEach((file, index) => {
+            setTimeout(() => {
+              this.$store.commit('postNotification', {
+                title: `File is too big! Max Size: ${maxFileSize}`,
+                message: `File: ${file.name} size: ${Math.round(file.size / 1024 / 1024)} Mb`,
+              });
+            }, index * 250);
+          });
+
+          const normalFiles = files.filter((file) => file.size <= (maxFileSize * 1024 * 1024));
+          this.$store.commit('setAttachedFiles', normalFiles);
+        }
+      }
     },
   },
   methods: {

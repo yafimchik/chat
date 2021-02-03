@@ -32,7 +32,7 @@ export default {
         message,
         title,
         variant: 'danger',
-        autoHideDelay: 2500,
+        autoHideDelay: 3000,
       });
     },
     showNotification(message, title) {
@@ -48,7 +48,7 @@ export default {
         title = 'Attention!',
         variant = 'secondary',
         solid = true,
-        autoHideDelay = 1500,
+        autoHideDelay = 2000,
       },
     ) {
       this.$bvToast.toast(message, {
