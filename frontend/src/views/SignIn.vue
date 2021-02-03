@@ -1,50 +1,52 @@
 <template>
   <div class="flex-grow-1">
-    <b-form
-      class="h-100 d-flex flex-column justify-content-center align-items-stretch"
-      @submit="onSubmit"
-      @reset="onReset"
-      v-if="show"
-    >
-<!--      <b-form-group-->
-<!--        id="input-group-1"-->
-<!--        label="Email address:"-->
-<!--        label-for="input-1"-->
-<!--        description="We'll never share your email with anyone else."-->
-<!--      >-->
-<!--        <b-form-input-->
-<!--          id="input-1"-->
-<!--          v-model="form.email"-->
-<!--          type="email"-->
-<!--          placeholder="Enter email"-->
-<!--          required-->
-<!--        ></b-form-input>-->
-<!--      </b-form-group>-->
+    <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+      <b-form
+        class="h-100 d-flex flex-column justify-content-center align-items-stretch"
+        @submit="onSubmit"
+        @reset="onReset"
+        v-if="show"
+      >
+        <!--      <b-form-group-->
+        <!--        id="input-group-1"-->
+        <!--        label="Email address:"-->
+        <!--        label-for="input-1"-->
+        <!--        description="We'll never share your email with anyone else."-->
+        <!--      >-->
+        <!--        <b-form-input-->
+        <!--          id="input-1"-->
+        <!--          v-model="form.email"-->
+        <!--          type="email"-->
+        <!--          placeholder="Enter email"-->
+        <!--          required-->
+        <!--        ></b-form-input>-->
+        <!--      </b-form-group>-->
 
-      <b-form-group id="input-group-2" label="Your Name:" label-for="input-2">
-        <b-form-input
-          id="input-2"
-          v-model="form.username"
-          placeholder="Enter name"
-          required
-        ></b-form-input>
-      </b-form-group>
+        <b-form-group id="input-group-2" label="Your Name:" label-for="input-2">
+          <b-form-input
+            id="input-2"
+            v-model="form.username"
+            placeholder="Enter name"
+            required
+          ></b-form-input>
+        </b-form-group>
 
-<!--      <b-form-group id="input-group-3" label="password:" label-for="input-3">-->
-<!--        <b-form-input-->
-<!--          id="input-3"-->
-<!--          v-model="form.password"-->
-<!--          placeholder="Enter password"-->
-<!--          type="password"-->
-<!--        ></b-form-input>-->
-<!--      </b-form-group>-->
+        <!--      <b-form-group id="input-group-3" label="password:" label-for="input-3">-->
+        <!--        <b-form-input-->
+        <!--          id="input-3"-->
+        <!--          v-model="form.password"-->
+        <!--          placeholder="Enter password"-->
+        <!--          type="password"-->
+        <!--        ></b-form-input>-->
+        <!--      </b-form-group>-->
 
-      <div class="buttons">
-        <b-button type="reset" variant="danger">Reset</b-button>
-        <b-button class="mx-2" type="submit" variant="primary">Sign In</b-button>
-        <b-button type="button" variant="outline-primary" @click="goSignUp">Sign Up</b-button>
-      </div>
-    </b-form>
+        <div class="buttons">
+          <b-button type="reset" variant="danger">Reset</b-button>
+          <b-button class="ml-2" type="submit" variant="primary">Sign In</b-button>
+<!--          <b-button type="button" variant="outline-primary" @click="goSignUp">Sign Up</b-button>-->
+        </div>
+      </b-form>
+    </div>
   </div>
 </template>
 
@@ -92,8 +94,10 @@ export default {
         this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
       }
       if (!this.chatClient) {
-        console.log('error!');
-        // TODO LOGIN ERROR modal form
+        this.$store.commit('postNotification', {
+          error: true,
+          message: 'System error!',
+        });
         return;
       }
 
@@ -109,8 +113,10 @@ export default {
       }
 
       if (!result) {
-        console.log('error!');
-        // TODO LOGIN ERROR modal form
+        this.$store.commit('postNotification', {
+          error: true,
+          message: 'Wrong username or password!',
+        });
         return;
       }
       this.$store.commit('saveUser', result.user);
@@ -126,8 +132,9 @@ export default {
       }
 
       if (!connected) {
-        console.log('connect error');
-        // TODO connection ERROR modal form
+        this.$store.commit('postNotification', {
+          error: true,
+        });
         return;
       }
 
@@ -140,5 +147,9 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+form {
+  width: 80%;
+  max-width: 600px;
+}
 </style>

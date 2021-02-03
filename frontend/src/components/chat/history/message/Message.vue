@@ -1,16 +1,16 @@
 <template>
-  <div class="message my-1 row">
+  <div class="message my-2 row">
     <div
       class="user mx-0 d-flex flex-row align-items-center justify-content-end col-3"
       :class="usernameClass"
     >
-      <h6 class="alert-heading">{{ username }}</h6>
+      <h6 class="alert-heading mb-0">{{ username }}</h6>
       <b-avatar class="ml-2" variant="primary" :text="initials"></b-avatar>
     </div>
     <b-alert show variant="secondary" class="message-block mb-0 d-flex justify-content-between
-          flex-column align-items-stretch col-9">
+          flex-column align-items-stretch col-9 pb-0">
       <p class="mb-1" v-if="!!message.text">{{ message.text }}</p>
-      <hr v-if="attached">
+      <hr v-if="attached && !!message.text">
       <app-audio class="mb-1" v-if="!!message.audio" :audio="message.audio"></app-audio>
       <app-files
         class="mb-1"
@@ -77,10 +77,8 @@ export default {
 
 <style scoped lang="scss">
 .message-block {
-  padding-bottom: 5px;
-
   p.time {
-    font-size: 0.8em;
+    font-size: 0.6em;
   }
 
   hr {

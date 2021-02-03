@@ -1,9 +1,9 @@
 <template>
-  <section class="new-message">
+  <section class="new-message my-2">
     <b-input-group>
       <template #prepend>
         <b-button variant="outline-info" @click="attachVisibility=!attachVisibility">
-          <b-icon icon="plus-circle"></b-icon>
+          <b-icon icon="paperclip" scale="2"></b-icon>
         </b-button>
       </template>
       <b-form-textarea
@@ -13,7 +13,9 @@
         @change="onBlur"
       ></b-form-textarea>
       <b-input-group-append>
-        <b-button variant="outline-info" @click="onSend">send</b-button>
+        <b-button variant="outline-info" @click="onSend">
+          <b-icon icon="cursor" scale="2"></b-icon>
+        </b-button>
 
       </b-input-group-append>
     </b-input-group>
@@ -84,12 +86,18 @@ export default {
       }
     },
     async onSend() {
-      if (!this.newMessage && !this.currentRecord && !this.hasFiles) return;
+      if (!this.newMessage && !this.currentRecord && !this.hasFiles) {
+        this.$store.commit('postNotification', {
+          message: 'Oops... We have nothing to send!',
+        });
+        return;
+      }
       if (await this.send()) {
         this.newMessage = '';
         await this.$store.dispatch('afterMessageSending');
         this.chatClient.sendStatus(this.virtualServer, undefined);
         this.$store.commit('updateDraft', this.newMessage);
+        this.attachVisibility = false;
       } else {
         this.$store.commit('postNotification', {
           error: true,
@@ -151,9 +159,3 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss">
-section.new-message {
-  margin: 10px;
-}
-</style>

@@ -99,7 +99,7 @@ class ChatEngineClient {
     try {
       const serversArray = Object.values(this.servers);
       const results = await Promise.all(serversArray.map((server) => server.client.disconnect()));
-      return results.some((result) => !result);
+      return !results.some((result) => !result);
     } catch (e) {
       this.onException(e);
       return false;

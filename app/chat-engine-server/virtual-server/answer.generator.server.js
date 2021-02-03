@@ -22,7 +22,7 @@ class AnswerGeneratorServer {
     }
 
     this.serverStatus = this.serverStatus
-      .filter(userStatus => this.contactsOnline.some((user) => user === userStatus.user));
+      .filter(userStatus => this.contactsOnline.some((user) => user._id === userStatus.user));
 
     return this.serverStatus;
   }

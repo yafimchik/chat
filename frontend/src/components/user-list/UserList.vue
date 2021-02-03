@@ -1,8 +1,6 @@
 <template>
-  <div class="chat-list">
-    <b-list-group>
-      <app-user-name v-for="(user, index) in users" :user="user" :key="index"></app-user-name>
-    </b-list-group>
+  <div class="chat-list p-3">
+    <app-user-name v-for="(user, index) in users" :user="user" :key="index"></app-user-name>
   </div>
 </template>
 

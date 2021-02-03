@@ -92,8 +92,11 @@ export default {
       state.contacts = [...contacts];
     },
     setToDefaultsAll(state) {
+      console.log('set to def');
       const newState = DEFAULT_STATE();
       Object.entries(newState).forEach(([key, value]) => {
+        console.log('key ', key);
+        console.log('val ', value);
         state[key] = value;
       });
     },

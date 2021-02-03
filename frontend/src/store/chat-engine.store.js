@@ -19,8 +19,13 @@ export default {
   },
   actions: {
     async logout({ commit, state }) {
+      console.log('logout action');
       const result = await state.chatClient.disconnect();
-      if (result) commit('setToDefaultsAll');
+      console.log('result of disc', result);
+      if (result) {
+        console.log('lets set to def');
+        commit('setToDefaultsAll');
+      }
     },
     async initializeAllChatUI(
       {

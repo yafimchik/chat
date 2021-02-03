@@ -5,7 +5,7 @@ const relationActionTypes = require('../prototype/relation-action.types');
 const modelType = {
   text: {
     type: String,
-    required: true,
+    required: false,
     unique: false,
   },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },

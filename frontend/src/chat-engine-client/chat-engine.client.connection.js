@@ -93,6 +93,7 @@ class ChatEngineClientConnection {
   }
 
   sendStatus(status) {
+    console.log('send status ', status);
     return this.socket.send({
       status,
       token: this.token,
