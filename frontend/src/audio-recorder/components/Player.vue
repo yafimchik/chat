@@ -107,7 +107,6 @@ export default {
     stop() {
       this.setSource(undefined);
       this.$store.commit('setPlayerState', false);
-      // this.$refs.player.load();
     },
     play() {
       if (this.getSource()) this.$refs.player.play();

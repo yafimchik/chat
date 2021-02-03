@@ -35,19 +35,6 @@ class ChatEngineServer {
     } else {
       socket.destroy();
     }
-
-    // TODO authorization;
-    // authenticate(request, (err, client) => {
-    //   if (err || !client) {
-    //     socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-    //     socket.destroy();
-    //     return;
-    //   }
-    //
-    //   wss.handleUpgrade(request, socket, head, function done(ws) {
-    //     wss.emit('connection', ws, request, client);
-    //   });
-    // });
   }
 }
 

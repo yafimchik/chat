@@ -6,10 +6,6 @@ const BadPermissionError = require('../../errors/bad-permission.error');
 const {toArrayBuffer} = require('../../common/utils');
 const { verifyToken } = require('../../app/middlewares/auth.middleware');
 
-// audioRouter.all('*', (req) => {
-//   console.log('req ', req);
-// });
-
 audioRouter.route('/:id').get(
   asyncHandler(verifyToken),
   asyncHandler(
