@@ -10,18 +10,31 @@
       class="message-block mb-0 d-flex justify-content-between flex-column align-items-stretch"
     >
       <p class="mb-1" v-if="!!message.text">{{ message.text }}</p>
+      <hr v-if="message.attached">
       <app-audio class="mb-1" v-if="!!message.audio" :audio="message.audio"></app-audio>
-      <app-files class="mb-1" v-if="!!message.files" :files="message.files"></app-files>
+      <app-files
+        class="mb-1"
+        v-if="!!(message.files && message.files.length)"
+        :files="message.files"
+      ></app-files>
+      <hr>
       <p class="time mb-0">{{ message.date | myDate }}</p>
     </b-alert>
   </div>
 </template>
 
 <script>
+import Audio from '@/components/chat/history/message/Audio.vue';
+import Files from '@/components/chat/history/message/Files.vue';
+
 export default {
   name: 'Message',
   props: {
     message: String,
+  },
+  components: {
+    appAudio: Audio,
+    appFiles: Files,
   },
   data() {
     return {
@@ -57,8 +70,8 @@ export default {
 .message-block {
   padding-bottom: 5px;
 
-  p.time {
-    font-size: 0.7em;
+  hr {
+    margin: 2px 0;
   }
 }
 </style>

@@ -10,6 +10,11 @@ function generateValidator(schema) {
   };
 }
 
+function toArrayBuffer(buffer, size) {
+  return buffer.buffer.slice(0, size);
+}
+
 module.exports = {
   generateValidator,
+  toArrayBuffer,
 };

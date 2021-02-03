@@ -1,15 +1,12 @@
 <template>
-  <div class="d-flex flex-row flex-nowrap attached-files">
-    <p class="mt-2">files:</p>
-    <div class="w-100 d-flex flex-wrap">
-      <app-file
-        class="ml-2 mt-2"
-        v-for="(item, index) of attachedFiles"
-        :file="item"
-        :index="index"
-        :key="index"
-      ></app-file>
-    </div>
+  <div class="w-100 d-flex flex-wrap">
+    <app-file
+      class="ml-2 mt-2"
+      v-for="(item, index) of attachedFiles"
+      :file="item"
+      :index="index"
+      :key="index"
+    ></app-file>
   </div>
 </template>
 

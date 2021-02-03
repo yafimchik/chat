@@ -1,11 +1,11 @@
 const CrudService = require("../prototype/crud.service");
 
 class AudioService extends CrudService {
-  getByMessageId(message) {
-    const audios = this.getWhere({ message });
+  async getByMessageId(message) {
+    const audios = await this.repo.getByMessageId(message);
     if (!audios) return undefined;
+    if (!audios.length) return undefined;
     const audio = audios[0];
-    audio.size = audio.audio.size;
     delete audio.audio;
     return audio;
   }

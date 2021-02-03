@@ -2,7 +2,7 @@
   <div class="d-flex flex-row justify-content-end">
     <app-mic class="mr-2"></app-mic>
     <app-play class="mr-2"></app-play>
-    <app-delete class="mr-2"></app-delete>
+    <app-delete></app-delete>
   </div>
 </template>
 

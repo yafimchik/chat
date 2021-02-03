@@ -39,6 +39,7 @@ class VirtualServerClient {
       this.onBinaryMessage(message);
       return;
     }
+    console.log('not binary');
 
     const messageObject = WsMessage.fromString(message);
     const token = messageObject.payload.token;

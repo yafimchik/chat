@@ -4,12 +4,16 @@ const relations = require("../prototype/relation.types");
 const modelType = {
   message: { type: mongoose.Schema.Types.ObjectId, ref: 'message' },
   file: {
-    type: mongoose.Types.Buffer,
+    type: Buffer,
     required: true,
   },
   filename: {
     type: String,
     default: 'file',
+  },
+  size: {
+    type: Number,
+    required: true,
   },
 };
 

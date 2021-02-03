@@ -19,7 +19,7 @@ export default {
         if (value.serverError) {
           this.showError('Server Error!');
         } else {
-          this.showError('Connection Error!');
+          this.showError(value.message, value.title);
         }
         return;
       }
@@ -27,7 +27,7 @@ export default {
     },
   },
   methods: {
-    showError(message, title) {
+    showError(message = 'ConnectionError', title) {
       this.showToast({
         message,
         title,

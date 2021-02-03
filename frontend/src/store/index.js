@@ -12,6 +12,13 @@ const DEFAULT_STATE = () => ({
 
 export default new Vuex.Store({
   state: DEFAULT_STATE(),
+  actions: {
+    afterMessageSending({ commit }) {
+      commit('setAttachedFiles', []);
+      commit('saveRecord', undefined);
+      commit('updateUserStatus', undefined);
+    },
+  },
   modules: {
     audio: audioStore,
     ui: uiStore,

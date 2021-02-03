@@ -22,7 +22,7 @@ async function verifyToken(req, res, next) {
     throw new UnauthorizedError();
   }
 
-  req.user = result;
+  req.user = result.user;
 
   next();
 }

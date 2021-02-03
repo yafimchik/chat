@@ -4,7 +4,7 @@ const BadLoginError = require('../../errors/bad-login.error');
 const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
 
-userRouter.route('/login').post(
+userRouter.route('/login').get(
   asyncHandler(
     async (req, res) => {
       const { username, password } = req.body;

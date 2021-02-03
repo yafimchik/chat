@@ -9,7 +9,6 @@
 import AttachFile from '@/components/chat/new-message/attaching-files/AttachFile.vue';
 import AttachedFiles from '@/components/chat/new-message/attaching-files/AttachedFiles.vue';
 
-
 export default {
   name: 'AttachingFiles',
   data() {

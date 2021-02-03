@@ -14,6 +14,10 @@ class FullMessage {
     this.savedRecord = undefined;
   }
 
+  get attached() {
+    return !!(this.audio || this.files);
+  }
+
   setAudioInfo(info) {
     if (this.isWaitingAudio || this.isWaitingFile) throw new BadRequestError();
     this.audio = info;
@@ -60,6 +64,7 @@ class FullMessage {
       user: this.user,
       date: this.date,
       chat: this.chat,
+      attached: this.attached,
     });
 
     if (!messageSavedInDB) throw new DatabaseError();
@@ -78,12 +83,12 @@ class FullMessage {
     if (!this.audio) return;
 
     this.audio.message = this.savedRecord._id;
+    console.log('audio for save ', this.audio);
     const audioSavedInDB = await serviceFabric.create('audio').create(this.audio);
 
     if (!audioSavedInDB) throw new DatabaseError();
 
     this.savedRecord.audio = audioSavedInDB;
-    this.savedRecord.audio.size = this.savedRecord.audio.audio.size;
     delete this.savedRecord.audio.audio;
   }
 
@@ -91,14 +96,16 @@ class FullMessage {
     if (!this.files) return;
     if (!this.files.length) return;
 
-    this.files = this.files.forEach((record) => record.message = this.savedRecord._id);
+    this.files.forEach((record) => record.message = this.savedRecord._id);
+    console.log('files', this.files);
+
     let filesSavedInDB = await serviceFabric.create('file').createMany(this.files);
     if (!filesSavedInDB) throw new DatabaseError();
 
     this.savedRecord.files = filesSavedInDB.map((fileRecord) => ({
       _id: fileRecord._id,
       message: fileRecord.message,
-      size: fileRecord.file.size,
+      size: fileRecord.size,
       filename: fileRecord.filename,
     }));
   }

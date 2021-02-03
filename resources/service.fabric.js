@@ -11,7 +11,8 @@ class ServiceFabric {
   create(modelName) {
     if (this.services[modelName]) return this.services[modelName];
     const repository = this.repositoryFabric.create(modelName);
-    const currentConfig = this.config.resourceConfigs.find(resourceConfig => resourceConfig.modelName === modelName);
+    const currentConfig = this.config.resourceConfigs
+      .find(resourceConfig => resourceConfig.modelName === modelName);
     if (!currentConfig) return;
     this.services[modelName] = new currentConfig.Service(repository);
     return this.services[modelName];

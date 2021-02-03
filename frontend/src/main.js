@@ -7,6 +7,7 @@ import {
   ToastPlugin,
   FormFilePlugin,
   BadgePlugin,
+  TooltipPlugin,
 } from 'bootstrap-vue';
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -23,6 +24,7 @@ Vue.use(IconsPlugin);
 Vue.use(SidebarPlugin);
 Vue.use(ToastPlugin);
 Vue.use(BadgePlugin);
+Vue.use(TooltipPlugin);
 
 Vue.config.productionTip = false;
 

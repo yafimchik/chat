@@ -1,26 +1,37 @@
 <template>
-  <b-card
-    header="Files:"
-    header-tag="header"
-  >
-    <div class="row">
-      <app-file v-for="fileItem in files" :file="fileItem"></app-file>
+  <div>
+    <div class="w-100 d-flex flex-row-reverse">
+      <b-button
+        class="d-block"
+        variant="info"
+        @click="visibility=!visibility"
+      >Attached files</b-button>
     </div>
-  </b-card>
+    <div class="files d-flex flow-column align-items-stretch">
+      <b-collapse v-model="visibility" class="mt-2">
+        <b-card>
+          <app-file v-for="(fileItem, index) of files" :file="fileItem" :key="index"></app-file>
+        </b-card>
+      </b-collapse>
+    </div>
+  </div>
 </template>
 
 <script>
-
 import File from '@/components/chat/history/message/File.vue';
 
 export default {
-  name: 'Audio',
+  name: 'Files',
   components: {
     appFile: File,
   },
   props: {
     files: { type: Array },
   },
-  data() {},
+  data() {
+    return {
+      visibility: false,
+    };
+  },
 };
 </script>

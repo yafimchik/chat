@@ -1,4 +1,9 @@
-import {ASYNC_BINARY_TIME_LIMIT, ASYNC_TIME_LIMIT, EVENT_TYPES, STATUSES} from './socket-constants';
+import {
+  ASYNC_BINARY_TIME_LIMIT,
+  ASYNC_TIME_LIMIT,
+  EVENT_TYPES,
+  STATUSES,
+} from './socket-constants';
 import WsMessage from './ws-message';
 import TimeoutError from '../errors/timeout.error';
 
@@ -139,6 +144,7 @@ class AsyncSocket {
   connect(url = this.url) {
     if (url) {
       this.socket = new WebSocket(url);
+      this.socket.binaryType = 'arraybuffer';
     } else throw new Error('Bad url for websocket connection!');
     this.setSocketCallbacks();
   }

@@ -40,6 +40,7 @@ export default {
     startRecorder() {
       if (this.isRecording) return;
       this.$store.commit('saveRecord', null);
+      this.$store.commit('stopPlay');
       this.recorder.start();
       this.$store.commit('setRecorderState', this.isRecording);
     },

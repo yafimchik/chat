@@ -52,27 +52,28 @@ class AnswerGeneratorClient {
   }
 
   fromMessageHeader(messageObject) {
-    this.fullMessageTemp = { ...(messageObject.payload) };
+    this.fullMessageTemp = new FullMessage(messageObject.payload);
+    console.log('header ', this.fullMessageTemp);
 
     return WsMessage.clone(messageObject);
   }
 
   fromAudioInfo(messageObject) {
-    if (!this.fullMessageTemp) throw new BadRequestError();
-    this.fullMessageTemp.setAudioInfo({ ...(messageObject.payload) });
+    if (!this.fullMessageTemp || !messageObject.payload.binaryInfo) throw new BadRequestError();
+    this.fullMessageTemp.setAudioInfo({ ...(messageObject.payload.binaryInfo) });
     return WsMessage.clone(messageObject);
   }
 
   fromFileInfo(messageObject) {
-    if (!this.fullMessageTemp) throw new BadRequestError();
-    this.fullMessageTemp.setFileInfo({ ...(messageObject.payload) });
+    if (!this.fullMessageTemp || !messageObject.payload.binaryInfo) throw new BadRequestError();
+    this.fullMessageTemp.setFileInfo({ ...(messageObject.payload.binaryInfo) });
     return WsMessage.clone(messageObject);
   }
 
   fromBinary(data) {
     if (!this.fullMessageTemp) throw new BadRequestError();
     this.fullMessageTemp.setBinary(data);
-    return new WsMessage(undefined, undefined, true);
+    return new WsMessage({}, undefined, true);
   }
 
   async fromMessageFooter(messageObject) {
@@ -80,6 +81,7 @@ class AnswerGeneratorClient {
     const answer = WsMessage.clone(messageObject);
 
     answer.payload = await this.fullMessageTemp.save();
+    console.log('footer save ', answer.payload);
     this.fullMessageTemp = null;
 
     return answer;
@@ -88,7 +90,8 @@ class AnswerGeneratorClient {
   async fromTextMessage(messageObject) {
     const answer = WsMessage.clone(messageObject);
 
-    const textMessage = new FullMessage({ ...(messageObject.payload) });
+    const textMessage = new FullMessage(messageObject.payload);
+    console.log('text', textMessage);
     answer.payload = await textMessage.save();
 
     return answer;
@@ -124,10 +127,12 @@ class AnswerGeneratorClient {
     const history = await serviceFabric.create('message')
       .getHistory(answer.payload.chat, answer.payload.offset);
 
-    for (let message in history) {
+    for (let message of history) {
+      console.log('is attached ', message);
       if (message.attached) {
-        message.audio = serviceFabric.create('audio').getByMessageId(message._id);
-        message.files = serviceFabric.create('file').getByMessageId(message._id);
+        console.log('on attached ');
+        message.audio = await serviceFabric.create('audio').getByMessageId(message._id);
+        message.files = await serviceFabric.create('file').getByMessageId(message._id);
       }
     }
 

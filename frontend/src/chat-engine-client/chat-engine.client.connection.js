@@ -126,8 +126,10 @@ class ChatEngineClientConnection {
       await this.sendAudio(messageObject.audio);
     }
     if (messageObject.files) {
-      const tasksChain = messageObject.files
-        .reduce((acc, file) => acc.then(this.sendFile(file)), Promise.resolve());
+      let tasksChain = Promise.resolve();
+      messageObject.files.forEach((file) => {
+        tasksChain = tasksChain.then(() => this.sendFile(file));
+      });
 
       await tasksChain;
       // for (let file of messageObject.files) {
@@ -150,6 +152,7 @@ class ChatEngineClientConnection {
   }
 
   async sendBinary(info, data, action = ACTIONS.audioInfo) {
+    console.log('binary type ', data);
     const infoResult = await this.sendBinaryInfo(info, action);
     if (infoResult.error) throw new SendMessageError();
     const binaryResult = await this.socket.sendBinaryAsync(data);
@@ -158,6 +161,7 @@ class ChatEngineClientConnection {
   }
 
   async sendBinaryInfo(binaryInfo, action = ACTIONS.audioInfo) {
+    console.log('info ', binaryInfo);
     return this.socket.sendAsync({
       binaryInfo,
       token: this.token,
@@ -166,8 +170,11 @@ class ChatEngineClientConnection {
   }
 
   async sendMessageHeader(chat, messageObject) {
+    const header = {
+      text: messageObject.text,
+    };
     return this.socket.sendAsync({
-      message: messageObject,
+      ...header,
       chat,
       token: this.token,
       action: ACTIONS.messageHeader,

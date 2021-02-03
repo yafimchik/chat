@@ -3,13 +3,15 @@ const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
 const { verifyToken } = require('../../app/middlewares/auth.middleware');
 const mime = require('mime-types');
+const BadPermissionError = require('../../errors/bad-permission.error');
+const { toArrayBuffer } = require('../../common/utils');
 
-fileRouter.route('/:id').post(
+fileRouter.route('/:id').get(
   asyncHandler(verifyToken),
   asyncHandler(
     async (req, res) => {
       const { id } = req.params;
-      console.log('audio id = ', id);
+      console.log('file id = ', id);
 
       const fileRecord = await serviceFabric.create('file').getById(id);
 
@@ -19,8 +21,10 @@ fileRouter.route('/:id').post(
 
       let contentType = mime.lookup(fileRecord.filename);
       if (!contentType) contentType = 'application/octet-stream';
-      const { size } = fileRecord.file;
+      const { size } = fileRecord.size;
       const filename = fileRecord.filename;
+
+      const arraybuffer = toArrayBuffer(fileRecord.file, fileRecord.size);
 
       res.set({
         'Cache-Control': 'no-cache',
@@ -28,7 +32,8 @@ fileRouter.route('/:id').post(
         'Content-Length': size,
         'Content-Disposition': `attachment; filename=${filename}`,
       });
-      res.send(fileRecord.file);
+      console.log('file buf ', arraybuffer);
+      res.send(arraybuffer);
     },
   ),
 );

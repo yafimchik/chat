@@ -6,6 +6,7 @@
     placeholder="Choose a file or drop it here..."
     drop-placeholder="Drop file here..."
     @input="onInput"
+    variant="outline-info"
   ></b-form-file>
 </template>
 

@@ -6,6 +6,10 @@ export default {
     currentRecord: undefined,
     isRecording: false,
     isPlaying: false,
+    startPlay: '',
+    playerSource: '',
+    playedTime: '',
+    playerDuration: '',
   }),
   mutations: {
     initRecorder(state, options) {
@@ -19,9 +23,39 @@ export default {
     },
     setPlayerState(state, isPlaying) {
       state.isPlaying = isPlaying;
+      console.log('is playing state ', state.isPlaying);
+    },
+    setPlayerTime(state, playedTime) {
+      state.playedTime = playedTime;
+    },
+    setPlayerDuration(state, playerDuration) {
+      state.playerDuration = playerDuration;
+    },
+    setPlayerSource(state, source) {
+      if (typeof source === 'string') {
+        state.playerSource = source.slice();
+      } else {
+        state.playerSource = source;
+      }
+    },
+    startPlay(state, source) {
+      if (typeof source === 'string') {
+        state.startPlay = source.slice();
+      } else {
+        state.startPlay = source;
+      }
+    },
+    stopPlay(state) {
+      state.startPlay = undefined;
+    },
+    startStopPlay(state, source) {
+      if (typeof source === 'string') {
+        state.startPlay = source.slice();
+      } else {
+        state.startPlay = source;
+      }
     },
   },
-  actions: {},
   getters: {
     audioSource(state) {
       return state.currentRecord ? state.currentRecord.url : '';

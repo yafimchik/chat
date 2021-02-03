@@ -2,7 +2,9 @@
   <section class="new-message">
     <b-input-group>
       <template #prepend>
-        <b-input-group-text>new message</b-input-group-text>
+        <b-button variant="outline-info" @click="attachVisibility=!attachVisibility">
+          <b-icon icon="plus-circle"></b-icon>
+        </b-button>
       </template>
       <b-form-textarea
         v-model="newMessage"
@@ -12,12 +14,10 @@
       ></b-form-textarea>
       <b-input-group-append>
         <b-button variant="outline-info" @click="onSend">send</b-button>
-        <b-button v-b-toggle.collapse-plus variant="outline-info">
-          <b-icon icon="plus-circle" sacle="2"></b-icon>
-        </b-button>
+
       </b-input-group-append>
     </b-input-group>
-    <b-collapse id="collapse-plus">
+    <b-collapse v-model="attachVisibility">
       <app-audio class="mt-2"></app-audio>
       <app-files class="mt-2"></app-files>
     </b-collapse>
@@ -27,6 +27,7 @@
 <script>
 import AttachingAudio from '@/components/chat/new-message/AttachingAudio.vue';
 import AttachingFiles from '@/components/chat/new-message/attaching-files/AttachingFiles.vue';
+import readFileAsync from '@/vue-utils/utils';
 
 export default {
   name: 'NewMessage',
@@ -36,6 +37,7 @@ export default {
   },
   data() {
     return {
+      attachVisibility: false,
       newMessage: this.draft ? this.draft : '',
     };
   },
@@ -61,6 +63,10 @@ export default {
     attachedFiles() {
       return this.$store.state.ui.attachedFiles;
     },
+    hasFiles() {
+      if (!this.attachedFiles) return false;
+      return !!this.attachedFiles.length;
+    },
     currentRecord() {
       return this.$store.state.audio.currentRecord;
     },
@@ -77,39 +83,70 @@ export default {
         this.chatClient.sendStatus(this.virtualServer, this.chat);
       }
     },
-    onSend() {
-      if (this.newMessage) this.send();
-      else {
-        console.log('nothing to send');
+    async onSend() {
+      if (!this.newMessage && !this.currentRecord && !this.hasFiles) return;
+      if (await this.send()) {
+        this.newMessage = '';
+        await this.$store.dispatch('afterMessageSending');
+        this.chatClient.sendStatus(this.virtualServer, undefined);
+        this.$store.commit('updateDraft', this.newMessage);
+      } else {
+        this.$store.commit('postNotification', {
+          error: true,
+          message: 'Message was not sent!',
+          title: 'Attention. Error!',
+        });
       }
     },
     async send() {
-      // const chat = this.chat.slice();
+      const chat = this.chat.slice();
       const text = this.newMessage;
-      // const audio = this.currentRecord;
-      // const files = this.attachedFiles;
+      let audio;
+      try {
+        if (this.currentRecord) {
+          audio = {
+            type: this.currentRecord.type,
+            audio: await this.currentRecord.blob.arrayBuffer(),
+            size: this.currentRecord.size,
+            duration: this.currentRecord.duration,
+          };
+        }
+      } catch (e) {
+        return false;
+      }
+
+      let files = this.attachedFiles;
+      if (files) {
+        files = files.length ? files : undefined;
+      }
+      if (files) {
+        files = await Promise.all(files.map((file) => readFileAsync(file)
+          .then((fileBuffer) => ({
+            filename: file.name,
+            file: fileBuffer,
+            size: file.size,
+          }))));
+      }
+
+      const message = {
+        chat,
+        text,
+        audio,
+        files,
+      };
+
       let result;
       try {
         result = await this.chatClient
-          .sendFullMessage(this.virtualServer, this.chat, text);
+          .sendFullMessage(this.virtualServer, this.chat, message);
       } catch (e) {
-        console.log('error on send ', e);
-        return;
+        return false;
       }
 
-      if (!result) {
-        console.log('no result from server');
-        return;
+      if (!result || result.error) {
+        return false;
       }
-      if (result.error) {
-        console.log('error result from server');
-        return;
-      }
-
-      this.newMessage = '';
-      this.$store.commit('updateUserStatus', undefined);
-      this.chatClient.sendStatus(this.virtualServer, undefined);
-      this.$store.commit('updateDraft', this.newMessage);
+      return true;
     },
   },
 };

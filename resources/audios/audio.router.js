@@ -3,14 +3,18 @@ const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
 const mime = require('mime-types');
 const BadPermissionError = require('../../errors/bad-permission.error');
+const {toArrayBuffer} = require('../../common/utils');
 const { verifyToken } = require('../../app/middlewares/auth.middleware');
 
-audioRouter.route('/:id').post(
+// audioRouter.all('*', (req) => {
+//   console.log('req ', req);
+// });
+
+audioRouter.route('/:id').get(
   asyncHandler(verifyToken),
   asyncHandler(
     async (req, res, next) => {
       const { id } = req.params;
-      console.log('audio id = ', id);
 
       const audioRecord = await serviceFabric.create('audio').getById(id);
 
@@ -21,7 +25,9 @@ audioRouter.route('/:id').post(
       const type = audioRecord.type;
       let contentType = mime.lookup(type);
       if (!contentType) contentType = 'audio/mpeg';
-      const size = mime.lookup(audioRecord.audio.size);
+      const size = audioRecord.size;
+
+      const arraybuffer = toArrayBuffer(audioRecord.audio, audioRecord.size);
 
       res.set({
         'Cache-Control': 'no-cache',
@@ -29,7 +35,8 @@ audioRouter.route('/:id').post(
         'Content-Length': size,
         'Content-Disposition': `attachment; filename=${id}.${type ? type : 'mp3'}`,
       });
-      res.send(audioRecord.audio);
+
+      res.send(arraybuffer);
     },
   ),
 );

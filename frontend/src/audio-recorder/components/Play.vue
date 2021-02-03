@@ -1,16 +1,8 @@
 <template>
-  <b-button class="play" variant="outline-info" @click="playback" :disabled="!isPlayerReady">
-    <b-icon icon="play-fill" scale="1"></b-icon>
-    <p>{{ playedTime }}</p>
-    <p v-if="!!duration">{{ `/ ${duration}` }}</p>
-    <audio
-      ref="player"
-      :src="audioSource"
-      @loadstart="onPlayerLoadStart"
-      @ended="onPlayerEnded"
-      @loadeddata="onPlayerLoadedData"
-      @timeupdate="onPlayerTimeUpdate"
-    ></audio>
+  <b-button class="play" variant="outline-info" @click="onPlay" :disabled="!downloadLink">
+    <b-icon :icon="icon" scale="1"></b-icon>
+    <p v-if="downloadLink">{{ playedTime }}</p>
+    <p v-if="downloadLink">{{ `/ ${duration}` }}</p>
   </b-button>
 </template>
 
@@ -19,81 +11,45 @@ import { convertTimeMMSS } from '../lib/utils';
 
 export default {
   props: {
-    src: {
+    icon: {
       type: String,
-      default: '',
+      default: 'play-fill',
     },
   },
   data() {
     return {
-      duration: convertTimeMMSS(0),
-      playedTime: convertTimeMMSS(0),
-      isPlayerReady: false,
     };
   },
-  mounted() {
-  },
-  beforeDestroy() {
-    this.stop();
+  async beforeDestroy() {
+    if (this.isOnPlayer) {
+      this.$store.commit('stopPlay');
+    }
   },
   computed: {
-    audioSource() {
-      if (this.src) return this.src;
-      const url = this.$store.getters.audioSource;
-      if (url) {
-        return url;
-      }
-      this._resetProgress();
-      return '';
+    playerSource() {
+      return this.$store.state.audio.playerSource;
     },
-    isPlaying() {
-      return this.$store.state.audio.isPlaying;
+    isOnPlayer() {
+      if (!this.downloadLink) return false;
+      return (this.downloadLink === this.playerSource);
+    },
+    downloadLink() {
+      if (!this.$store.state.audio.currentRecord) return undefined;
+      return this.$store.state.audio.currentRecord.url;
+    },
+    playedTime() {
+      if (!this.isOnPlayer) return convertTimeMMSS(0);
+      return this.$store.state.audio.playedTime;
+    },
+    duration() {
+      if (this.downloadLink) return this.$store.state.audio.currentRecord.duration;
+      return convertTimeMMSS(0);
     },
   },
   methods: {
-    onPlayerLoadStart() {
-      this.isPlayerReady = false;
-    },
-    onPlayerEnded() {
-      this.$store.commit('setPlayerState', false);
-    },
-    onPlayerLoadedData() {
-      this.isPlayerReady = true;
-      this._resetProgress();
-      this.duration = convertTimeMMSS(this.$refs.player.duration);
-    },
-    onPlayerTimeUpdate() {
-      this.playedTime = convertTimeMMSS(this.$refs.player.currentTime);
-    },
-    playback() {
-      if (!this.audioSource) {
-        return;
-      }
-
-      if (this.isPlaying) {
-        this.stop();
-      } else {
-        setTimeout(() => {
-          this.play();
-        }, 0);
-      }
-    },
-    play() {
-      this.$refs.player.load();
-      this.$store.commit('setPlayerState', false);
-    },
-    stop() {
-      this.$store.commit('setPlayerState', true);
-      this.$refs.player.play();
-    },
-    _resetProgress() {
-      if (this.isPlaying) {
-        this.$refs.player.load();
-      }
-
-      this.duration = convertTimeMMSS(0);
-      this.playedTime = convertTimeMMSS(0);
-      this.$store.commit('setPlayerState', false);
+    onPlay() {
+      if (!this.downloadLink) return;
+      this.$store.commit('startStopPlay', this.downloadLink);
     },
   },
 };

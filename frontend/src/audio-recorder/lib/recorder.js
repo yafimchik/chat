@@ -78,7 +78,8 @@ export default class {
       record = wavEncoder.finish();
       this.wavSamples = [];
     }
-
+    record.type = this.format;
+    record.size = record.blob.size;
     record.duration = convertTimeMMSS(this.duration);
     this.record = record;
 

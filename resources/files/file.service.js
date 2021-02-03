@@ -1,14 +1,15 @@
 const CrudService = require('../prototype/crud.service');
 
 class FileService extends CrudService {
-  getByMessageId(message) {
-    let files = this.getWhere({ message });
+  async getByMessageId(message) {
+    let files = await this.repo.getByMessageId(message);
     if (!files) return [];
+    if (!files.length) return [];
     files = files.map((record) => ({
       _id: record._id,
       filename: record.filename,
-      size: record.file.size,
       message: record.message,
+      size: record.size,
     }));
     return files;
   }

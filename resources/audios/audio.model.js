@@ -4,12 +4,20 @@ const relations = require("../prototype/relation.types");
 const modelType = {
   message: { type: mongoose.Schema.Types.ObjectId, ref: 'message' },
   audio: {
-    type: String,
+    type: Buffer,
     required: true,
     unique: false,
   },
   type: {
     type: String,
+    required: true,
+  },
+  duration: {
+    type: String,
+    required: true,
+  },
+  size: {
+    type: Number,
     required: true,
   },
 };

@@ -12,11 +12,11 @@ class WsMessage {
   }
 
   toString() {
-    return JSON.stringify({ payload: this.payload, uuid: this.uuid });
+    return JSON.stringify({ payload: this.payload, uuid: this.uuid, binarySent: this.binarySent });
   }
 
   static clone(messageObject) {
-    return new WsMessage(messageObject.payload, messageObject.uuid);
+    return new WsMessage(messageObject.payload, messageObject.uuid, messageObject.binarySent);
   }
 
   static fromString(string) {
