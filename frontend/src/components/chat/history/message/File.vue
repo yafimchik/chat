@@ -58,9 +58,7 @@ export default {
         if (response.ok) buffer = await response.arrayBuffer();
         if (buffer) {
           const dataView = new DataView(buffer);
-          console.log(mime.lookup(this.file.filename));
           const blob = new Blob([dataView], { type: mime.lookup(this.file.filename) });
-          console.log('blob ', blob);
           if (window.navigator.msSaveOrOpenBlob) { // IE10+
             window.navigator.msSaveOrOpenBlob(blob, this.file.filename);
           } else { // Others
@@ -71,7 +69,10 @@ export default {
           }
         }
       } catch (e) {
-        console.error(e);
+        this.$store.commit('postNotification', {
+          error: true,
+          message: 'File download error!',
+        });
       }
     },
   },
