@@ -23,7 +23,6 @@ export default {
     },
     setPlayerState(state, isPlaying) {
       state.isPlaying = isPlaying;
-      console.log('is playing state ', state.isPlaying);
     },
     setPlayerTime(state, playedTime) {
       state.playedTime = playedTime;

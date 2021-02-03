@@ -28,10 +28,7 @@ export default {
         this.onStart();
       } else if (mutation.type === 'stopPlay') {
         this.onStop();
-      } else {
-        return;
       }
-      console.log(mutation.type);
     }));
   },
   beforeDestroy() {
@@ -57,7 +54,6 @@ export default {
       if (this.$refs.player) this.$refs.player.src = value;
     },
     onStartStop() {
-      console.log('on start stop ', this.newSource);
       if (!this.newSource) {
         this.onStop();
         return;
@@ -74,11 +70,9 @@ export default {
     },
     onStart() {
       if (!this.getSource() && !this.newSource) return;
-      console.log('on start ', this.newSource);
 
       if (this.newSource !== this.getSource()) {
         this.setSource(this.newSource);
-        console.log('source', this.$refs.player.src);
         this.$store.commit('setPlayerSource', this.getSource());
         this.play();
       } else if (!this.isPlaying) {
@@ -86,24 +80,20 @@ export default {
       }
     },
     onStop() {
-      console.log('on stop ', this.newSource);
       this.stop();
     },
     onPlayerPlay() {
-      console.log('on play ');
       if (this.isPlaying) return;
       this.isPlaying = true;
       this.$store.commit('setPlayerState', this.isPlaying);
     },
     onPlayerEnded() {
-      console.log('on end');
       this.isPlaying = false;
       this.$store.commit('setPlayerState', this.isPlaying);
       this.playedTime = convertTimeMMSS(0);
       this.$store.commit('setPlayerTime', this.playedTime);
     },
     onPlayerLoadedData() {
-      console.log('on loaded');
       if (!this.$refs.player) return;
       this.resetProgress();
       this.duration = convertTimeMMSS(this.$refs.player.duration);
@@ -115,13 +105,11 @@ export default {
       this.$store.commit('setPlayerTime', this.playedTime);
     },
     stop() {
-      console.log('stop');
       this.setSource(undefined);
       this.$store.commit('setPlayerState', false);
       // this.$refs.player.load();
     },
     play() {
-      console.log('play ', this.$refs.player.src);
       if (this.getSource()) this.$refs.player.play();
     },
     resetProgress() {

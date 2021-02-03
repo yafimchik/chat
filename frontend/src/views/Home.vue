@@ -1,12 +1,12 @@
 <template>
   <main class="flex-grow-1 row">
-    <div class="col-3">
+    <div class="col-3 p-2">
       <app-chat-list></app-chat-list>
     </div>
-    <div class="col-6">
+    <div class="col-7 p-2">
       <app-chat></app-chat>
     </div>
-    <div class="col-3">
+    <div class="col-2 p-2">
       <app-user-list></app-user-list>
     </div>
   </main>

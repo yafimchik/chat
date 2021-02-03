@@ -1,6 +1,6 @@
 <template>
   <b-button class="play" variant="outline-info" @click="onPlay" :disabled="!downloadLink">
-    <b-icon :icon="icon" scale="1"></b-icon>
+    <b-icon :icon="icon" scale="1" :animation="iconAnimation"></b-icon>
     <p v-if="downloadLink">{{ playedTime }}</p>
     <p v-if="downloadLink">{{ `/ ${duration}` }}</p>
   </b-button>
@@ -26,6 +26,12 @@ export default {
     }
   },
   computed: {
+    iconAnimation() {
+      return (this.isPlaying && this.isOnPlayer) ? 'fade' : undefined;
+    },
+    isPlaying() {
+      return this.$store.state.audio.isPlaying;
+    },
     playerSource() {
       return this.$store.state.audio.playerSource;
     },

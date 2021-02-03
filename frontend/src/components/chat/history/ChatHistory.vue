@@ -59,6 +59,8 @@ export default {
     },
     scrollHistoryToEnd() {
       if (this.userScrolling) return;
+      if (!this.historyElement) return;
+      if (!this.historyElement.children.length) return;
       this.historyElement.children[this.historySize - 1].scrollIntoView();
       this.autoScroll = true;
     },
@@ -88,6 +90,9 @@ export default {
       this.$store.commit('clearUnreadMessagesCount');
     }
     if (this.previousHistorySize !== null) {
+      if (!this.historyElement) return;
+      if (!this.historyElement.children) return;
+      if (!this.historyElement.children.length) return;
       this.historyElement.children[this.historySize - this.previousHistorySize].scrollIntoView();
       this.previousHistorySize = null;
     } else {

@@ -7,7 +7,7 @@
     >
       <p class="mb-0" v-if="!isOnPlayer">{{ size }} Mb</p>
       <p class="mb-0" v-if="isOnPlayer">{{ playedTime }} / {{ audio.duration }}</p>
-      <b-icon class="ml-3" icon="soundwave" scale="2"></b-icon>
+      <b-icon class="ml-3" icon="soundwave" scale="2" :animation="iconAnimation"></b-icon>
     </b-button>
   </div>
 </template>
@@ -28,7 +28,6 @@ export default {
   },
   methods: {
     async download() {
-      console.log('audio', this.$store.state.audio);
       if (this.downloadLink) {
         this.$store.commit('startStopPlay', this.downloadLink);
         return;
@@ -62,6 +61,12 @@ export default {
     window.URL.revokeObjectURL(this.downloadLink);
   },
   computed: {
+    iconAnimation() {
+      return (this.isPlaying && this.isOnPlayer) ? 'fade' : undefined;
+    },
+    isPlaying() {
+      return this.$store.state.audio.isPlaying;
+    },
     playerSource() {
       return this.$store.state.audio.playerSource;
     },
