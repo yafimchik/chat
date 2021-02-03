@@ -6,7 +6,8 @@ class AudioCrudMongodb extends CrudMongodb {
     super(...props);
 
     this.getByMessageId = async function (messageId) {
-      return this.getWhere({ message: mongoose.Types.ObjectId(messageId) });
+      return this
+        .getWhere({ message: mongoose.Types.ObjectId(messageId) }, undefined, ['audio']);
     };
   }
 

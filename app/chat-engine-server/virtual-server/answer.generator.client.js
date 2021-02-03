@@ -124,17 +124,20 @@ class AnswerGeneratorClient {
   async fromGetHistoryMessage(messageObject) {
     const answer = WsMessage.clone(messageObject);
 
-    const history = await serviceFabric.create('message')
+    let history = await serviceFabric.create('message')
       .getHistory(answer.payload.chat, answer.payload.offset);
 
-    for (let message of history) {
-      console.log('is attached ', message);
-      if (message.attached) {
-        console.log('on attached ');
-        message.audio = await serviceFabric.create('audio').getByMessageId(message._id);
-        message.files = await serviceFabric.create('file').getByMessageId(message._id);
-      }
+    async function getAttachedData(messageObject) {
+      const newObject = { ...messageObject };
+      newObject.audio = await serviceFabric.create('audio').getByMessageId(messageObject._id);
+      newObject.files = await serviceFabric.create('file').getByMessageId(messageObject._id);
+      return newObject;
     }
+
+    history = await Promise.all(history.map((message) => {
+      if (!message.attached) Promise.resolve(message);
+      return getAttachedData(message);
+    }));
 
     answer.payload.history = history;
     return answer;

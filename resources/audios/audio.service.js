@@ -6,7 +6,7 @@ class AudioService extends CrudService {
     if (!audios) return undefined;
     if (!audios.length) return undefined;
     const audio = audios[0];
-    delete audio.audio;
+    // delete audio.audio;
     return audio;
   }
 }
