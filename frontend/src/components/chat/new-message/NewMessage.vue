@@ -82,7 +82,7 @@ export default {
           bigFiles.forEach((file, index) => {
             setTimeout(() => {
               this.$store.commit('postNotification', {
-                title: `File is too big! Max Size: ${maxFileSize}`,
+                title: `File is too big! Max Size: ${maxFileSize} Mb`,
                 message: `File: ${file.name} size: ${Math.round(file.size / 1024 / 1024)} Mb`,
               });
             }, index * 250);
