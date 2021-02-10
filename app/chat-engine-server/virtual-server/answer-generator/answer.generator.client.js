@@ -1,8 +1,9 @@
-const WsMessage = require('./ws-message');
-const serviceFabric = require('../../../resources/service.fabric');
-const BadRequestError = require('../../../errors/bad-request.error');
+const WsMessage = require('../ws-message');
+const serviceFabric = require('../../../../resources/service.fabric');
+const BadRequestError = require('../../../../errors/bad-request.error');
 const FullMessage = require('./full-message');
-const { ACTIONS, BROADCAST_ANSWERS } = require('../chat-engine.client.constants');
+const { filterDoublesInArray } = require('../../../../common/utils');
+const { ACTIONS, BROADCAST_ANSWERS } = require('../../chat-engine.client.constants');
 
 class AnswerGeneratorClient {
   constructor(answerGeneratorServer) {
@@ -53,8 +54,6 @@ class AnswerGeneratorClient {
 
   fromMessageHeader(messageObject) {
     this.fullMessageTemp = new FullMessage(messageObject.payload);
-    console.log('header ', this.fullMessageTemp);
-
     return WsMessage.clone(messageObject);
   }
 
@@ -81,7 +80,6 @@ class AnswerGeneratorClient {
     const answer = WsMessage.clone(messageObject);
 
     answer.payload = await this.fullMessageTemp.save();
-    console.log('footer save ', answer.payload);
     this.fullMessageTemp = null;
 
     return answer;
@@ -91,7 +89,6 @@ class AnswerGeneratorClient {
     const answer = WsMessage.clone(messageObject);
 
     const textMessage = new FullMessage(messageObject.payload);
-    console.log('text', textMessage);
     answer.payload = await textMessage.save();
 
     return answer;
@@ -100,8 +97,10 @@ class AnswerGeneratorClient {
   async fromStatusMessage(messageObject) {
     this.updateStatus(messageObject.payload.user, messageObject.payload.status);
 
+    const status = filterDoublesInArray(this.serverStatus, (status) => status.user);
+
     return new WsMessage({
-      status: this.serverStatus,
+      status,
       action: ACTIONS.status,
     });
   }

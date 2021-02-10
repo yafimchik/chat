@@ -1,14 +1,15 @@
 const BadTokenError = require('../../../errors/bad-token.error');
 const BadPermissionError = require('../../../errors/bad-permission.error');
-const AnswerGeneratorClient = require('./answer.generator.client');
 const serviceFabric = require('../../../resources/service.fabric');
 const loginService = require('../../../common/login.service');
 const WsMessage = require('./ws-message');
+const Status = require('./status');
 
 class VirtualServerClient {
   constructor(wsConnection, virtualServer) {
     this.connection = wsConnection;
     this.user = undefined;
+    this.status = new Status();
     this.virtualServer = virtualServer;
     this.answerGenerator = this.virtualServer.answerGenerator.createClient();
     this.isAlive = true;
@@ -39,7 +40,6 @@ class VirtualServerClient {
       this.onBinaryMessage(message);
       return;
     }
-    console.log('not binary');
 
     const messageObject = WsMessage.fromString(message);
     const token = messageObject.payload.token;
@@ -50,20 +50,23 @@ class VirtualServerClient {
         throw new BadTokenError();
       }
 
-      messageObject.payload.user = loginService.getUserId(token);
+      const userId = loginService.getUserId(token);
+      const user = loginService.getUser(token);
 
       const userHasPermission = await serviceFabric.create('user')
-        .hasVirtualServer(messageObject.payload.user, this.virtualServer.id);
+        .hasVirtualServer(userId, this.virtualServer.id);
       if (!userHasPermission) throw new BadPermissionError();
 
+      messageObject.payload.user = userId;
+
       if (!this.user) {
-        this.user = messageObject.payload.user;
+        this.user = user;
         await this.virtualServer.broadcastContactsOnline();
       }
 
       const answer = await this.answerGenerator.fromMessage(messageObject);
 
-      if (AnswerGeneratorClient.isBroadcast(answer)) {
+      if (this.answerGenerator.constructor.isBroadcast(answer)) {
         this.virtualServer.broadcastMessage(answer);
       } else {
         this.sendToClient(answer);
@@ -78,12 +81,10 @@ class VirtualServerClient {
   }
 
   onError(error) {
-    console.log('ws error ', error);
     this.connection.terminate();
   }
 
   sendErrorToClient(messageObject, error) {
-    console.log(error);
     messageObject.payload.error = {
       shortMsg: error.shortMsg,
       responseStatus: error.responseStatus,
@@ -92,7 +93,6 @@ class VirtualServerClient {
   }
 
   async onClose(event) {
-    console.log(event);
     this.virtualServer.clients = this.virtualServer.clients.filter(client => client !== this);
     await this.virtualServer.broadcastContactsOnline();
   }

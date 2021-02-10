@@ -3,12 +3,14 @@ const DEFAULT_STATE = () => ({
   token: undefined,
   virtualServers: {},
   chats: {},
+  voiceChannels: {},
   chatHistory: [],
   status: {},
   contacts: [],
   contactsOnline: {},
   currentVirtualServerId: undefined,
   currentChatId: undefined,
+  currentVoiceChannelId: undefined,
 });
 
 export default {
@@ -24,6 +26,9 @@ export default {
     setCurrentChat(state, chatId) {
       state.currentChatId = chatId.slice();
     },
+    setCurrentVoiceChannel(state, voiceChannelId) {
+      state.currentVoiceChannelId = voiceChannelId.slice();
+    },
     setVirtualServers(state, virtualServersArray) {
       const virtualServers = {};
       virtualServersArray.forEach((vs) => {
@@ -33,6 +38,9 @@ export default {
     },
     setChats(state, chats) {
       state.chats = { ...chats };
+    },
+    setVoiceChannels(state, voiceChannels) {
+      state.voiceChannels = { ...voiceChannels };
     },
     saveUser(state, user) {
       state.user = { ...user };
@@ -92,11 +100,8 @@ export default {
       state.contacts = [...contacts];
     },
     setToDefaultsAll(state) {
-      console.log('set to def');
       const newState = DEFAULT_STATE();
       Object.entries(newState).forEach(([key, value]) => {
-        console.log('key ', key);
-        console.log('val ', value);
         state[key] = value;
       });
     },
@@ -116,6 +121,10 @@ export default {
       const chat = state.chats[state.currentChatId];
       return { ...chat };
     },
+    currentVoiceChannel(state) {
+      const voiceChannel = state.voiceChannels[state.currentVoiceChannelId];
+      return { ...voiceChannel };
+    },
     currentVirtualServer(state) {
       return state.virtualServers[state.currentVirtualServerId];
     },
@@ -133,6 +142,30 @@ export default {
     },
     currentVirtualServerStatus(state) {
       return state.status[state.currentVirtualServerId];
+    },
+    currentChatStatus(state) {
+      console.log('curStatus', state.status);
+      if (!state.status[state.currentVirtualServerId]) return [];
+      const status = state.status[state.currentVirtualServerId]
+        .filter((userStatus) => userStatus.value.chat === state.currentChatId)
+        .map((userStatus) => userStatus.user);
+      return status;
+    },
+    voiceChannelStatus(state) {
+      return (voiceChannelId) => {
+        if (!state.status[state.currentVirtualServerId]) return [];
+        const status = state.status[state.currentVirtualServerId]
+          .filter((userStatus) => userStatus.value.voiceChannel === voiceChannelId)
+          .map((userStatus) => userStatus.user);
+        return status;
+      };
+    },
+    currentVoiceChannelStatus(state) {
+      if (!state.status[state.currentVirtualServerId]) return [];
+      const status = state.status[state.currentVirtualServerId]
+        .filter((userStatus) => userStatus.value.voiceChannel === state.currentVoiceChannelId)
+        .map((userStatus) => userStatus.user);
+      return status;
     },
     userById(state) {
       return (userId) => state.contacts.find((user) => user._id === userId);

@@ -18,12 +18,30 @@ export default {
     },
   },
   actions: {
+    async updateUserChatStatus({ commit, state, rootState }, chatId) {
+      commit('updateUserChatStatus', chatId);
+      state.chatClient.sendStatus(
+        rootState.chatData.currentVirtualServerId,
+        rootState.ui.userStatus,
+      );
+    },
+    async updateUserVoiceChannelStatus({ commit, state, rootState }, voiceChannelId) {
+      commit('updateUserVoiceChannelStatus', voiceChannelId);
+      state.chatClient.sendStatus(
+        rootState.chatData.currentVirtualServerId,
+        rootState.ui.userStatus,
+      );
+    },
+    async updateUserStatus({ commit, state, rootState }, newStatus) {
+      commit('updateUserStatus', newStatus);
+      state.chatClient.sendStatus(
+        rootState.chatData.currentVirtualServerId,
+        rootState.ui.userStatus,
+      );
+    },
     async logout({ commit, state }) {
-      console.log('logout action');
       const result = await state.chatClient.disconnect();
-      console.log('result of disc', result);
       if (result) {
-        console.log('lets set to def');
         commit('setToDefaultsAll');
       }
     },

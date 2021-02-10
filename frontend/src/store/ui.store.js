@@ -1,6 +1,9 @@
 const DEFAULT_STATE = () => ({
   online: false,
-  userStatus: undefined, // chat id where user writes a message or undefined
+  userStatus: {
+    chat: undefined,
+    voiceChannel: undefined,
+  },
   draft: {},
   unreadMessages: {},
   historyLoaded: {},
@@ -20,7 +23,18 @@ export default {
       state.draft = { ...state.draft };
     },
     updateUserStatus(state, status) {
-      state.userStatus = status;
+      if (status) state.userStatus = { ...status };
+      else state.userStatus = status;
+    },
+    updateUserChatStatus(state, chatId) {
+      const newUserStatus = { ...state.userStatus };
+      newUserStatus.chat = chatId;
+      state.userStatus = newUserStatus;
+    },
+    updateUserVoiceChannelStatus(state, voiceChannelId) {
+      const newUserStatus = { ...state.userStatus };
+      newUserStatus.voiceChannel = voiceChannelId;
+      state.userStatus = newUserStatus;
     },
     clearUnreadMessagesCount(state) {
       const unreadMessages = { ...state.unreadMessages };

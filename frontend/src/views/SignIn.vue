@@ -43,7 +43,7 @@
         <div class="buttons">
           <b-button type="reset" variant="danger">Reset</b-button>
           <b-button class="ml-2" type="submit" variant="primary">Sign In</b-button>
-<!--          <b-button type="button" variant="outline-primary" @click="goSignUp">Sign Up</b-button>-->
+<!--  <b-button type="button" variant="outline-primary" @click="goSignUp">Sign Up</b-button>-->
         </div>
       </b-form>
     </div>
@@ -108,7 +108,9 @@ export default {
           this.form.password,
         );
       } catch (e) {
-        console.log(e);
+        this.$store.commit('postNotification', {
+          error: true,
+        });
         return;
       }
 
@@ -127,7 +129,9 @@ export default {
       try {
         connected = await this.chatClient.connect();
       } catch (e) {
-        console.log(e);
+        this.$store.commit('postNotification', {
+          error: true,
+        });
         return;
       }
 

@@ -37,7 +37,6 @@ class ChatEngineClientConnection {
     });
 
     let result = await this.socket.connectAsync();
-    console.log('connected or not: ', result);
 
     if (!result && !reconnect) result = await this.connectToServer(true);
     if (result) {
@@ -92,7 +91,6 @@ class ChatEngineClientConnection {
   }
 
   sendStatus(status) {
-    console.log('send status ', status);
     return this.socket.send({
       status,
       token: this.token,
@@ -119,7 +117,6 @@ class ChatEngineClientConnection {
     }
     const message = await this.sendMessageHeader(chat, messageObject);
     if (message.error) {
-      console.debug(message.error);
       throw new SendMessageError();
     }
     if (messageObject.audio) {

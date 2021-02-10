@@ -39,17 +39,12 @@ const router = new VueRouter({
 
 router.beforeEach((toR, fromR, next) => {
   if (toR.matched.some((route) => route.meta.requiresAuth) && (!store.getters.isLoggedIn)) {
-    console.log('redirect to login?');
     next({ name: 'signIn' });
-    return;
-  }
-  if (toR.path === '/signIn' && store.getters.isLoggedIn) {
-    console.log('redirect to home?');
+  } else if (toR.path === '/signIn' && store.getters.isLoggedIn) {
     next({ name: 'home' });
-    return;
+  } else {
+    next();
   }
-  console.log('straight');
-  next();
 });
 
 export default router;

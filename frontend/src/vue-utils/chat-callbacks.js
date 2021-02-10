@@ -2,7 +2,6 @@ import store from '../store';
 
 export default function onUpdateCallback({ message, virtualServer }) {
   if (message.error) {
-    console.log('error!!! ', message.error);
     const notification = {
       error: message.error,
       serverError: !!message.serverError,
@@ -22,7 +21,6 @@ export default function onUpdateCallback({ message, virtualServer }) {
     store.commit('addMessage', message);
   }
   if (message.status) {
-    console.log(message.status);
     store.commit('updateStatus', {
       virtualServer,
       status: message.status,

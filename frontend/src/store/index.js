@@ -13,10 +13,10 @@ const DEFAULT_STATE = () => ({
 export default new Vuex.Store({
   state: DEFAULT_STATE(),
   actions: {
-    afterMessageSending({ commit }) {
+    async afterMessageSending({ commit, dispatch }) {
       commit('setAttachedFiles', []);
       commit('saveRecord', undefined);
-      commit('updateUserStatus', undefined);
+      await dispatch('updateUserChatStatus', undefined);
     },
   },
   modules: {

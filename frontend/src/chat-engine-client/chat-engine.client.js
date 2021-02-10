@@ -270,7 +270,7 @@ class ChatEngineClient {
 
   get virtualServers() {
     if (!this.user) return [];
-    if (!this.user.virtualServers) return []; // eslint-disable-next-line
+    if (!this.user.virtualServers) return [];
     return this.user.virtualServers.map((vs) => vs._id);
   }
 

@@ -55,7 +55,7 @@ export default {
       return this.$store.state.chatData.currentVirtualServerId;
     },
     userStatus() {
-      return this.$store.state.ui.userStatus;
+      return this.$store.state.ui.userStatus.chat;
     },
     chat() {
       return this.$store.state.chatData.currentChatId;
@@ -95,15 +95,13 @@ export default {
     },
   },
   methods: {
-    onBlur() {
+    async onBlur() {
       this.$store.commit('updateDraft', this.newMessage);
-      this.$store.commit('updateUserStatus', null);
-      this.chatClient.sendStatus(this.virtualServer, undefined);
+      await this.$store.dispatch('updateUserChatStatus', undefined);
     },
-    onInput() {
+    async onInput() {
       if (this.userStatus !== this.chat) {
-        this.$store.commit('updateUserStatus', this.chat);
-        this.chatClient.sendStatus(this.virtualServer, this.chat);
+        await this.$store.dispatch('updateUserChatStatus', this.chat);
       }
     },
     async onSend() {
@@ -116,7 +114,6 @@ export default {
       if (await this.send()) {
         this.newMessage = '';
         await this.$store.dispatch('afterMessageSending');
-        this.chatClient.sendStatus(this.virtualServer, undefined);
         this.$store.commit('updateDraft', this.newMessage);
         this.attachVisibility = false;
       } else {

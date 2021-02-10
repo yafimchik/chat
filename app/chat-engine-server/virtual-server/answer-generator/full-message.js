@@ -1,6 +1,6 @@
-const DatabaseError = require('../../../errors/database.error');
-const serviceFabric = require('../../../resources/service.fabric');
-const BadRequestError = require('../../../errors/bad-request.error');
+const DatabaseError = require('../../../../errors/database.error');
+const serviceFabric = require('../../../../resources/service.fabric');
+const BadRequestError = require('../../../../errors/bad-request.error');
 
 class FullMessage {
   constructor(messageHeader) {
@@ -83,7 +83,6 @@ class FullMessage {
     if (!this.audio) return;
 
     this.audio.message = this.savedRecord._id;
-    console.log('audio for save ', this.audio);
     const audioSavedInDB = await serviceFabric.create('audio').create(this.audio);
 
     if (!audioSavedInDB) throw new DatabaseError();
@@ -97,7 +96,6 @@ class FullMessage {
     if (!this.files.length) return;
 
     this.files.forEach((record) => record.message = this.savedRecord._id);
-    console.log('files', this.files);
 
     let filesSavedInDB = await serviceFabric.create('file').createMany(this.files);
     if (!filesSavedInDB) throw new DatabaseError();

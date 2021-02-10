@@ -16,7 +16,7 @@ class LoginService {
     }
 
     const user = await this.userService.getByLogin(login);
-
+    if (!user) throw new BadLoginError();
     // let result = await this.cryptService.compareStringWithHash(
     //   password,
     //   user.password,
