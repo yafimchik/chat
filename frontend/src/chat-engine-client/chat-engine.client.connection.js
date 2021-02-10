@@ -60,7 +60,6 @@ class ChatEngineClientConnection {
 
   async onError(event) {
     this.errorsCount += 1;
-    console.log('on error ', event);
 
     let isConnectionBad = false;
 
@@ -133,9 +132,6 @@ class ChatEngineClientConnection {
       });
 
       await tasksChain;
-      // for (let file of messageObject.files) {
-      //   await this.sendFile(file);
-      // }
     }
     return this.sendMessageFooter(chat, messageObject);
   }
@@ -153,7 +149,6 @@ class ChatEngineClientConnection {
   }
 
   async sendBinary(info, data, action = ACTIONS.audioInfo) {
-    console.log('binary type ', data);
     const infoResult = await this.sendBinaryInfo(info, action);
     if (infoResult.error) throw new SendMessageError();
     const binaryResult = await this.socket.sendBinaryAsync(data);
@@ -162,7 +157,6 @@ class ChatEngineClientConnection {
   }
 
   async sendBinaryInfo(binaryInfo, action = ACTIONS.audioInfo) {
-    console.log('info ', binaryInfo);
     return this.socket.sendAsync({
       binaryInfo,
       token: this.token,

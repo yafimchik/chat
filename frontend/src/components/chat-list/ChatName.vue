@@ -33,7 +33,6 @@ export default {
   methods: {
     onClick() {
       this.$store.dispatch('setCurrentChat', this.chat._id);
-      // TODO active status (from $store)
     },
   },
 };
