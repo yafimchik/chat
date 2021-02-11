@@ -4,6 +4,7 @@ const userResourceConfig = require('./users/user.resource.config');
 const virtualServerResourceConfig = require('./virtual-servers/virtual-server.resource.config');
 const fileResourceConfig = require('./files/file.resource.config');
 const audioResourceConfig = require('./audios/audio.resource.config');
+const voiceChannelResourceConfig = require('./voice-channels/voice-channel.resource.config');
 
 const mongodbResourceConfig = {
   resourceConfigs: [
@@ -13,6 +14,7 @@ const mongodbResourceConfig = {
     virtualServerResourceConfig,
     fileResourceConfig,
     audioResourceConfig,
+    voiceChannelResourceConfig,
   ],
 };
 

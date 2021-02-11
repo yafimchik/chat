@@ -19,3 +19,7 @@ export const CONNECTION_STATUSES = {
   OPENED: 'opened',
   CLOSING: 'CLOSING',
 };
+
+export const ICE_SERVER_URLS = [
+  'stun:stun.l.google.com:19302',
+];
