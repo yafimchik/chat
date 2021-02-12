@@ -67,7 +67,11 @@ class VirtualServerClient {
       const answer = await this.answerGenerator.fromMessage(messageObject);
 
       if (this.answerGenerator.constructor.isBroadcast(answer)) {
-        this.virtualServer.broadcastMessage(answer);
+        let contacts = answer.payload.to;
+        if (answer.payload.to) {
+          contacts = (contacts instanceof Array) ? answer.payload.to : [ answer.payload.to ];
+        }
+        this.virtualServer.broadcastMessage(answer, contacts);
       } else {
         this.sendToClient(answer);
       }

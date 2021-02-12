@@ -1,4 +1,4 @@
-import VoiceChannelConnection from "@/chat-engine-client/voice-channel/voice-channel.connection";
+import VoiceChannelConnection from '@/chat-engine-client/voice-channel/voice-channel.connection';
 
 const { ICE_SERVER_URLS } = require('@/chat-engine-client/chat-engine.client.constants');
 
@@ -8,8 +8,9 @@ export default class VoiceChannel {
       iceServers: [
         {
           urls: ICE_SERVER_URLS,
-        }
-      ]},
+        },
+      ],
+    },
     sendOfferCallback = () => {},
     sendIceCallback = () => {},
     sendAnswerCallback = () => {},
@@ -28,7 +29,10 @@ export default class VoiceChannel {
     this.mediaStream = undefined;
   }
 
-  async connectToChannel(contacts = []) {
+  async connectToChannel(contacts = [], virtualServer, voiceChannel) {
+    this.virtualServer = virtualServer;
+    this.voiceChannel = voiceChannel;
+
     if (!contacts || !contacts.length) return false;
 
     try {
@@ -38,10 +42,10 @@ export default class VoiceChannel {
         this.connections.push(new VoiceChannelConnection(
           contact,
           this.connectionConfig,
-          this.sendIce,
-          this.sendOffer,
-          this.sendAnswer,
-          this.onInputStream,
+          this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
+          this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
+          this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
+          this.onInputStream.bind(undefined, this.virtualServer, this.voiceChannel),
         ));
       });
 
@@ -49,7 +53,10 @@ export default class VoiceChannel {
     } catch (error) {
       console.error(error);
       this.onError(error);
+      return false;
     }
+
+    return true;
   }
 
   async createMediaStream() {
@@ -60,7 +67,7 @@ export default class VoiceChannel {
       || navigator.mozGetUserMedia;
 
     try {
-      this.mediaStream = await getUserMediaFunction({ video: true, audio:true });
+      this.mediaStream = await getUserMediaFunction({ video: true, audio: true });
       // TODO let see us on screen
       // var my_video = document.getElementById('my')
       // my_video.srcObject = stream
@@ -72,21 +79,34 @@ export default class VoiceChannel {
     return !!this.mediaStream;
   }
 
-  async disconnect() {}
+  // async disconnect() {}
 
-  async onOffer(contact, offer) {
+  async onOffer(
+    virtualServer,
+    {
+      voiceChannel,
+      user,
+      offer,
+      uniqueMessageId,
+    },
+  ) {
+    if (this.virtualServer) {
+      this.virtualServer = virtualServer;
+      this.voiceChannel = voiceChannel;
+    }
+
     try {
       await this.createMediaStream();
 
       const connection = new VoiceChannelConnection(
-        contact,
+        user,
         this.connectionConfig,
-        this.sendIce,
-        this.sendOffer,
-        this.sendAnswer,
-        this.onInputStream,
+        this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
+        this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
+        this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
+        this.onInputStream.bind(undefined, this.virtualServer, this.voiceChannel),
       );
-      await connection.connectToClient(offer);
+      await connection.connectToClient(offer, uniqueMessageId);
       this.connections.push(connection);
     } catch (error) {
       console.error(error);
@@ -94,8 +114,8 @@ export default class VoiceChannel {
     }
   }
 
-  async onIce(contact, ice) {
-    const connection = this.getConnectionByContact(contact);
+  async onIce({ user, ice }) {
+    const connection = this.getConnectionByContact(user);
     try {
       if (connection) await connection.onIce(ice);
     } catch (error) {
@@ -105,7 +125,7 @@ export default class VoiceChannel {
   }
 
   getConnectionByContact(contact) {
-    return this.connections.find((connection) => connection.contact = contact);
+    return this.connections.find((connection) => connection.contact === contact);
   }
 }
 

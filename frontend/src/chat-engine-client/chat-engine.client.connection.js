@@ -7,8 +7,8 @@ class ChatEngineClientConnection {
     serverUrl,
     token,
     virtualServerId,
-    onMessageCallback,
-    onErrorCallback,
+    onMessageCallback = () => {},
+    onErrorCallback = () => {},
     errorsToReconnect = 3,
   ) {
     this.virtualServerId = virtualServerId;
@@ -54,7 +54,7 @@ class ChatEngineClientConnection {
   }
 
   onMessage(message) {
-    if (this.onMessageCallback) this.onMessageCallback(this.virtualServerId, message);
+    this.onMessageCallback(this.virtualServerId, message);
   }
 
   async onError(event) {
@@ -74,7 +74,7 @@ class ChatEngineClientConnection {
     } catch (e) {
       this.onErrorCallback(this.virtualServerId, event);
     }
-    if (isConnectionBad && this.onErrorCallback) this.onErrorCallback(this.virtualServerId, event);
+    if (isConnectionBad) this.onErrorCallback(this.virtualServerId, event);
   }
 
   onOpen() {
@@ -181,20 +181,51 @@ class ChatEngineClientConnection {
   }
 
   async getHistory(chat, offset) {
-    return this.socket.sendAsync({
+    const result = await this.socket.sendAsync({
       offset,
       chat,
       token: this.token,
       action: ACTIONS.getHistory,
     });
+    return result.history;
   }
 
   async getChats() {
-    return this.socket.sendAsync({ token: this.token, action: ACTIONS.getChats });
+    const result = await this.socket.sendAsync({ token: this.token, action: ACTIONS.getChats });
+    return result.chats;
   }
 
   async getContacts() {
-    return this.socket.sendAsync({ token: this.token, action: ACTIONS.getContacts });
+    const result = await this.socket.sendAsync({ token: this.token, action: ACTIONS.getContacts });
+    return result.contacts;
+  }
+
+  async sendOffer(voiceChannel, offer) {
+    return this.socket.sendAsync({
+      voiceChannel,
+      offer,
+      token: this.token,
+      action: ACTIONS.voiceChannelOffer,
+    });
+  }
+
+  sendAnswer(voiceChannel, answer, uniqueMessageId) {
+    return this.socket.send({
+      uniqueMessageId,
+      voiceChannel,
+      answer,
+      token: this.token,
+      action: ACTIONS.voiceChannelAnswer,
+    });
+  }
+
+  async sendIce(voiceChannel, ice) {
+    return this.socket.sendAsync({
+      voiceChannel,
+      ice,
+      token: this.token,
+      action: ACTIONS.voiceChannelIce,
+    });
   }
 
   get isClosed() {

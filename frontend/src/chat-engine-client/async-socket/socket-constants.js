@@ -13,5 +13,6 @@ export const EVENT_TYPES = {
 };
 
 export const ASYNC_TIME_LIMIT = 5000;
+export const CLIENT_ANSWER_TIME_LIMIT = 20000;
 
 export const ASYNC_BINARY_TIME_LIMIT = 20000;

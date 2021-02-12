@@ -8,9 +8,9 @@
 </template>
 
 <script>
+import Player from '@/audio-recorder/components/Player.vue';
 import Header from './components/Header.vue';
 import Toaster from './components/Toaster.vue';
-import Player from '@/audio-recorder/components/Player.vue';
 
 export default {
   components: {

@@ -33,7 +33,7 @@ export default class VoiceChannelConnection {
       }
     };
 
-    this.peerConnection.ontrack = function(event) {
+    this.peerConnection.ontrack = (event) => {
       if (!event.streams[0]) return;
       if (this.stream) return;
 
@@ -44,19 +44,19 @@ export default class VoiceChannelConnection {
       // console.log('not track is added');
     };
 
-    for (const track of outputStream.getTracks()) {
+    outputStream.getTracks().forEach((track) => {
       this.peerConnection.addTrack(track);
-    }
+    });
   }
 
-  async connectToClient(offer) {
+  async connectToClient(offer, uniqueMessageId) {
     try {
       if (offer) {
-        await this.onOffer(offer)
+        await this.onOffer(offer, uniqueMessageId);
       } else {
-        const offer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(offer);
-        const result = await this.sendOffer(this.contact, offer); // TODO отправляем наш offer на сокет
+        const newOffer = await this.peerConnection.createOffer();
+        await this.peerConnection.setLocalDescription(newOffer);
+        const result = await this.sendOffer(this.contact, newOffer);
         if (!result.answer) throw new Error('No answer from voice channel client!');
         await this.onAnswer(result.answer);
       }
@@ -66,11 +66,11 @@ export default class VoiceChannelConnection {
     }
   }
 
-  async onOffer(offer) {
+  async onOffer(offer, uniqueMessageId) {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
-    await this.sendAnswer(this.contact, answer); // TODO отправляем наш answer на сокет
+    await this.sendAnswer(this.contact, answer, uniqueMessageId);
   }
 
   async onAnswer(answer) {

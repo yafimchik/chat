@@ -1,3 +1,4 @@
+import ServerError from '@/chat-engine-client/errors/server.error';
 import {
   ASYNC_BINARY_TIME_LIMIT,
   ASYNC_TIME_LIMIT,
@@ -33,9 +34,9 @@ class AsyncSocket {
     }
   }
 
-  send(data) {
+  send(data, uuid) {
     if (this.status === STATUSES.open) {
-      const message = new WsMessage(data);
+      const message = new WsMessage(data, uuid);
       this.socket.send(message);
     } else throw new Error('connection is not opened!');
   }
@@ -65,13 +66,13 @@ class AsyncSocket {
     });
   }
 
-  async sendAsync(data) {
-    // TODO sort data types for string and binary
+  async sendAsync(data = {}, timeForAnswer = ASYNC_TIME_LIMIT) {
     return new Promise((resolve, reject) => {
-      const message = new WsMessage(data);
+      // if data has unique id, it means this an answer for previous message;
+      const message = new WsMessage(data, data.uniqueMessageId);
       const watchDogTimeout = setTimeout(() => {
         reject(new TimeoutError());
-      }, ASYNC_TIME_LIMIT);
+      }, timeForAnswer);
       this.addTask((event, eventType) => {
         if (eventType === EVENT_TYPES.error) {
           clearTimeout(watchDogTimeout);
@@ -83,7 +84,19 @@ class AsyncSocket {
           const answer = WsMessage.fromEvent(event);
           if (message.uuid !== answer.uuid) return false;
           clearTimeout(watchDogTimeout);
-          setTimeout(() => resolve(answer.payload), 0);
+
+          setTimeout(
+            () => {
+              if (answer.payload.error) {
+                reject(new ServerError());
+              } else {
+                const receivedData = { ...answer.payload };
+                receivedData.uniqueMessageId = answer.uuid;
+                resolve(receivedData);
+              }
+            },
+            0,
+          );
           return true;
         }
         return false;

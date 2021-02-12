@@ -1,7 +1,7 @@
 const { v4: uuidV4 } = require('uuid');
 
 class WsMessage {
-  constructor(payload, uuid = uuidV4(), binarySent = false) {
+  constructor(payload = {}, uuid = uuidV4(), binarySent = false) {
     this.payload = payload;
     this.uuid = uuid;
     this.binarySent = binarySent;

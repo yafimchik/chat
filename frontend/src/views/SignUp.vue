@@ -43,7 +43,7 @@
         <div class="buttons">
           <b-button type="reset" variant="danger">Reset</b-button>
           <b-button class="ml-2" type="submit" variant="primary">Sign Up</b-button>
-<!--          <b-button type="button" variant="outline-primary" @click="goSignIn">Sign In</b-button>-->
+<!--      <b-button type="button" variant="outline-primary" @click="goSignIn">Sign In</b-button>-->
         </div>
       </b-form>
     </div>

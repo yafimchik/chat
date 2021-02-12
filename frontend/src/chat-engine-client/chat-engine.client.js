@@ -1,15 +1,19 @@
+import { VOICE_CHANNEL_SERVICE_ACTIONS } from '@/chat-engine-client/chat-engine.client.constants';
+import VoiceChannel from '@/chat-engine-client/voice-channel/voice-channel';
 import ClientError from './errors/client.error';
 import ChatEngineClientConnection from './chat-engine.client.connection';
 import ServerError from './errors/server.error';
 import ConnectionError from './errors/connection.error';
 
 class ChatEngineClient {
-  constructor(apiUrl, onUpdateCallback) {
+  constructor(apiUrl, onUpdateCallback = () => {}) {
     this.apiUrl = apiUrl;
     this.user = undefined;
     this.servers = {};
     this.token = undefined;
     this.onUpdateCallback = onUpdateCallback;
+
+    this.voiceChannel = new VoiceChannel();
   }
 
   async login(username) {
@@ -135,15 +139,30 @@ class ChatEngineClient {
     }
   }
 
-  onMessage(virtualServer, message) {
+  async onMessage(virtualServer, message) {
     if (message.error) {
       const event = { ...message };
       event.serverError = true;
       this.onError(virtualServer, event);
       return;
     }
+
+    if (VOICE_CHANNEL_SERVICE_ACTIONS.includes(message.action)) {
+      if (message.offer) {
+        await this.voiceChannel.onOffer(
+          virtualServer,
+          message,
+        );
+      } else if (message.ice) {
+        await this.voiceChannel.onIce(
+          message,
+        );
+      }
+      return;
+    }
+
     const answer = { message, virtualServer };
-    if (this.onUpdateCallback) this.onUpdateCallback(answer);
+    this.onUpdateCallback(answer);
   }
 
   onError(virtualServer, event) {
@@ -161,86 +180,58 @@ class ChatEngineClient {
   }
 
   sendStatus(virtualServer, status) {
-    const result = undefined;
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return connection.sendStatus(status);
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(virtualServer, [], 'sendStatus', status);
   }
 
   async sendToken(virtualServer) {
-    const result = undefined;
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return await connection.sendToken();
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(virtualServer, undefined, 'sendText');
   }
 
   async sendText(virtualServer, chat, text) {
-    const result = undefined;
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return await connection.sendText(chat, text);
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(virtualServer, undefined, 'sendText', chat, text);
   }
 
   async sendFullMessage(virtualServer, chat, messageObject) {
-    const result = undefined;
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return await connection.sendFullMessage(chat, messageObject);
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(
+      virtualServer,
+      undefined,
+      'sendFullMessage',
+      chat,
+      messageObject,
+    );
   }
 
   async getHistory(virtualServer, chat, offset) {
-    const result = [];
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return (await connection.getHistory(chat, offset)).history;
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(virtualServer, [], 'getHistory', chat, offset);
   }
 
   async getChats(virtualServer) {
-    const result = [];
-    const connection = this.getClient(virtualServer);
-    if (!connection) return result;
-    try {
-      return (await connection.getChats()).chats;
-    } catch (e) {
-      this.onException(e);
-      return result;
-    }
+    return this.safeRequest(virtualServer, [], 'getChats');
   }
 
   async getContacts() {
-    const result = [];
-    const connection = this.getRandomClient();
-    if (!connection) return result;
+    return this.safeRequest(undefined, [], 'getContacts');
+  }
+
+  async sendOffer(virtualServer, voiceChannel, offer) {
+    return this.safeRequest(virtualServer, undefined, 'sendOffer', voiceChannel, offer);
+  }
+
+  async sendAnswer(virtualServer, voiceChannel, answer) {
+    return this.safeRequest(virtualServer, undefined, 'sendAnswer', voiceChannel, answer);
+  }
+
+  async sendIce(virtualServer, voiceChannel, ice) {
+    return this.safeRequest(virtualServer, undefined, 'sendIce', voiceChannel, ice);
+  }
+
+  async safeRequest(virtualServer, defaultValue = {}, requestName, ...params) {
+    const connection = this.getClient(virtualServer);
+    if (!connection) throw new Error('There is not any connection to server!');
     try {
-      return (await connection.getContacts()).contacts;
+      return connection[requestName](...params);
     } catch (e) {
-      this.onException(e);
-      return result;
+      return defaultValue;
     }
   }
 
@@ -275,12 +266,11 @@ class ChatEngineClient {
   }
 
   getClient(virtualServer) {
-    return this.servers[virtualServer].client;
-  }
-
-  getRandomClient() {
     const serversArray = Object.values(this.servers);
-    if (!serversArray) return undefined;
+    if (!serversArray || !serversArray.length) return undefined;
+
+    if (virtualServer) return this.servers[virtualServer].client;
+
     const index = Math.round(Math.random() * (serversArray.length - 1));
     return serversArray[index].client;
   }

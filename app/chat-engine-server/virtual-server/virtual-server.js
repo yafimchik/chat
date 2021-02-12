@@ -40,10 +40,19 @@ class VirtualServer {
     await this.broadcastContactsOnline();
   }
 
-  broadcastMessage(messageObject) {
-    this.clients.forEach(client => {
-      if (client.user) client.sendToClient(messageObject);
-    });
+  broadcastMessage(messageObject, clients) {
+    if (clients) {
+      this.clients.forEach(client => {
+        if (!client.user) return;
+        if (clients.includes(client.user._id)) {
+          client.sendToClient(messageObject);
+        }
+      });
+    } else {
+      this.clients.forEach(client => {
+        if (client.user) client.sendToClient(messageObject);
+      });
+    }
   }
 
   async broadcastContactsOnline() {

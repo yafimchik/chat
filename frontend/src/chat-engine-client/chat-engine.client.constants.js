@@ -11,7 +11,18 @@ export const ACTIONS = {
   getContactsOnline: 'get-contacts-online',
   status: 'status',
   userInfo: 'user-info',
+  voiceChannelIce: 'voice-channel-ice',
+  voiceChannelOffer: 'voice-channel-offer',
+  voiceChannelAnswer: 'voice-channel-answer',
+  callRequest: 'call-request',
+  callResponse: 'call-response',
 };
+
+export const VOICE_CHANNEL_SERVICE_ACTIONS = [
+  ACTIONS.voiceChannelIce,
+  ACTIONS.voiceChannelOffer,
+  ACTIONS.voiceChannelAnswer,
+];
 
 export const CONNECTION_STATUSES = {
   CLOSED: 'closed',
