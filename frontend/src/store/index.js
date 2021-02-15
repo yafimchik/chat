@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import audioStore from '@/audio-recorder/store/audio.store';
 import uiStore from './ui.store';
-import chatDataStore from './chat-data.store';
+import chatDataStore from './chat-data/chat-data.store';
 import chatEngineStore from './chat-engine.store';
 
 Vue.use(Vuex);

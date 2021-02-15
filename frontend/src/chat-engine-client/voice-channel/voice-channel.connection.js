@@ -1,5 +1,6 @@
 export default class VoiceChannelConnection {
   constructor(
+    outputStream,
     contact,
     connectionConfig,
     sendIceCallback = () => {},
@@ -18,8 +19,9 @@ export default class VoiceChannelConnection {
     this.isOnline = false;
 
     this.stream = undefined;
+    this.iceQueue = [];
 
-    this.createPeerConnection(connectionConfig);
+    this.createPeerConnection(outputStream, connectionConfig);
   }
 
   createPeerConnection(outputStream, config) {
@@ -29,14 +31,15 @@ export default class VoiceChannelConnection {
       console.log('new ice candidate', event.candidate);
       if (event.candidate !== null) {
         this.sendIce(this.contact, event.candidate);
-        // TODO отправляем json и ice пакеты
       }
     };
 
     this.peerConnection.ontrack = (event) => {
-      if (!event.streams[0]) return;
-      if (this.stream) return;
+      if (!this.stream) this.stream = new MediaStream();
+      if (!event.track) return;
+      this.stream.addTrack(event.track);
 
+      console.log('on stream ', this.contact, this.stream);
       this.onInputStream(this.contact, this.stream); // TODO listening of stream in front
 
       // document.getElementById("received_video").srcObject = event.streams[0];
@@ -70,15 +73,33 @@ export default class VoiceChannelConnection {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
+    console.log('answer id ', uniqueMessageId);
     await this.sendAnswer(this.contact, answer, uniqueMessageId);
   }
 
   async onAnswer(answer) {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    if (this.iceQueue.length) {
+      let tasksChain = Promise.resolve();
+      this.iceQueue.forEach((ice) => {
+        tasksChain = tasksChain.then(() => this.onIce(ice, true));
+      });
+
+      await tasksChain;
+    }
     this.isOnline = true;
   }
 
-  async onIce(ice) {
+  async onIce(ice, fromQueue = false) {
+    if (
+      !this.peerConnection
+      || !this.peerConnection.remoteDescription
+      || !this.peerConnection.remoteDescription.type
+    ) {
+      if (!fromQueue) this.iceQueue.push(ice);
+      return false;
+    }
     await this.peerConnection.addIceCandidate(new RTCIceCandidate(ice));
+    return true;
   }
 }

@@ -6,14 +6,23 @@ import ServerError from './errors/server.error';
 import ConnectionError from './errors/connection.error';
 
 class ChatEngineClient {
-  constructor(apiUrl, onUpdateCallback = () => {}) {
+  constructor(apiUrl, onUpdateCallback = () => {}, onInputStreamCallback = () => {}) {
     this.apiUrl = apiUrl;
     this.user = undefined;
     this.servers = {};
     this.token = undefined;
     this.onUpdateCallback = onUpdateCallback;
 
-    this.voiceChannel = new VoiceChannel();
+    this.voiceChannel = new VoiceChannel(
+      undefined,
+      this.sendIce.bind(this),
+      this.sendOffer.bind(this),
+      this.sendAnswer.bind(this),
+      onInputStreamCallback,
+      this.onException.bind(this),
+    );
+    this.connectToVoiceChannel = this.voiceChannel.connectToChannel.bind(this.voiceChannel);
+    this.disconnectFromVoiceChannel = this.voiceChannel.disconnect.bind(this.voiceChannel);
   }
 
   async login(username) {
@@ -122,7 +131,26 @@ class ChatEngineClient {
       return chats;
     } catch (e) {
       this.onException(e);
-      return {};
+      return [];
+    }
+  }
+
+  async getAllVoiceChannels() {
+    try {
+      const results = await Promise.all(
+        this.virtualServers.map((vsId) => this.getVoiceChannels(vsId)),
+      );
+      const voiceChannelsArray = results.flat();
+      const voiceChannels = {};
+      voiceChannelsArray.forEach((voiceChannel) => {
+        const { virtualServer } = voiceChannel;
+        if (!voiceChannels[virtualServer]) voiceChannels[virtualServer] = [];
+        voiceChannels[virtualServer].push(voiceChannel);
+      });
+      return voiceChannels;
+    } catch (e) {
+      this.onException(e);
+      return [];
     }
   }
 
@@ -147,7 +175,10 @@ class ChatEngineClient {
       return;
     }
 
+    // console.log('client on message ', message);
+
     if (VOICE_CHANNEL_SERVICE_ACTIONS.includes(message.action)) {
+      // console.log('voice channel service mes ', message);
       if (message.offer) {
         await this.voiceChannel.onOffer(
           virtualServer,
@@ -209,20 +240,32 @@ class ChatEngineClient {
     return this.safeRequest(virtualServer, [], 'getChats');
   }
 
+  async getVoiceChannels(virtualServer) {
+    return this.safeRequest(virtualServer, [], 'getVoiceChannels');
+  }
+
   async getContacts() {
     return this.safeRequest(undefined, [], 'getContacts');
   }
 
-  async sendOffer(virtualServer, voiceChannel, offer) {
-    return this.safeRequest(virtualServer, undefined, 'sendOffer', voiceChannel, offer);
+  async sendOffer(virtualServer, voiceChannel, contact, offer) {
+    return this.safeRequest(virtualServer, undefined, 'sendOffer', voiceChannel, contact, offer);
   }
 
-  async sendAnswer(virtualServer, voiceChannel, answer) {
-    return this.safeRequest(virtualServer, undefined, 'sendAnswer', voiceChannel, answer);
+  async sendAnswer(virtualServer, voiceChannel, contact, answer, uniqueMessageId) {
+    return this.safeRequest(
+      virtualServer,
+      undefined,
+      'sendAnswer',
+      voiceChannel,
+      contact,
+      answer,
+      uniqueMessageId,
+    );
   }
 
-  async sendIce(virtualServer, voiceChannel, ice) {
-    return this.safeRequest(virtualServer, undefined, 'sendIce', voiceChannel, ice);
+  async sendIce(virtualServer, voiceChannel, contact, ice) {
+    return this.safeRequest(virtualServer, undefined, 'sendIce', voiceChannel, contact, ice);
   }
 
   async safeRequest(virtualServer, defaultValue = {}, requestName, ...params) {

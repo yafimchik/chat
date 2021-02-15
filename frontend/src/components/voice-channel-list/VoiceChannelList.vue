@@ -1,27 +1,31 @@
 <template>
-  <div class="chat-list p-3">
+  <div class="voice-channel-list p-3">
     <b-list-group>
-      <app-chat-name v-for="chat in chats" :chatObject="chat" :key="chat._id"></app-chat-name>
+      <app-chat-name
+        v-for="voiceChannel in voiceChannels"
+        :voiceChannel="voiceChannel"
+        :key="voiceChannel._id"
+      ></app-chat-name>
     </b-list-group>
   </div>
 </template>
 
 <script>
-import ChatName from '@/components/chat-list/ChatName.vue';
+import VoiceChannelName from '@/components/voice-channel-list/VoiceChannelName.vue';
 
 export default {
-  name: 'ChatList',
+  name: 'VoiceChannelList',
   data() {
     return {
     };
   },
   computed: {
-    chats() {
-      return this.$store.getters.chatsByCurrentVirtualServer;
+    voiceChannels() {
+      return this.$store.getters.voiceChannelsByCurrentVirtualServer;
     },
   },
   components: {
-    appChatName: ChatName,
+    appChatName: VoiceChannelName,
   },
 };
 </script>

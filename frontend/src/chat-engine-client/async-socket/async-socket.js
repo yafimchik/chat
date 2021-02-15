@@ -34,9 +34,10 @@ class AsyncSocket {
     }
   }
 
-  send(data, uuid) {
+  send(data) {
     if (this.status === STATUSES.open) {
-      const message = new WsMessage(data, uuid);
+      const message = new WsMessage(data, data.uniqueMessageId);
+      // console.log('not async send ', message);
       this.socket.send(message);
     } else throw new Error('connection is not opened!');
   }
@@ -67,6 +68,7 @@ class AsyncSocket {
   }
 
   async sendAsync(data = {}, timeForAnswer = ASYNC_TIME_LIMIT) {
+    // console.log('send data', data);
     return new Promise((resolve, reject) => {
       // if data has unique id, it means this an answer for previous message;
       const message = new WsMessage(data, data.uniqueMessageId);
@@ -101,6 +103,7 @@ class AsyncSocket {
         }
         return false;
       });
+      // console.log('async message to send ', message);
       this.socket.send(message);
     });
   }
@@ -132,7 +135,9 @@ class AsyncSocket {
   onMessage(event) {
     this.startTasks(event, EVENT_TYPES.message);
     const message = WsMessage.fromEvent(event);
-    if (this.onMessageCallback) this.onMessageCallback(message.payload);
+    const payload = { ...message.payload };
+    payload.uniqueMessageId = message.uuid;
+    if (this.onMessageCallback) this.onMessageCallback(payload);
   }
 
   onClose(event) {

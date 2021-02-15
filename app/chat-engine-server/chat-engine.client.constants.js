@@ -7,6 +7,7 @@ const ACTIONS = {
   messageFooter: 'message-footer',
   getHistory: 'get-history',
   getChats: 'get-chats',
+  getVoiceChannels: 'get-voice-channels',
   getContacts: 'get-contacts',
   getContactsOnline: 'get-contacts-online',
   status: 'status',

@@ -1,38 +1,36 @@
 <template>
   <b-list-group-item button @click="onClick" :active="isActive">
-    <p >{{ chat.name }}</p>
-    <b-badge
-      v-if="!!unreadMessages"
-      :variant="isActive ? 'light' : 'primary'"
-      pill
-    >
-      {{ unreadMessages }}
-    </b-badge>
+    <p >{{ voiceChannel.name }}</p>
+    <audio ref="inputStream" autoplay></audio>
   </b-list-group-item>
 </template>
 
 <script>
 export default {
-  name: 'ChatName',
+  name: 'VoiceChannelName',
   props: {
-    chatObject: Object,
+    voiceChannel: Object,
   },
   data() {
-    return {
-      chat: this.chatObject,
-    };
+    return {};
   },
   computed: {
     isActive() {
-      return (this.chat._id === this.$store.state.chatData.currentChatId);
+      return (this.voiceChannel._id === this.$store.getters.currentVoiceChannelId);
     },
-    unreadMessages() {
-      return this.$store.getters.unreadMessagesByChatId(this.chat._id);
+    stream() {
+      console.log('audio stream ', this.$store.getters.firstStream);
+      return this.$store.getters.firstStream;
+    },
+  },
+  watch: {
+    stream(value) {
+      this.$refs.inputStream.srcObject = value;
     },
   },
   methods: {
     onClick() {
-      this.$store.dispatch('setCurrentChat', this.chat._id);
+      this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
     },
   },
 };

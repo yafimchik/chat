@@ -2,19 +2,23 @@ import ChatEngineClient from '../chat-engine-client/chat-engine.client';
 
 const DEFAULT_STATE = () => ({
   chatClient: undefined,
+  voiceChannelOnline: false,
 });
 
 export default {
   state: DEFAULT_STATE,
   mutations: {
-    createChatEngine(state, { apiUrl, onUpdateCallback }) {
-      state.chatClient = new ChatEngineClient(apiUrl, onUpdateCallback);
+    createChatEngine(state, { apiUrl, onUpdateCallback, onInputStreamCallback }) {
+      state.chatClient = new ChatEngineClient(apiUrl, onUpdateCallback, onInputStreamCallback);
     },
     setToDefaultsAll(state) {
       const newState = DEFAULT_STATE();
       Object.entries(newState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+    setVoiceChannelState(state, value = false) {
+      state.voiceChannelOnline = value;
     },
   },
   actions: {
@@ -45,6 +49,39 @@ export default {
         commit('setToDefaultsAll');
       }
     },
+    async connectToVoiceChannel(
+      {
+        state,
+        getters,
+        commit,
+        dispatch,
+        rootState,
+      },
+      voiceChannel,
+    ) {
+      if (state.voiceChannelOnline) {
+        const voiceChannelId = rootState.chatData.currentVoiceChannelId;
+        await dispatch('disconnectFromVoiceChannel');
+        await dispatch('updateUserVoiceChannelStatus', undefined);
+        if (voiceChannelId === voiceChannel) return;
+      }
+      const contacts = getters.getVoiceChannelContacts(voiceChannel);
+
+      const result = await state.chatClient.connectToVoiceChannel(
+        rootState.chatData.currentVirtualServerId,
+        voiceChannel,
+        contacts,
+      );
+      const status = result ? voiceChannel : undefined;
+
+      await dispatch('updateUserVoiceChannelStatus', status);
+      commit('setVoiceChannelState', result);
+    },
+    async disconnectFromVoiceChannel({ state, commit }) {
+      await state.chatClient.disconnectFromVoiceChannel();
+
+      commit('setVoiceChannelState', false);
+    },
     async initializeAllChatUI(
       {
         commit,
@@ -64,6 +101,9 @@ export default {
         const chatHistory = await state.chatClient.getAllHistory(chatsArray);
         if (chatHistory) commit('updateChatHistory', chatHistory);
       }
+
+      const voiceChannels = await state.chatClient.getAllVoiceChannels();
+      if (voiceChannels) commit('updateVoiceChannels', voiceChannels);
 
       const { virtualServers } = rootState.chatData;
       if (Object.values(virtualServers).length) {

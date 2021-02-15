@@ -2,17 +2,35 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store';
 import SignUp from '@/views/SignUp.vue';
-import SignIn from '../views/SignIn.vue';
-import Home from '../views/Home.vue';
+import SignIn from '@/views/SignIn.vue';
+import Home from '@/views/home/Home.vue';
+import Chat from '@/views/home/Chat';
+import VoiceChannel from '@/views/home/VoiceChannel.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '',
-    name: 'home',
     component: Home,
     meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'home',
+        redirect: { name: 'chat' },
+      },
+      {
+        path: 'chat',
+        component: Chat,
+        name: 'chat',
+      },
+      {
+        path: 'voice-channel',
+        name: 'voiceChannel',
+        component: VoiceChannel,
+      },
+    ],
   },
   {
     path: '/sign-in',

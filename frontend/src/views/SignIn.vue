@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import onUpdateCallback from '@/vue-utils/chat-callbacks';
+import { onUpdateCallback, onInputStreamCallback } from '@/vue-utils/chat-callbacks';
 import { apiUrl } from '../configs/chat-connection.config';
 
 export default {
@@ -91,7 +91,7 @@ export default {
     async signIn() {
       this.$store.commit('updateLinkStatus', true);
       if (!this.chatClient) {
-        this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback });
+        this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback, onInputStreamCallback });
       }
       if (!this.chatClient) {
         this.$store.commit('postNotification', {

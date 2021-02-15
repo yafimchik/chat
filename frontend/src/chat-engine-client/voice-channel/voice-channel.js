@@ -11,8 +11,8 @@ export default class VoiceChannel {
         },
       ],
     },
-    sendOfferCallback = () => {},
     sendIceCallback = () => {},
+    sendOfferCallback = () => {},
     sendAnswerCallback = () => {},
     onInputStreamCallback = () => {},
     onErrorCallback = () => {},
@@ -29,23 +29,24 @@ export default class VoiceChannel {
     this.mediaStream = undefined;
   }
 
-  async connectToChannel(contacts = [], virtualServer, voiceChannel) {
+  async connectToChannel(virtualServer, voiceChannel, contacts = []) {
     this.virtualServer = virtualServer;
     this.voiceChannel = voiceChannel;
 
-    if (!contacts || !contacts.length) return false;
+    if (!contacts || !contacts.length) return true;
 
     try {
       await this.createMediaStream();
 
       contacts.forEach((contact) => {
         this.connections.push(new VoiceChannelConnection(
+          this.mediaStream,
           contact,
           this.connectionConfig,
           this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
           this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
           this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
-          this.onInputStream.bind(undefined, this.virtualServer, this.voiceChannel),
+          this.onInputStream,
         ));
       });
 
@@ -59,15 +60,30 @@ export default class VoiceChannel {
     return true;
   }
 
+  async disconnect() {
+    console.log(this.mediaStream);
+  }
+
   async createMediaStream() {
     if (this.mediaStream) return true;
 
-    const getUserMediaFunction = navigator.getUserMedia
+    navigator.getUserMedia = navigator.getUserMedia
       || navigator.webkitGetUserMedia
       || navigator.mozGetUserMedia;
 
     try {
-      this.mediaStream = await getUserMediaFunction({ video: true, audio: true });
+      this.mediaStream = await new Promise((resolve, reject) => {
+        navigator.getUserMedia(
+          { video: false, audio: true },
+          (stream) => {
+            resolve(stream);
+          },
+          (error) => {
+            reject(error);
+          },
+        );
+      });
+
       // TODO let see us on screen
       // var my_video = document.getElementById('my')
       // my_video.srcObject = stream
@@ -99,12 +115,13 @@ export default class VoiceChannel {
       await this.createMediaStream();
 
       const connection = new VoiceChannelConnection(
+        this.mediaStream,
         user,
         this.connectionConfig,
         this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
         this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
         this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
-        this.onInputStream.bind(undefined, this.virtualServer, this.voiceChannel),
+        this.onInputStream,
       );
       await connection.connectToClient(offer, uniqueMessageId);
       this.connections.push(connection);

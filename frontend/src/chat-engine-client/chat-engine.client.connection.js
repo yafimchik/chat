@@ -195,36 +195,45 @@ class ChatEngineClientConnection {
     return result.chats;
   }
 
+  async getVoiceChannels() {
+    const result = await this.socket
+      .sendAsync({ token: this.token, action: ACTIONS.getVoiceChannels });
+    return result.voiceChannels;
+  }
+
   async getContacts() {
     const result = await this.socket.sendAsync({ token: this.token, action: ACTIONS.getContacts });
     return result.contacts;
   }
 
-  async sendOffer(voiceChannel, offer) {
+  async sendOffer(voiceChannel, contact, offer) {
     return this.socket.sendAsync({
       voiceChannel,
       offer,
       token: this.token,
       action: ACTIONS.voiceChannelOffer,
+      to: contact,
     });
   }
 
-  sendAnswer(voiceChannel, answer, uniqueMessageId) {
+  sendAnswer(voiceChannel, contact, answer, uniqueMessageId) {
     return this.socket.send({
       uniqueMessageId,
       voiceChannel,
       answer,
       token: this.token,
       action: ACTIONS.voiceChannelAnswer,
+      to: contact,
     });
   }
 
-  async sendIce(voiceChannel, ice) {
-    return this.socket.sendAsync({
+  async sendIce(voiceChannel, contact, ice) {
+    return this.socket.send({
       voiceChannel,
       ice,
       token: this.token,
       action: ACTIONS.voiceChannelIce,
+      to: contact,
     });
   }
 

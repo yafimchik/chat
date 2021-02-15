@@ -1,6 +1,7 @@
 import store from '../store';
 
-export default function onUpdateCallback({ message, virtualServer }) {
+export async function onUpdateCallback({ message, virtualServer }) {
+  // console.log('input message ', message);
   if (message.error) {
     const notification = {
       error: message.error,
@@ -21,9 +22,24 @@ export default function onUpdateCallback({ message, virtualServer }) {
     store.commit('addMessage', message);
   }
   if (message.status) {
-    store.commit('updateStatus', {
+    await store.dispatch('updateStatus', {
       virtualServer,
       status: message.status,
     });
+    // store.commit('updateStatus', {
+    //   virtualServer,
+    //   status: message.status,
+    // });
   }
+}
+
+export async function onInputStreamCallback(contact, stream) {
+  console.log('contact ', contact);
+  console.log('stream ', stream);
+  if (stream) {
+    store.commit('setContactStream', {
+      contact,
+      stream,
+    });
+  } else store.commit('deleteContactStream', contact);
 }

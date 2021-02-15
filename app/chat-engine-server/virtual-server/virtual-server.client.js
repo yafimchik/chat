@@ -71,6 +71,8 @@ class VirtualServerClient {
         if (answer.payload.to) {
           contacts = (contacts instanceof Array) ? answer.payload.to : [ answer.payload.to ];
         }
+        console.log('message to ', answer.payload.to);
+        console.log('contacts ', contacts);
         this.virtualServer.broadcastMessage(answer, contacts);
       } else {
         this.sendToClient(answer);

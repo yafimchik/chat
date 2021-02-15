@@ -1,16 +1,16 @@
+import voiceChannelStore from './voice-channel.store';
+
 const DEFAULT_STATE = () => ({
   user: undefined,
   token: undefined,
   virtualServers: {},
   chats: {},
-  voiceChannels: {},
   chatHistory: [],
   status: {},
   contacts: [],
   contactsOnline: {},
   currentVirtualServerId: undefined,
   currentChatId: undefined,
-  currentVoiceChannelId: undefined,
 });
 
 export default {
@@ -26,9 +26,6 @@ export default {
     setCurrentChat(state, chatId) {
       state.currentChatId = chatId.slice();
     },
-    setCurrentVoiceChannel(state, voiceChannelId) {
-      state.currentVoiceChannelId = voiceChannelId.slice();
-    },
     setVirtualServers(state, virtualServersArray) {
       const virtualServers = {};
       virtualServersArray.forEach((vs) => {
@@ -38,9 +35,6 @@ export default {
     },
     setChats(state, chats) {
       state.chats = { ...chats };
-    },
-    setVoiceChannels(state, voiceChannels) {
-      state.voiceChannels = { ...voiceChannels };
     },
     saveUser(state, user) {
       state.user = { ...user };
@@ -107,12 +101,20 @@ export default {
     },
   },
   getters: {
+    currentVirtualServerId(state) {
+      return state.currentVirtualServerId;
+    },
+    currentChatId(state) {
+      return state.currentChatId;
+    },
     usersOnline(state) {
       return state.contactsOnline[state.currentVirtualServerId];
     },
     chatsByCurrentVirtualServer(state) {
       if (!state.currentVirtualServerId) return [];
-      return state.chats[state.currentVirtualServerId];
+      const result = state.chats[state.currentVirtualServerId];
+      if (!result) return [];
+      return result;
     },
     isLoggedIn(state) {
       return !!state.user;
@@ -120,10 +122,6 @@ export default {
     currentChat(state) {
       const chat = state.chats[state.currentChatId];
       return { ...chat };
-    },
-    currentVoiceChannel(state) {
-      const voiceChannel = state.voiceChannels[state.currentVoiceChannelId];
-      return { ...voiceChannel };
     },
     currentVirtualServer(state) {
       return state.virtualServers[state.currentVirtualServerId];
@@ -144,26 +142,9 @@ export default {
       return state.status[state.currentVirtualServerId];
     },
     currentChatStatus(state) {
-      console.log('curStatus', state.status);
       if (!state.status[state.currentVirtualServerId]) return [];
       const status = state.status[state.currentVirtualServerId]
         .filter((userStatus) => userStatus.value.chat === state.currentChatId)
-        .map((userStatus) => userStatus.user);
-      return status;
-    },
-    voiceChannelStatus(state) {
-      return (voiceChannelId) => {
-        if (!state.status[state.currentVirtualServerId]) return [];
-        const status = state.status[state.currentVirtualServerId]
-          .filter((userStatus) => userStatus.value.voiceChannel === voiceChannelId)
-          .map((userStatus) => userStatus.user);
-        return status;
-      };
-    },
-    currentVoiceChannelStatus(state) {
-      if (!state.status[state.currentVirtualServerId]) return [];
-      const status = state.status[state.currentVirtualServerId]
-        .filter((userStatus) => userStatus.value.voiceChannel === state.currentVoiceChannelId)
         .map((userStatus) => userStatus.user);
       return status;
     },
@@ -172,6 +153,13 @@ export default {
     },
   },
   actions: {
+    updateStatus({ state, commit }, { virtualServer, status }) {
+      commit('updateStatus', { virtualServer, status });
+      const userStatus = status.find((item) => item.user === state.user._id);
+      if (userStatus && userStatus.value) {
+        commit('setCurrentVoiceChannel', userStatus.value.voiceChannel);
+      }
+    },
     setCurrentVirtualServer({ commit }, serverId) {
       commit('setCurrentVirtualServer', serverId);
       commit('setAttachedFiles', []);
@@ -182,5 +170,8 @@ export default {
       commit('setAttachedFiles', []);
       commit('saveRecord', undefined);
     },
+  },
+  modules: {
+    voiceChannel: voiceChannelStore,
   },
 };
