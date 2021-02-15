@@ -1,7 +1,6 @@
 <template>
   <b-list-group-item button @click="onClick" :active="isActive">
-    <p >{{ voiceChannel.name }}</p>
-    <audio ref="inputStream" autoplay></audio>
+    <p>{{ voiceChannel.name }}</p>
   </b-list-group-item>
 </template>
 
@@ -18,19 +17,11 @@ export default {
     isActive() {
       return (this.voiceChannel._id === this.$store.getters.currentVoiceChannelId);
     },
-    stream() {
-      console.log('audio stream ', this.$store.getters.firstStream);
-      return this.$store.getters.firstStream;
-    },
-  },
-  watch: {
-    stream(value) {
-      this.$refs.inputStream.srcObject = value;
-    },
   },
   methods: {
-    onClick() {
-      this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
+    async onClick() {
+      await this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
+      await this.$router.push({ name: 'voiceChannel' });
     },
   },
 };

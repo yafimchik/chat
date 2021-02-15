@@ -43,9 +43,8 @@ export default {
     currentVoiceChannelId(state) {
       return state.currentVoiceChannelId;
     },
-    firstStream(state) {
-      if (!state.inputStreams || !state.inputStreams.length) return undefined;
-      return state.inputStreams[0].stream;
+    contactsWithStreams(state) {
+      return state.inputStreams;
     },
     voiceChannelsByCurrentVirtualServer(state, getters) {
       const virtualServerId = getters.currentVirtualServerId;

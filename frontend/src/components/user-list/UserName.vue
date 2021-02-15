@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'ChatName',
+  name: 'UserName',
   props: {
     user: Object,
   },
