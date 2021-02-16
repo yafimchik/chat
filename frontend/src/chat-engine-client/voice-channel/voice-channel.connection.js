@@ -18,8 +18,6 @@ export default class VoiceChannelConnection {
     this.onCloseConnection = onCloseConnectionCallback;
     this.onError = onErrorCallback;
 
-    this.isOnline = false;
-
     this.stream = undefined;
     this.iceQueue = [];
 
@@ -73,12 +71,13 @@ export default class VoiceChannelConnection {
     this.onCloseConnection();
     this.peerConnection.close();
 
-    const tracks = this.stream.getTracks();
-    tracks.forEach((track) => {
-      track.stop();
-    });
-    this.stream = undefined;
-    this.isOnline = false;
+    if (this.stream) {
+      const tracks = this.stream.getTracks();
+      tracks.forEach((track) => {
+        track.stop();
+      });
+      this.stream = undefined;
+    }
   }
 
   async onOffer(offer, uniqueMessageId) {
@@ -98,7 +97,6 @@ export default class VoiceChannelConnection {
 
       await tasksChain;
     }
-    this.isOnline = true;
   }
 
   async onIce(ice, fromQueue = false) {

@@ -69,11 +69,13 @@ export default class VoiceChannel {
     });
     this.connections = [];
 
-    const tracks = this.mediaStream.getTracks();
-    tracks.forEach((track) => {
-      track.stop();
-    });
-    this.mediaStream = undefined;
+    if (this.mediaStream) {
+      const tracks = this.mediaStream.getTracks();
+      tracks.forEach((track) => {
+        track.stop();
+      });
+      this.mediaStream = undefined;
+    }
   }
 
   onContactDisconnect(contact) {
@@ -88,13 +90,9 @@ export default class VoiceChannel {
   async createMediaStream() {
     if (this.mediaStream) return true;
 
-    navigator.getUserMedia = navigator.getUserMedia
-      || navigator.webkitGetUserMedia
-      || navigator.mozGetUserMedia;
-
     try {
       this.mediaStream = await new Promise((resolve, reject) => {
-        navigator.getUserMedia(
+        navigator.mediaDevices.getUserMedia(
           { video: false, audio: true },
           (stream) => {
             resolve(stream);
