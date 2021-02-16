@@ -153,12 +153,19 @@ export default {
     },
   },
   actions: {
-    updateStatus({ state, commit }, { virtualServer, status }) {
+    async updateStatus({ state, commit, dispatch }, { virtualServer, status }) {
       commit('updateStatus', { virtualServer, status });
+
       const userStatus = status.find((item) => item.user === state.user._id);
       if (userStatus && userStatus.value) {
         commit('setCurrentVoiceChannel', userStatus.value.voiceChannel);
       }
+
+      const contactsInVoiceChannel = status
+        .filter((item) => item.value.voiceChannel === userStatus.value.voiceChannel)
+        .map((item) => item.user);
+
+      await dispatch('updateStreamsByContactsOnline', contactsInVoiceChannel);
     },
     setCurrentVirtualServer({ commit }, serverId) {
       commit('setCurrentVirtualServer', serverId);

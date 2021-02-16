@@ -60,7 +60,7 @@ export default {
       voiceChannel,
     ) {
       if (state.voiceChannelOnline) {
-        const voiceChannelId = rootState.chatData.currentVoiceChannelId;
+        const voiceChannelId = getters.currentVoiceChannelId;
         await dispatch('disconnectFromVoiceChannel');
         await dispatch('updateUserVoiceChannelStatus', undefined);
         if (voiceChannelId === voiceChannel) return;
@@ -109,6 +109,9 @@ export default {
       if (Object.values(virtualServers).length) {
         dispatch('setCurrentVirtualServer', Object.keys(virtualServers)[0]);
       }
+    },
+    disconnectContact({ state }, contact) {
+      state.chatClient.onContactDisconnect(contact);
     },
     async getHistoryChunk({ commit, state, rootState }) {
       const curChat = rootState.chatData.currentChatId;

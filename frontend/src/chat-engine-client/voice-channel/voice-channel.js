@@ -15,6 +15,7 @@ export default class VoiceChannel {
     sendOfferCallback = () => {},
     sendAnswerCallback = () => {},
     onInputStreamCallback = () => {},
+    onCloseConnectionCallback = () => {},
     onErrorCallback = () => {},
   ) {
     this.connectionConfig = connectionConfig;
@@ -23,6 +24,7 @@ export default class VoiceChannel {
     this.sendIce = sendIceCallback;
     this.sendAnswer = sendAnswerCallback;
     this.onInputStream = onInputStreamCallback;
+    this.onCloseConnection = onCloseConnectionCallback;
     this.onError = onErrorCallback;
 
     this.connections = [];
@@ -47,6 +49,7 @@ export default class VoiceChannel {
           this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
           this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
           this.onInputStream,
+          this.onCloseConnection,
         ));
       });
 
@@ -61,7 +64,25 @@ export default class VoiceChannel {
   }
 
   async disconnect() {
-    console.log(this.mediaStream);
+    this.connections.forEach((connection) => {
+      connection.close();
+    });
+    this.connections = [];
+
+    const tracks = this.mediaStream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    this.mediaStream = undefined;
+  }
+
+  onContactDisconnect(contact) {
+    const connectionIndex = this.connections
+      .findIndex((connection) => connection.contact === contact);
+    if (connectionIndex === -1) return;
+    const connection = this.connections[connectionIndex];
+    connection.close();
+    this.connections.splice(connectionIndex, 1);
   }
 
   async createMediaStream() {
@@ -94,8 +115,6 @@ export default class VoiceChannel {
     }
     return !!this.mediaStream;
   }
-
-  // async disconnect() {}
 
   async onOffer(
     virtualServer,
@@ -145,18 +164,3 @@ export default class VoiceChannel {
     return this.connections.find((connection) => connection.contact === contact);
   }
 }
-
-// // функция помощник
-// function endCall() {
-//   var videos = document.getElementsByTagName('video');
-//   for (var i = 0; i < videos.length; i++) {
-//     videos[i].pause();
-//   }
-//
-//   pc.close();
-// }
-//
-// function error(err) {
-//   endCall();
-// }
-// }

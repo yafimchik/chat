@@ -34,12 +34,14 @@ export async function onUpdateCallback({ message, virtualServer }) {
 }
 
 export async function onInputStreamCallback(contact, stream) {
-  console.log('contact ', contact);
-  console.log('stream ', stream);
   if (stream) {
     store.commit('setContactStream', {
       contact,
       stream,
     });
   } else store.commit('deleteContactStream', contact);
+}
+
+export async function onCloseConnectionCallback(contact) {
+  store.commit('deleteContactStream', contact);
 }

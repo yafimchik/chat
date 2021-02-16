@@ -7,6 +7,7 @@ export default class VoiceChannelConnection {
     sendOfferCallback = () => {},
     sendAnswerCallback = () => {},
     onInputStreamCallback = () => {},
+    onCloseConnectionCallback = () => {},
     onErrorCallback = () => {},
   ) {
     this.contact = contact;
@@ -14,6 +15,7 @@ export default class VoiceChannelConnection {
     this.sendOffer = sendOfferCallback;
     this.sendAnswer = sendAnswerCallback;
     this.onInputStream = onInputStreamCallback;
+    this.onCloseConnection = onCloseConnectionCallback;
     this.onError = onErrorCallback;
 
     this.isOnline = false;
@@ -28,7 +30,6 @@ export default class VoiceChannelConnection {
     this.peerConnection = new RTCPeerConnection(config);
 
     this.peerConnection.onicecandidate = (event) => {
-      console.log('new ice candidate', event.candidate);
       if (event.candidate !== null) {
         this.sendIce(this.contact, event.candidate);
       }
@@ -39,8 +40,7 @@ export default class VoiceChannelConnection {
       if (!event.track) return;
       this.stream.addTrack(event.track);
 
-      console.log('on stream ', this.contact, this.stream);
-      this.onInputStream(this.contact, this.stream); // TODO listening of stream in front
+      this.onInputStream(this.contact, this.stream);
 
       // document.getElementById("received_video").srcObject = event.streams[0];
       // // document.getElementById("hangup-button").disabled = false;
@@ -69,11 +69,22 @@ export default class VoiceChannelConnection {
     }
   }
 
+  close() {
+    this.onCloseConnection();
+    this.peerConnection.close();
+
+    const tracks = this.stream.getTracks();
+    tracks.forEach((track) => {
+      track.stop();
+    });
+    this.stream = undefined;
+    this.isOnline = false;
+  }
+
   async onOffer(offer, uniqueMessageId) {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
-    console.log('answer id ', uniqueMessageId);
     await this.sendAnswer(this.contact, answer, uniqueMessageId);
   }
 

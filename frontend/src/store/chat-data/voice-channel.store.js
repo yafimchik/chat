@@ -78,4 +78,18 @@ export default {
         .map((userStatus) => userStatus.user);
     },
   },
+  actions: {
+    async updateStreamsByContactsOnline({ state, dispatch }, contactsOnline) {
+      if (!state.inputStreams.length) return;
+      const disconnectedStreams = state.inputStreams
+        .filter((inputStream) => !contactsOnline.includes(inputStream.contact));
+
+      state.inputStreams = state.inputStreams
+        .filter((inputStream) => contactsOnline.includes(inputStream.contact));
+
+      await Promise.all(disconnectedStreams.map(
+        (disconnectedStream) => dispatch('disconnectContact', disconnectedStream.contact),
+      ));
+    },
+  },
 };

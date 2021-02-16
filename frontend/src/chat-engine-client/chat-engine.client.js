@@ -6,7 +6,12 @@ import ServerError from './errors/server.error';
 import ConnectionError from './errors/connection.error';
 
 class ChatEngineClient {
-  constructor(apiUrl, onUpdateCallback = () => {}, onInputStreamCallback = () => {}) {
+  constructor(
+    apiUrl,
+    onUpdateCallback = () => {},
+    onInputStreamCallback = () => {},
+    onCloseConnectionCallback = () => {},
+  ) {
     this.apiUrl = apiUrl;
     this.user = undefined;
     this.servers = {};
@@ -19,10 +24,12 @@ class ChatEngineClient {
       this.sendOffer.bind(this),
       this.sendAnswer.bind(this),
       onInputStreamCallback,
+      onCloseConnectionCallback,
       this.onException.bind(this),
     );
     this.connectToVoiceChannel = this.voiceChannel.connectToChannel.bind(this.voiceChannel);
     this.disconnectFromVoiceChannel = this.voiceChannel.disconnect.bind(this.voiceChannel);
+    this.onContactDisconnect = this.voiceChannel.onContactDisconnect.bind(this.voiceChannel);
   }
 
   async login(username) {
