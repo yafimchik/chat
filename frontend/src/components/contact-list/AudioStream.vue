@@ -12,6 +12,7 @@ export default {
     return {};
   },
   mounted() {
+    console.log('stream ', this.stream);
     this.$refs.audio.srcObject = this.stream;
   },
   beforeDestroy() {

@@ -2,15 +2,13 @@
   <div class="contact p-3">
     <app-contact v-for="user in voiceChannelContacts" :user="user" :key="user._id">
     </app-contact>
-    <app-audio-stream v-if="isListening">
+    <div class="audio-streams" v-if="isListening">
       <app-audio-stream
         v-for="stream in activeStreams"
         :stream="stream"
         :key="stream.id"
       ></app-audio-stream>
-      :stream="activeStreams"
-    </app-audio-stream>
-    <audio src=""></audio>
+    </div>
   </div>
 </template>
 
@@ -39,6 +37,7 @@ export default {
       return this.$store.getters.currentVoiceChannelId === this.voiceChannel._id;
     },
     activeStreams() {
+      console.log('activeStreams ', this.$store.getters.activeStreams);
       return this.$store.getters.activeStreams;
     },
     usersOnline() {

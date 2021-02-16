@@ -39,6 +39,7 @@ export default {
       this.isHovered = isHovered;
     },
     async onClick() {
+      // console.log('activeStreams ', this.$store.getters.activeStreams);
       if (this.isListening) {
         if (this.isActive) {
           await this.$store.dispatch('disconnectFromVoiceChannel');
