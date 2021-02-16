@@ -91,17 +91,8 @@ export default class VoiceChannel {
     if (this.mediaStream) return true;
 
     try {
-      this.mediaStream = await new Promise((resolve, reject) => {
-        navigator.mediaDevices.getUserMedia(
-          { video: false, audio: true },
-          (stream) => {
-            resolve(stream);
-          },
-          (error) => {
-            reject(error);
-          },
-        );
-      });
+      this.mediaStream = await navigator.mediaDevices
+        .getUserMedia({ video: false, audio: true });
 
       // TODO let see us on screen
       // var my_video = document.getElementById('my')

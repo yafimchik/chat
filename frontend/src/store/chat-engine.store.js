@@ -77,9 +77,9 @@ export default {
       await dispatch('updateUserVoiceChannelStatus', status);
       commit('setVoiceChannelState', result);
     },
-    async disconnectFromVoiceChannel({ state, commit }) {
+    async disconnectFromVoiceChannel({ state, commit, dispatch }) {
       await state.chatClient.disconnectFromVoiceChannel();
-
+      await dispatch('updateUserVoiceChannelStatus', undefined);
       commit('setVoiceChannelState', false);
     },
     async initializeAllChatUI(

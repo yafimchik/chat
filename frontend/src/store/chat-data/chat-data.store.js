@@ -24,7 +24,8 @@ export default {
         ? state.chats[virtualServerId][0]._id.slice() : undefined;
     },
     setCurrentChat(state, chatId) {
-      state.currentChatId = chatId.slice();
+      if (chatId) state.currentChatId = chatId.slice();
+      else state.currentChatId = chatId;
     },
     setVirtualServers(state, virtualServersArray) {
       const virtualServers = {};
@@ -158,7 +159,7 @@ export default {
 
       const userStatus = status.find((item) => item.user === state.user._id);
       if (userStatus && userStatus.value) {
-        commit('setCurrentVoiceChannel', userStatus.value.voiceChannel);
+        await dispatch('setCurrentVoiceChannel', userStatus.value.voiceChannel);
       }
 
       const contactsInVoiceChannel = status

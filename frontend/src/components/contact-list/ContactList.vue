@@ -1,39 +1,49 @@
 <template>
   <div class="contact p-3">
-    <app-contact
-      v-for="(item, index) in contactsWithStreams"
-      :user="item.user" :key="index" :stream="item.stream"
-    ></app-contact>
+    <app-contact v-for="user in voiceChannelContacts" :user="user" :key="user._id">
+    </app-contact>
+    <app-audio-stream v-if="isListening">
+      <app-audio-stream
+        v-for="stream in activeStreams"
+        :stream="stream"
+        :key="stream.id"
+      ></app-audio-stream>
+      :stream="activeStreams"
+    </app-audio-stream>
+    <audio src=""></audio>
   </div>
 </template>
 
 <script>
-import Contact from '@/components/contact-list/Contact.vue';
+import AudioStream from '@/components/contact-list/AudioStream.vue';
+import UserName from '@/components/user-list/UserName.vue';
 
 export default {
   name: 'ContactList',
   components: {
-    appContact: Contact,
+    appContact: UserName,
+    appAudioStream: AudioStream,
+  },
+  props: {
+    voiceChannel: Object,
   },
   data() {
     return {};
   },
   computed: {
-    contactsWithStreams() {
-      return this.$store.getters.contactsWithStreams
-        .map(({ contact, stream }) => ({
-          contact,
-          stream,
-          user: this.$store.getters.userById(contact),
-        }));
+    voiceChannelContacts() {
+      return this.$store.getters.getVoiceChannelContacts(this.voiceChannel._id)
+        .map((userId) => this.$store.getters.userById(userId));
     },
-    users() {
+    isListening() {
+      return this.$store.getters.currentVoiceChannelId === this.voiceChannel._id;
+    },
+    activeStreams() {
+      return this.$store.getters.activeStreams;
+    },
+    usersOnline() {
       return this.$store.getters.usersOnline;
     },
   },
 };
 </script>
-
-<style scoped lang="scss">
-
-</style>

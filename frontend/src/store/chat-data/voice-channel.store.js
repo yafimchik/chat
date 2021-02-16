@@ -46,6 +46,9 @@ export default {
     contactsWithStreams(state) {
       return state.inputStreams;
     },
+    activeStreams(state) {
+      return state.inputStreams.map((inputStream) => inputStream.stream);
+    },
     voiceChannelsByCurrentVirtualServer(state, getters) {
       const virtualServerId = getters.currentVirtualServerId;
       if (!virtualServerId) return [];
@@ -79,6 +82,9 @@ export default {
     },
   },
   actions: {
+    async setCurrentVoiceChannel({ commit }, voiceChannelId) {
+      commit('setCurrentVoiceChannel', voiceChannelId);
+    },
     async updateStreamsByContactsOnline({ state, dispatch }, contactsOnline) {
       if (!state.inputStreams.length) return;
       const disconnectedStreams = state.inputStreams

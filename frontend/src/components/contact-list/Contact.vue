@@ -23,6 +23,11 @@ export default {
   data() {
     return {};
   },
+  computed: {
+    isListening() {
+      return this.$store.getters.currentVoiceChannelId ===
+    },
+  },
   mounted() {
     this.$refs.audio.srcObject = this.stream;
   },

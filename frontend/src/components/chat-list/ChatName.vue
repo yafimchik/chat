@@ -33,7 +33,7 @@ export default {
   methods: {
     async onClick() {
       await this.$store.dispatch('setCurrentChat', this.chat._id);
-      if (this.$router.currentRoute.name !== 'chat') {
+      if (this.$route.name !== 'chat') {
         await this.$router.push({ name: 'chat' });
       }
     },

@@ -1,15 +1,15 @@
 <template>
   <b-list-group-item
     button @click="onClick"
-    :active="isActive"
+    :active="isListening"
     v-b-hover="hoverHandler"
     class="d-flex flex-row justify-content-between align-items-center"
   >
     <p>{{ voiceChannel.name }}</p>
-    <b-badge variant="success" v-if="!isActive && isHovered">
+    <b-badge variant="success" v-if="!isListening && isHovered">
       <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
     </b-badge>
-    <b-badge variant="danger" v-if="isActive && isHovered">
+    <b-badge variant="danger" v-if="isListening && isActive && isHovered">
       <b-icon icon="telephone-x-fill" aria-hidden="true"></b-icon>
     </b-badge>
   </b-list-group-item>
@@ -28,6 +28,9 @@ export default {
   },
   computed: {
     isActive() {
+      return this.$route.name === 'voiceChannel';
+    },
+    isListening() {
       return (this.voiceChannel._id === this.$store.getters.currentVoiceChannelId);
     },
   },
@@ -36,9 +39,15 @@ export default {
       this.isHovered = isHovered;
     },
     async onClick() {
-      await this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
-      if (this.$router.currentRoute.name !== 'voiceChannel') {
-        await this.$router.push({ name: 'voiceChannel' });
+      if (this.isListening) {
+        if (this.isActive) {
+          await this.$store.dispatch('disconnectFromVoiceChannel');
+        } else {
+          await this.$store.dispatch('setCurrentChat', undefined);
+          await this.$router.push({ name: 'voiceChannel' });
+        }
+      } else {
+        await this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
       }
     },
   },
