@@ -178,6 +178,11 @@ export default {
       commit('setAttachedFiles', []);
       commit('saveRecord', undefined);
     },
+    async saveUser({ commit }, loginResult) {
+      commit('saveUser', loginResult.user);
+      commit('saveToken', loginResult.token);
+      commit('setVirtualServers', loginResult.virtualServers);
+    },
   },
   modules: {
     voiceChannel: voiceChannelStore,

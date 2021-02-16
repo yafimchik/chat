@@ -59,14 +59,20 @@ export default {
     },
   },
   getters: {
+    userStatus(state) {
+      return state.userStatus;
+    },
+    isSystemOnline(state) {
+      return state.online;
+    },
     unreadMessagesByChatId(state) {
       return (chatId) => state.unreadMessages[chatId];
     },
-    currentDraft(state, getters, rootState) {
-      return state.draft[rootState.chatData.currentChatId];
+    currentDraft(state, getters) {
+      return state.draft[getters.currentChatId];
     },
-    isHistoryFull(state, getters, rootState) {
-      return !!state.historyLoaded[rootState.chatData.currentChatId];
+    isHistoryFull(state, getters) {
+      return !!state.historyLoaded[getters.currentChatId];
     },
   },
 };

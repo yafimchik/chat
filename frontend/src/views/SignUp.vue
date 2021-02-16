@@ -55,7 +55,7 @@ import { onUpdateCallback, onInputStreamCallback } from '@/vue-utils/chat-callba
 import { apiUrl } from '../configs/chat-connection.config';
 
 export default {
-  name: 'signIn',
+  name: 'signUp',
   components: {
   },
   data() {
@@ -68,14 +68,11 @@ export default {
     };
   },
   computed: {
-    chatClient() {
-      return this.$store.state.chatEngine.chatClient;
+    isOnline() {
+      return this.$store.getters.isSystemOnline;
     },
   },
   methods: {
-    async goSignIn() {
-      await this.$router.push({ name: 'signIn' });
-    },
     async onSubmit(event) {
       event.preventDefault();
       await this.signUp();
@@ -92,35 +89,18 @@ export default {
       });
     },
     async signUp() {
-      if (!this.chatClient) {
-        this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback, onInputStreamCallback });
-      }
-      if (!this.chatClient) {
-        // TODO LOGIN ERROR modal form
-        console.log('chat client error');
-        return;
-      }
-      const result = await this.chatClient.register(
-        this.form.username,
-        this.form.password,
-      );
-      if (!result) {
-        // TODO LOGIN ERROR modal form
-        console.log('login error');
-        return;
-      }
-      this.$store.commit('saveUser', result.user);
-      this.$store.commit('saveToken', result.token);
-      this.$store.commit('setVirtualServers', result.virtualServers);
+      await this.$store
+        .dispatch('initChatClient', { apiUrl, onUpdateCallback, onInputStreamCallback });
 
-      const connected = await this.chatClient.connect();
-      if (!connected) {
-        console.log('connection error');
-        // TODO connection ERROR modal form
-        return;
-      }
+      await this.$store
+        .dispatch('register', { user: this.form.username, password: this.form.password });
 
-      await this.$router.push({ name: 'home' });
+      await this.$store
+        .dispatch('connectToServer');
+
+      if (this.isOnline) {
+        await this.$router.push({ name: 'home' });
+      }
     },
   },
 };

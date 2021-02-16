@@ -21,29 +21,73 @@ export default {
       state.voiceChannelOnline = value;
     },
   },
+  getters: {
+    isChatEngineInitialized(state) {
+      return !!state.chatClient;
+    },
+  },
   actions: {
-    async updateUserChatStatus({ commit, state, rootState }, chatId) {
+    async sendUserStatus({ state, getters }) {
+      state.chatClient.sendStatus(getters.currentVirtualServerId, getters.userStatus);
+    },
+    async updateUserChatStatus({ commit, dispatch }, chatId) {
       commit('updateUserChatStatus', chatId);
-      state.chatClient.sendStatus(
-        rootState.chatData.currentVirtualServerId,
-        rootState.ui.userStatus,
-      );
+      await dispatch('sendUserStatus');
     },
-    async updateUserVoiceChannelStatus({ commit, state, rootState }, voiceChannelId) {
+    async updateUserVoiceChannelStatus({ commit, dispatch }, voiceChannelId) {
       commit('updateUserVoiceChannelStatus', voiceChannelId);
-      state.chatClient.sendStatus(
-        rootState.chatData.currentVirtualServerId,
-        rootState.ui.userStatus,
-      );
+      await dispatch('sendUserStatus');
     },
-    async updateUserStatus({ commit, state, rootState }, newStatus) {
+    async updateUserStatus({ commit, dispatch }, newStatus) {
       commit('updateUserStatus', newStatus);
-      state.chatClient.sendStatus(
-        rootState.chatData.currentVirtualServerId,
-        rootState.ui.userStatus,
-      );
+      await dispatch('sendUserStatus');
     },
-    async logout({ commit, state }) {
+    async initChatClient({ state, commit }, { apiUrl, onUpdateCallback, onInputStreamCallback }) {
+      if (state.chatClient) return;
+      commit('createChatEngine', { apiUrl, onUpdateCallback, onInputStreamCallback });
+    },
+    async login({ state, commit, dispatch }, { user, password }) {
+      if (!state.chatClient) return;
+
+      try {
+        const loginResult = await state.chatClient.login(user, password);
+        if (!loginResult) {
+          commit('postNotification', { error: true, message: 'Wrong username or password!' });
+          return;
+        }
+        await dispatch('saveUser', loginResult);
+      } catch (e) {
+        commit('postNotification', { error: true });
+      }
+    },
+    async connectToServer({ state, getters, commit }) {
+      if (!getters.isLoggedIn) return;
+
+      try {
+        const connected = await state.chatClient.connect();
+
+        if (!connected) commit('postNotification', { error: true });
+        commit('updateLinkStatus', connected);
+      } catch (e) {
+        commit('postNotification', { error: true });
+      }
+    },
+    async register({ state, commit, dispatch }, { user, password }) {
+      if (!state.chatClient) return;
+
+      try {
+        const registerResult = await state.chatClient.register(user, password);
+        if (!registerResult) {
+          commit('postNotification', { error: true, message: 'Wrong username or password!' });
+          return;
+        }
+        await dispatch('saveUser', registerResult);
+      } catch (e) {
+        console.error(e);
+        commit('postNotification', { error: true });
+      }
+    },
+    async logout({ state, commit }) {
       const result = await state.chatClient.disconnect();
       if (result) {
         commit('setToDefaultsAll');

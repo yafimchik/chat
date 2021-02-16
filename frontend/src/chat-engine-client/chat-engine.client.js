@@ -78,6 +78,7 @@ class ChatEngineClient {
     this.token = authResponse.token;
 
     this.servers = {};
+    console.log('authResponse', authResponse);
     authResponse.user.virtualServers.forEach((vs) => {
       const url = `${this.apiUrl}/wss/${vs._id}`
         .replace('http', 'ws');
@@ -326,6 +327,7 @@ class ChatEngineClient {
   }
 
   onException(error, fromClient = false) {
+    console.error(error);
     let clientError = error instanceof ClientError;
     const serverError = error instanceof ServerError;
     const connectionError = error instanceof ConnectionError;

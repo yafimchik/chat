@@ -68,8 +68,8 @@ export default {
     };
   },
   computed: {
-    chatClient() {
-      return this.$store.state.chatEngine.chatClient;
+    isOnline() {
+      return this.$store.getters.isSystemOnline;
     },
   },
   methods: {
@@ -89,63 +89,18 @@ export default {
       });
     },
     async signIn() {
-      this.$store.commit('updateLinkStatus', true);
-      if (!this.chatClient) {
-        this.$store.commit('createChatEngine', { apiUrl, onUpdateCallback, onInputStreamCallback });
-      }
-      if (!this.chatClient) {
-        this.$store.commit('postNotification', {
-          error: true,
-          message: 'System error!',
-        });
-        return;
-      }
+      await this.$store
+        .dispatch('initChatClient', { apiUrl, onUpdateCallback, onInputStreamCallback });
 
-      let result;
-      try {
-        result = await this.chatClient.login(
-          this.form.username,
-          this.form.password,
-        );
-      } catch (e) {
-        this.$store.commit('postNotification', {
-          error: true,
-        });
-        return;
-      }
+      await this.$store
+        .dispatch('login', { user: this.form.username, password: this.form.password });
 
-      if (!result) {
-        this.$store.commit('postNotification', {
-          error: true,
-          message: 'Wrong username or password!',
-        });
-        return;
-      }
-      this.$store.commit('saveUser', result.user);
-      this.$store.commit('saveToken', result.token);
-      this.$store.commit('setVirtualServers', result.virtualServers);
+      await this.$store
+        .dispatch('connectToServer');
 
-      let connected;
-      try {
-        connected = await this.chatClient.connect();
-      } catch (e) {
-        this.$store.commit('postNotification', {
-          error: true,
-        });
-        return;
+      if (this.isOnline) {
+        await this.$router.push({ name: 'home' });
       }
-
-      if (!connected) {
-        this.$store.commit('postNotification', {
-          error: true,
-        });
-        return;
-      }
-
-      await this.$router.push({ name: 'home' });
-    },
-    async goSignUp() {
-      await this.$router.push({ name: 'signUp' });
     },
   },
 };

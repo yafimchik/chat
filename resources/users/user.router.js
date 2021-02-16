@@ -31,7 +31,7 @@ userRouter.route('/register').post(
     async (req, res) => {
       const { username, password } = req.body;
 
-      const virtualServers = ['60019757576dda55bbe9196c']; // mock virtualserver
+      const virtualServers = ['60019757576dda55bbe9196c']; // TODO virtualservers / mock
 
       await serviceFabric.create('user')
         .create({ username, password, virtualServers });
@@ -45,7 +45,7 @@ userRouter.route('/register').post(
       }
 
       if (user.virtualServers) {
-        user.virtualServers = serviceFabric.create('virtualServer')
+        user.virtualServers = await serviceFabric.create('virtualServer')
           .getMany(user.virtualServers);
       }
       res.json({ user, token });
