@@ -1,27 +1,10 @@
 export default class VoiceChannelConnection {
-  constructor(
-    outputStream,
-    contact,
-    connectionConfig,
-    sendIceCallback = () => {},
-    sendOfferCallback = () => {},
-    sendAnswerCallback = () => {},
-    onInputStreamCallback = () => {},
-    onCloseConnectionCallback = () => {},
-    onErrorCallback = () => {},
-  ) {
+  constructor(outputStream, contact, voiceChannel) {
+    this.voiceChannel = voiceChannel;
     this.contact = contact;
-    this.sendIce = sendIceCallback;
-    this.sendOffer = sendOfferCallback;
-    this.sendAnswer = sendAnswerCallback;
-    this.onInputStream = onInputStreamCallback;
-    this.onCloseConnection = onCloseConnectionCallback;
-    this.onError = onErrorCallback;
-
-    this.stream = undefined;
+    this.inputStream = undefined;
     this.iceQueue = [];
-
-    this.createPeerConnection(outputStream, connectionConfig);
+    this.createPeerConnection(outputStream, this.voiceChannel.connectionConfig);
   }
 
   createPeerConnection(outputStream, config) {
@@ -29,20 +12,16 @@ export default class VoiceChannelConnection {
 
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate !== null) {
-        this.sendIce(this.contact, event.candidate);
+        this.voiceChannel.sendIce(this.contact, event.candidate);
       }
     };
 
     this.peerConnection.ontrack = (event) => {
-      if (!this.stream) this.stream = new MediaStream();
+      if (!this.inputStream) this.inputStream = new MediaStream();
       if (!event.track) return;
-      this.stream.addTrack(event.track);
+      this.inputStream.addTrack(event.track);
 
-      this.onInputStream(this.contact, this.stream);
-
-      // document.getElementById("received_video").srcObject = event.streams[0];
-      // // document.getElementById("hangup-button").disabled = false;
-      // console.log('not track is added');
+      this.voiceChannel.onInputStream(this.contact, this.inputStream);
     };
 
     outputStream.getTracks().forEach((track) => {
@@ -57,26 +36,25 @@ export default class VoiceChannelConnection {
       } else {
         const newOffer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(newOffer);
-        const result = await this.sendOffer(this.contact, newOffer);
+        const result = await this.voiceChannel.sendOffer(this.contact, newOffer);
         if (!result.answer) throw new Error('No answer from voice channel client!');
         await this.onAnswer(result.answer);
       }
     } catch (e) {
-      console.error(e);
-      this.onError(e);
+      this.voiceChannel.onError(e);
     }
   }
 
   close() {
-    this.onCloseConnection();
+    this.voiceChannel.onCloseConnection();
     this.peerConnection.close();
 
-    if (this.stream) {
-      const tracks = this.stream.getTracks();
+    if (this.inputStream) {
+      const tracks = this.inputStream.getTracks();
       tracks.forEach((track) => {
         track.stop();
       });
-      this.stream = undefined;
+      this.inputStream = undefined;
     }
   }
 
@@ -84,7 +62,7 @@ export default class VoiceChannelConnection {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
-    await this.sendAnswer(this.contact, answer, uniqueMessageId);
+    await this.voiceChannel.sendAnswer(this.contact, answer, uniqueMessageId);
   }
 
   async onAnswer(answer) {

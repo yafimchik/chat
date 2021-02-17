@@ -20,9 +20,9 @@ export default class VoiceChannel {
   ) {
     this.connectionConfig = connectionConfig;
 
-    this.sendOffer = sendOfferCallback;
-    this.sendIce = sendIceCallback;
-    this.sendAnswer = sendAnswerCallback;
+    this.sendOffer = sendOfferCallback.bind(undefined, this.virtualServer, this.voiceChannel);
+    this.sendIce = sendIceCallback.bind(undefined, this.virtualServer, this.voiceChannel);
+    this.sendAnswer = sendAnswerCallback.bind(undefined, this.virtualServer, this.voiceChannel);
     this.onInputStream = onInputStreamCallback;
     this.onCloseConnection = onCloseConnectionCallback;
     this.onError = onErrorCallback;
@@ -31,35 +31,29 @@ export default class VoiceChannel {
     this.mediaStream = undefined;
   }
 
+  createConnection(contact) {
+    const connection = new VoiceChannelConnection(this.mediaStream, contact, this);
+    this.connections.push(connection);
+    return connection;
+  }
+
   async connectToChannel(virtualServer, voiceChannel, contacts = []) {
     this.virtualServer = virtualServer;
     this.voiceChannel = voiceChannel;
-
     if (!contacts || !contacts.length) return true;
 
     try {
       await this.createMediaStream();
 
       contacts.forEach((contact) => {
-        this.connections.push(new VoiceChannelConnection(
-          this.mediaStream,
-          contact,
-          this.connectionConfig,
-          this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
-          this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
-          this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
-          this.onInputStream,
-          this.onCloseConnection,
-        ));
+        this.createConnection(contact);
       });
 
       await Promise.all(this.connections.map((connection) => connection.connectToClient()));
     } catch (error) {
-      console.error(error);
       this.onError(error);
       return false;
     }
-
     return true;
   }
 
@@ -98,22 +92,18 @@ export default class VoiceChannel {
       // var my_video = document.getElementById('my')
       // my_video.srcObject = stream
     } catch (error) {
-      console.error(error);
       this.onError(error);
       this.mediaStream = null;
     }
     return !!this.mediaStream;
   }
 
-  async onOffer(
-    virtualServer,
-    {
-      voiceChannel,
-      user,
-      offer,
-      uniqueMessageId,
-    },
-  ) {
+  async onOffer(virtualServer, {
+    voiceChannel,
+    user,
+    offer,
+    uniqueMessageId,
+  }) {
     if (this.virtualServer) {
       this.virtualServer = virtualServer;
       this.voiceChannel = voiceChannel;
@@ -121,20 +111,9 @@ export default class VoiceChannel {
 
     try {
       await this.createMediaStream();
-
-      const connection = new VoiceChannelConnection(
-        this.mediaStream,
-        user,
-        this.connectionConfig,
-        this.sendIce.bind(undefined, this.virtualServer, this.voiceChannel),
-        this.sendOffer.bind(undefined, this.virtualServer, this.voiceChannel),
-        this.sendAnswer.bind(undefined, this.virtualServer, this.voiceChannel),
-        this.onInputStream,
-      );
+      const connection = this.createConnection(user);
       await connection.connectToClient(offer, uniqueMessageId);
-      this.connections.push(connection);
     } catch (error) {
-      console.error(error);
       this.onError(error);
     }
   }
@@ -144,7 +123,6 @@ export default class VoiceChannel {
     try {
       if (connection) await connection.onIce(ice);
     } catch (error) {
-      console.error(error);
       this.onError(error);
     }
   }
