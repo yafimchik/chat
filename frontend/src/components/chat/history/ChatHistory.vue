@@ -3,7 +3,15 @@
     class="flex-grow-1"
     id="chat-history"
   >
-    <div class="chat-history__wrapper h-100 w-100 p-4" :scrolltop="scrollTop" @scroll="onScroll">
+    <div
+      ref="chatHistory"
+      class="chat-history__wrapper h-100 w-100 p-4"
+      :scrolltop="scrollTop"
+      @scroll="onScroll"
+      @wheel="onUserInput"
+      @keydown="onUserInput"
+      @mousedown="onUserInput"
+    >
       <app-message
         v-for="(message, index) in chatHistory"
         :message="message"
@@ -26,6 +34,7 @@ export default {
       userScrollingTimeout: undefined,
       fullHistoryLoaded: false,
       previousHistorySize: null,
+      previousStartMessageId: undefined,
       autoScroll: false,
     };
   },
@@ -46,7 +55,7 @@ export default {
       return this.chatHistory.length;
     },
     historyElement() {
-      return document.querySelector('div.chat-history__wrapper');
+      return this.$refs.chatHistory;
     },
   },
   components: {
@@ -64,43 +73,59 @@ export default {
       this.historyElement.children[this.historySize - 1].scrollIntoView();
       this.autoScroll = true;
     },
+    scrollToPreviousStart() {
+      if (!this.historyElement) return;
+      if (!this.historyElement.children.length) return;
+      if (this.previousHistorySize !== null) {
+        this.autoScroll = true;
+        this.userScrolling = false;
+        this.previousStartMessageId = null;
+        this.historyElement.children[this.historySize - this.previousHistorySize].scrollIntoView();
+        this.previousHistorySize = null;
+      }
+    },
+    onUserInput() {
+      this.userScrolling = true;
+    },
     async onScroll() {
       if (this.isScrolledToEnd()) {
-        this.$store.commit('clearUnreadMessagesCount');
+        await this.$store.dispatch('clearUnreadMessagesCount');
       }
 
-      if (!this.autoScroll) {
-        this.userScrolling = true;
+      if (this.autoScroll) {
+        this.autoScroll = false;
+      }
+
+      if (this.userScrolling) {
+        if (this.historyElement.scrollTop <= 0 && !this.isHistoryFull) {
+          if (this.historySize) {
+            this.previousStartMessageId = this.chatHistory[0]._id;
+            this.previousHistorySize = this.historySize;
+            await this.$store.dispatch('getHistoryChunk');
+          }
+        }
         if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
         this.userScrollingTimeout = setTimeout(() => {
           this.userScrolling = false;
         }, scrollingDelay);
-
-        if (this.historyElement.scrollTop === 0 && !this.isHistoryFull) {
-          this.previousHistorySize = this.chatHistory.length;
-          await this.$store.dispatch('getHistoryChunk');
-        }
-      } else if (this.isScrolledToEnd()) {
-        this.autoScroll = false;
       }
     },
   },
-  updated() {
+  destroyed() {
+    if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
+  },
+  async updated() {
     if (this.isScrolledToEnd()) {
-      this.$store.commit('clearUnreadMessagesCount');
+      await this.$store.dispatch('clearUnreadMessagesCount');
     }
-    if (this.previousHistorySize !== null) {
-      if (!this.historyElement) return;
-      if (!this.historyElement.children) return;
-      if (!this.historyElement.children.length) return;
-      this.historyElement.children[this.historySize - this.previousHistorySize].scrollIntoView();
-      this.previousHistorySize = null;
+
+    const toGoToPreviousStart = this.chatHistory.length && this.previousStartMessageId
+      && this.previousStartMessageId !== this.chatHistory[0]._id;
+    if (toGoToPreviousStart) {
+      this.scrollToPreviousStart();
     } else {
       this.scrollHistoryToEnd();
     }
-  },
-  destroyed() {
-    if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
   },
 };
 </script>

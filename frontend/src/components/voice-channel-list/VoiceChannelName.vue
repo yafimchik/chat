@@ -3,13 +3,13 @@
     button @click="onClick"
     :active="isListening"
     v-b-hover="hoverHandler"
-    class="d-flex flex-row justify-content-between align-items-center"
+    class="d-flex flex-row justify-content-center align-items-center"
   >
-    <p>{{ voiceChannel.name }}</p>
-    <b-badge variant="success" v-if="!isListening && isHovered">
+    <p class="m-0">{{ voiceChannel.name }}</p>
+    <b-badge variant="success" v-if="!isListening && isHovered" class="ml-3">
       <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
     </b-badge>
-    <b-badge variant="danger" v-if="isListening && isActive && isHovered">
+    <b-badge variant="danger" v-if="isListening && isActive && isHovered" class="ml-3">
       <b-icon icon="telephone-x-fill" aria-hidden="true"></b-icon>
     </b-badge>
   </b-list-group-item>

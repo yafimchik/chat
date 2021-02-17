@@ -50,11 +50,7 @@ export default {
       state.chatHistory = [...chatHistory];
     },
     addChatHistoryChunk(state, chatHistory) {
-      if (!chatHistory.length) {
-        const historyLoaded = { ...state.historyLoaded };
-        historyLoaded[state.currentChatId] = true;
-        state.historyLoaded = historyLoaded;
-      } else {
+      if (chatHistory.length) {
         const newChatHistory = state.chatHistory.concat(chatHistory);
         state.chatHistory = newChatHistory;
       }
@@ -63,10 +59,6 @@ export default {
       const newHistory = [...state.chatHistory];
       newHistory.unshift(message);
       state.chatHistory = newHistory;
-
-      const unreadMessages = { ...state.unreadMessages };
-      unreadMessages[message.chat] += 1;
-      state.unreadMessages = unreadMessages;
     },
     updateStatus(state, { virtualServer, status }) {
       const newStatus = { ...state.status };
@@ -133,6 +125,9 @@ export default {
       if (!curChatHistory) return [];
       return curChatHistory.reverse();
     },
+    currentHistorySize(state, getters) {
+      return getters.currentChatHistory.length;
+    },
     usernameById(state) {
       return (id) => {
         const user = state.contacts.find((contact) => contact._id === id);
@@ -154,6 +149,10 @@ export default {
     },
   },
   actions: {
+    addMessage({ commit }, message) {
+      commit('addMessage', message);
+      commit('addUnreadMessage', message.chat);
+    },
     async updateStatus({ state, commit, dispatch }, { virtualServer, status }) {
       commit('updateStatus', { virtualServer, status });
 

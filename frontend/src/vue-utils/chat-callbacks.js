@@ -1,7 +1,6 @@
 import store from '../store';
 
 export async function onUpdateCallback({ message, virtualServer }) {
-  // console.log('input message ', message);
   if (message.error) {
     const notification = {
       error: message.error,
@@ -19,17 +18,13 @@ export async function onUpdateCallback({ message, virtualServer }) {
     });
   }
   if ((message.text || message.files || message.audio) && message.date) {
-    store.commit('addMessage', message);
+    await store.dispatch('addMessage', message);
   }
   if (message.status) {
     await store.dispatch('updateStatus', {
       virtualServer,
       status: message.status,
     });
-    // store.commit('updateStatus', {
-    //   virtualServer,
-    //   status: message.status,
-    // });
   }
 }
 

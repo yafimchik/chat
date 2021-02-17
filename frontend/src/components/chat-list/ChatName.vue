@@ -1,10 +1,13 @@
 <template>
-  <b-list-group-item button @click="onClick" :active="isActive">
-    <p >{{ chat.name }}</p>
+  <b-list-group-item button @click="onClick" :active="isActive"
+                     class="d-flex flex-row justify-content-center align-items-center"
+  >
+    <p class="m-0">{{ chat.name }}</p>
     <b-badge
       v-if="!!unreadMessages"
       :variant="isActive ? 'light' : 'primary'"
       pill
+      class="ml-2"
     >
       {{ unreadMessages }}
     </b-badge>

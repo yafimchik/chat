@@ -157,14 +157,16 @@ export default {
     disconnectContact({ state }, contact) {
       state.chatClient.onContactDisconnect(contact);
     },
-    async getHistoryChunk({ commit, state, rootState }) {
-      const curChat = rootState.chatData.currentChatId;
-      const curServer = rootState.chatData.currentVirtualServerId;
-      const historySize = rootState.chatData.chatHistory
-        .filter((message) => message.chat === curChat).length;
+    async getHistoryChunk({ commit, state, getters }) {
+      const curChat = getters.currentChatId;
+      const curServer = getters.currentVirtualServerId;
+      const historySize = getters.currentHistorySize;
       try {
         const historyChunk = await state.chatClient
           .getHistory(curServer, curChat, historySize);
+        if (!historyChunk || !historyChunk.length) {
+          commit('setHistoryLoaded', curChat);
+        }
         if (historyChunk) commit('addChatHistoryChunk', historyChunk);
       } catch (e) {
         console.debug('history chunk error ', e);

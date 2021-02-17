@@ -1,5 +1,6 @@
 <template>
-  <section class="chat d-flex flex-column h-100">
+  <section class="voice-channel d-flex flex-column h-100">
+    <h2>Voice channel</h2>
 <!--    <app-contact-list></app-contact-list>-->
   </section>
 </template>

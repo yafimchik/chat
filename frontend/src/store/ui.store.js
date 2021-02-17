@@ -36,9 +36,15 @@ export default {
       newUserStatus.voiceChannel = voiceChannelId;
       state.userStatus = newUserStatus;
     },
-    clearUnreadMessagesCount(state) {
+    setUnreadMessagesCount(state, { count, chat }) {
       const unreadMessages = { ...state.unreadMessages };
-      unreadMessages[state.currentChatId] = 0;
+      unreadMessages[chat] = count;
+      state.unreadMessages = unreadMessages;
+    },
+    addUnreadMessage(state, chat) {
+      const unreadMessages = { ...state.unreadMessages };
+      if (unreadMessages[chat]) unreadMessages[chat] += 1;
+      else unreadMessages[chat] = 1;
       state.unreadMessages = unreadMessages;
     },
     setToDefaultsAll(state) {
@@ -46,6 +52,11 @@ export default {
       Object.entries(newState).forEach(([key, value]) => {
         state[key] = value;
       });
+    },
+    setHistoryLoaded(state, chat) {
+      const newHistoryLoaded = { ...state.historyLoaded };
+      newHistoryLoaded[chat] = true;
+      state.historyLoaded = newHistoryLoaded;
     },
     updateLinkStatus(state, isOnline) {
       state.online = isOnline;
@@ -73,6 +84,16 @@ export default {
     },
     isHistoryFull(state, getters) {
       return !!state.historyLoaded[getters.currentChatId];
+    },
+  },
+  actions: {
+    clearUnreadMessagesCount({ commit, getters }) {
+      const chat = getters.currentChatId;
+      const count = 0;
+      commit('setUnreadMessagesCount', {
+        chat,
+        count,
+      });
     },
   },
 };

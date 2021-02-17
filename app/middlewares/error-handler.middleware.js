@@ -8,7 +8,7 @@ function errorHandler(error, req, res, next) {
   } else {
     res.status(500);
     console.error(error);
-    res.status(error.responseStatus).json({ error: new ServerError() });
+    res.json({ error: new ServerError() });
   }
 }
 
