@@ -8,8 +8,20 @@ const DEFAULT_STATE = () => ({
 export default {
   state: DEFAULT_STATE,
   mutations: {
-    createChatEngine(state, { apiUrl, onUpdateCallback, onInputStreamCallback }) {
-      state.chatClient = new ChatEngineClient(apiUrl, onUpdateCallback, onInputStreamCallback);
+    createChatEngine(state, {
+      apiUrl,
+      onUpdateCallback,
+      onInputStreamCallback,
+      onCloseConnectionCallback,
+      onVoiceDetectionEventCallback,
+    }) {
+      state.chatClient = new ChatEngineClient(
+        apiUrl,
+        onUpdateCallback,
+        onInputStreamCallback,
+        onCloseConnectionCallback,
+        onVoiceDetectionEventCallback,
+      );
     },
     setToDefaultsAll(state) {
       const newState = DEFAULT_STATE();
@@ -42,9 +54,21 @@ export default {
       commit('updateUserStatus', newStatus);
       await dispatch('sendUserStatus');
     },
-    async initChatClient({ state, commit }, { apiUrl, onUpdateCallback, onInputStreamCallback }) {
+    async initChatClient({ state, commit }, {
+      apiUrl,
+      onUpdateCallback,
+      onInputStreamCallback,
+      onCloseConnectionCallback,
+      onVoiceDetectionEventCallback,
+    }) {
       if (state.chatClient) return;
-      commit('createChatEngine', { apiUrl, onUpdateCallback, onInputStreamCallback });
+      commit('createChatEngine', {
+        apiUrl,
+        onUpdateCallback,
+        onInputStreamCallback,
+        onCloseConnectionCallback,
+        onVoiceDetectionEventCallback,
+      });
     },
     async login({ state, commit, dispatch }, { user, password }) {
       if (!state.chatClient) return;

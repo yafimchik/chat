@@ -51,7 +51,12 @@
 </template>
 
 <script>
-import { onUpdateCallback, onInputStreamCallback } from '@/vue-utils/chat-callbacks';
+import {
+  onUpdateCallback,
+  onInputStreamCallback,
+  onCloseConnectionCallback,
+  onVoiceDetectionEventCallback,
+} from '@/vue-utils/chat-callbacks';
 import { apiUrl } from '../configs/chat-connection.config';
 
 export default {
@@ -90,7 +95,13 @@ export default {
     },
     async signIn() {
       await this.$store
-        .dispatch('initChatClient', { apiUrl, onUpdateCallback, onInputStreamCallback });
+        .dispatch('initChatClient', {
+          apiUrl,
+          onUpdateCallback,
+          onInputStreamCallback,
+          onCloseConnectionCallback,
+          onVoiceDetectionEventCallback,
+        });
 
       await this.$store
         .dispatch('login', { user: this.form.username, password: this.form.password });

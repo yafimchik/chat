@@ -1,3 +1,5 @@
+import VoiceActivityDetector from '@/chat-engine-client/voice-channel/voice-activity-detector';
+
 export default class VoiceChannelConnection {
   constructor(outputStream, contact, voiceChannel) {
     this.voiceChannel = voiceChannel;
@@ -5,6 +7,15 @@ export default class VoiceChannelConnection {
     this.inputStream = undefined;
     this.iceQueue = [];
     this.createPeerConnection(outputStream, this.voiceChannel.connectionConfig);
+
+    this.voiceDetector = new VoiceActivityDetector({
+      onSpeaking: () => {
+        this.voiceChannel.onVoiceDetectionEvent({ value: true, contact: this.contact });
+      },
+      onStoppedSpeaking: () => {
+        this.voiceChannel.onVoiceDetectionEvent({ value: false, contact: this.contact });
+      },
+    });
   }
 
   createPeerConnection(outputStream, config) {
@@ -18,8 +29,12 @@ export default class VoiceChannelConnection {
 
     this.peerConnection.ontrack = (event) => {
       if (!this.inputStream) this.inputStream = new MediaStream();
+
       if (!event.track) return;
       this.inputStream.addTrack(event.track);
+      if (!this.voiceDetector.isListening) {
+        this.voiceDetector.startListeningStream(this.inputStream);
+      }
 
       this.voiceChannel.onInputStream(this.contact, this.inputStream);
     };
@@ -46,6 +61,7 @@ export default class VoiceChannelConnection {
   }
 
   close() {
+    this.voiceDetector.stopListening();
     this.voiceChannel.onCloseConnection();
     this.peerConnection.close();
 

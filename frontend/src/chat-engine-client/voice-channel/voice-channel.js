@@ -17,6 +17,7 @@ export default class VoiceChannel {
     onInputStreamCallback = () => {},
     onCloseConnectionCallback = () => {},
     onErrorCallback = () => {},
+    onVoiceDetectionEventCallback = () => {},
   ) {
     this.connectionConfig = connectionConfig;
 
@@ -26,6 +27,7 @@ export default class VoiceChannel {
     this.onInputStream = onInputStreamCallback;
     this.onCloseConnection = onCloseConnectionCallback;
     this.onError = onErrorCallback;
+    this.onVoiceDetectionEvent = onVoiceDetectionEventCallback;
 
     this.connections = [];
     this.mediaStream = undefined;

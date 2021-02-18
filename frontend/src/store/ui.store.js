@@ -88,12 +88,7 @@ export default {
   },
   actions: {
     clearUnreadMessagesCount({ commit, getters }) {
-      const chat = getters.currentChatId;
-      const count = 0;
-      commit('setUnreadMessagesCount', {
-        chat,
-        count,
-      });
+      commit('setUnreadMessagesCount', { chat: getters.currentChatId, count: 0 });
     },
   },
 };

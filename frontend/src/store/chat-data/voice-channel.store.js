@@ -2,11 +2,17 @@ const DEFAULT_STATE = () => ({
   voiceChannels: {},
   currentVoiceChannelId: undefined,
   inputStreams: [],
+  contactVoiceStates: {},
 });
 
 export default {
   state: DEFAULT_STATE,
   mutations: {
+    setContactVoiceState(state, { contact, value }) {
+      const newVoiceStates = { ...state.contactVoiceStates };
+      newVoiceStates[contact] = value;
+      state.contactVoiceStates = newVoiceStates;
+    },
     setCurrentVoiceChannel(state, voiceChannelId) {
       if (voiceChannelId) state.currentVoiceChannelId = voiceChannelId.slice();
       state.currentVoiceChannelId = voiceChannelId;
@@ -40,6 +46,9 @@ export default {
     },
   },
   getters: {
+    getContactVoiceState(state) {
+      return (contact) => !!state.contactVoiceStates[contact];
+    },
     currentVoiceChannelId(state) {
       return state.currentVoiceChannelId;
     },

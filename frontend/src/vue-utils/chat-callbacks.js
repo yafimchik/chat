@@ -40,3 +40,7 @@ export async function onInputStreamCallback(contact, stream) {
 export async function onCloseConnectionCallback(contact) {
   store.commit('deleteContactStream', contact);
 }
+
+export async function onVoiceDetectionEventCallback({ contact, value }) {
+  store.commit('setContactVoiceState', { contact, value });
+}

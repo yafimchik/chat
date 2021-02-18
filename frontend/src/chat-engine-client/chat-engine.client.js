@@ -16,6 +16,7 @@ class ChatEngineClient {
     onUpdateCallback = () => {},
     onInputStreamCallback = () => {},
     onCloseConnectionCallback = () => {},
+    onVoiceDetectionEventCallback = () => {},
   ) {
     this.apiUrl = apiUrl;
     this.wsUrl = `${this.apiUrl.replace('http', 'ws')}/wss`;
@@ -34,6 +35,7 @@ class ChatEngineClient {
       onInputStreamCallback,
       onCloseConnectionCallback,
       this.onException.bind(this),
+      onVoiceDetectionEventCallback,
     );
     this.connectToVoiceChannel = this.voiceChannel.connectToChannel.bind(this.voiceChannel);
     this.disconnectFromVoiceChannel = this.voiceChannel.disconnect.bind(this.voiceChannel);

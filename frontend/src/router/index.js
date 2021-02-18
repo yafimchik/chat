@@ -4,7 +4,7 @@ import store from '@/store';
 import SignUp from '@/views/SignUp.vue';
 import SignIn from '@/views/SignIn.vue';
 import Home from '@/views/home/Home.vue';
-import Chat from '@/views/home/Chat';
+import Chat from '@/views/home/Chat.vue';
 import VoiceChannel from '@/views/home/VoiceChannel.vue';
 
 Vue.use(VueRouter);
