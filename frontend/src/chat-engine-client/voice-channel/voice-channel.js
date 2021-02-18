@@ -31,6 +31,26 @@ export default class VoiceChannel {
 
     this.connections = [];
     this.mediaStream = undefined;
+    this.microphoneState = true;
+  }
+
+  get microphoneTrack() {
+    if (!this.mediaStream) return undefined;
+    const audioTracks = this.mediaStream.getAudioTracks();
+    if (!audioTracks && !audioTracks.length) return undefined;
+    return audioTracks[0];
+  }
+
+  switchMicrophone(value) {
+    this.microphoneState = (value !== undefined) ? value : !this.microphoneState;
+    if (!this.microphoneTrack) return true;
+    this.microphoneTrack.enabled = this.microphoneState;
+    return this.microphoneState;
+  }
+
+  get microphoneMuted() {
+    if (!this.microphoneTrack) return !this.microphoneState;
+    return !this.microphoneTrack.enabled;
   }
 
   createConnection(contact) {
@@ -89,10 +109,7 @@ export default class VoiceChannel {
     try {
       this.mediaStream = await navigator.mediaDevices
         .getUserMedia({ video: false, audio: true });
-
-      // TODO let see us on screen
-      // var my_video = document.getElementById('my')
-      // my_video.srcObject = stream
+      this.switchMicrophone(this.microphoneState);
     } catch (error) {
       this.onError(error);
       this.mediaStream = null;

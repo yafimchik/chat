@@ -40,6 +40,11 @@ class ChatEngineClient {
     this.connectToVoiceChannel = this.voiceChannel.connectToChannel.bind(this.voiceChannel);
     this.disconnectFromVoiceChannel = this.voiceChannel.disconnect.bind(this.voiceChannel);
     this.onContactDisconnect = this.voiceChannel.onContactDisconnect.bind(this.voiceChannel);
+    this.switchMicrophone = this.voiceChannel.switchMicrophone.bind(this.voiceChannel);
+  }
+
+  get microphoneMuted() {
+    return this.voiceChannel.microphoneMuted;
   }
 
   static async postToUrl(url, data) {

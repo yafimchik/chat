@@ -1,42 +1,41 @@
 <template>
-  <div class="contact">
-    <app-user-name
-      :user="user"
-      :key="index"
-    ></app-user-name>
-    <audio ref="audio" autoplay></audio>
+  <div class="my-2 d-flex flex-row align-items-center justify-content-center">
+    <app-mic-button v-if="isCurrentUser"></app-mic-button>
+    <app-user-name :user="user"></app-user-name>
   </div>
 </template>
 
 <script>
 import UserName from '@/components/user-list/UserName.vue';
+import MicrophoneSwitchButton from '@/components/contact-list/MicrophoneSwitchButton.vue';
 
 export default {
-  name: 'ChatName',
+  name: 'UserName',
   components: {
+    appMicButton: MicrophoneSwitchButton,
     appUserName: UserName,
   },
   props: {
     user: Object,
-    stream: MediaStream,
   },
   data() {
-    return {};
+    return {
+    };
   },
   computed: {
-    isListening() {
-      return this.$store.getters.currentVoiceChannelId ===
+    isCurrentUser() {
+      return this.user._id === this.$store.getters.user._id;
     },
-  },
-  mounted() {
-    this.$refs.audio.srcObject = this.stream;
-  },
-  beforeDestroy() {
-    this.$refs.audio.srcObject = undefined;
+    name() {
+      return this.user.username;
+    },
+    initials() {
+      const { name } = this;
+      if (!name) return '';
+      if (typeof name !== 'string') return '';
+      return name.split(' ')
+        .map((word) => word.toUpperCase()[0]).splice(0, 2).join('');
+    },
   },
 };
 </script>
-
-<style scoped lang="scss">
-
-</style>

@@ -34,11 +34,20 @@ export default {
     },
   },
   getters: {
+    chatEngine(state) {
+      return state.chatClient;
+    },
+    microphoneMuted(state) {
+      return state.chatClient.microphoneMuted;
+    },
     isChatEngineInitialized(state) {
       return !!state.chatClient;
     },
   },
   actions: {
+    switchMicrophone({ state }) {
+      if (state.chatClient) state.chatClient.switchMicrophone();
+    },
     async sendUserStatus({ state, getters }) {
       state.chatClient.sendStatus(getters.currentVirtualServerId, getters.userStatus);
     },

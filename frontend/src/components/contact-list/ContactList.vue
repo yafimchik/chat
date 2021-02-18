@@ -14,12 +14,12 @@
 
 <script>
 import AudioStream from '@/components/contact-list/AudioStream.vue';
-import UserName from '@/components/user-list/UserName.vue';
+import Contact from '@/components/contact-list/Contact.vue';
 
 export default {
   name: 'ContactList',
   components: {
-    appContact: UserName,
+    appContact: Contact,
     appAudioStream: AudioStream,
   },
   props: {
@@ -31,13 +31,13 @@ export default {
   computed: {
     voiceChannelContacts() {
       return this.$store.getters.getVoiceChannelContacts(this.voiceChannel._id)
-        .map((userId) => this.$store.getters.userById(userId));
+        .map((userId) => this.$store.getters.userById(userId))
+        .sort((a) => ((a._id === this.$store.getters.user._id) ? -1 : 0));
     },
     isListening() {
       return this.$store.getters.currentVoiceChannelId === this.voiceChannel._id;
     },
     activeStreams() {
-      console.log('activeStreams ', this.$store.getters.activeStreams);
       return this.$store.getters.activeStreams;
     },
     usersOnline() {

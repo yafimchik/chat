@@ -94,6 +94,9 @@ export default {
     },
   },
   getters: {
+    user(state) {
+      return state.user;
+    },
     currentVirtualServerId(state) {
       return state.currentVirtualServerId;
     },
