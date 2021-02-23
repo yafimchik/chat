@@ -1,29 +1,27 @@
 class Status {
-  constructor({ chat, voiceChannel } = {}) {
-    if (chat) this.chat = chat;
-    if (voiceChannel) this.voiceChannel = voiceChannel;
+  constructor(status = {}) {
+    Object.entries(status).forEach(([key, value]) => this[key] = value);
   }
 
   hasChanges(newStatus) {
     if (!newStatus) {
-      return this.chat || this.voiceChannel;
+      return Object.entries(this).some(([key, value]) => value !== undefined);
     }
-    return this.chat !== newStatus.chat || this.voiceChannel !== newStatus.voiceChannel;
+    let result = Object.keys(newStatus).some((key) => this[key] !== newStatus[key]);
+    result = result || Object.keys(newStatus).length !== Object.keys(this).length;
+    return result;
   }
 
   update(status) {
     if (!this.hasChanges(status)) {
       return false;
     }
-
     if (status) {
-      this.chat = status.chat;
-      this.voiceChannel = status.voiceChannel;
+      Object.keys(this).forEach((key) => this[key] = undefined);
+      Object.entries(status).forEach(([key, value]) => this[key] = value);
     } else {
-      this.chat = undefined;
-      this.voiceChannel = undefined;
+      Object.keys(this).forEach((key) => this[key] = undefined);
     }
-
     return true;
   }
 }
