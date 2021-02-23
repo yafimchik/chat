@@ -26,6 +26,14 @@ const chatModelConfig = {
     },
     {
       name: undefined,
+      modelName: 'voiceChannel',
+      relation: relations.oneToOne,
+      onDelete: relationActionTypes.null,
+      onUpdate: relationActionTypes.nothing,
+      relatedProperty: 'chat',
+    },
+    {
+      name: undefined,
       modelName: 'message',
       relation: relations.oneToMany,
       onDelete: relationActionTypes.cascade,

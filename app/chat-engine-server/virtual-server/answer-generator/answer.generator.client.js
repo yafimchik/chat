@@ -46,6 +46,8 @@ class AnswerGeneratorClient {
         answer = await this.fromGetChatsMessage(messageObject); break;
       case ACTIONS.getVoiceChannels:
         answer = await this.fromGetVoiceChannelsMessage(messageObject); break;
+      case ACTIONS.createVoiceChannel:
+        answer = await this.fromCreateVoiceChannelMessage(messageObject); break;
       case ACTIONS.getHistory:
         answer = await this.fromGetHistoryMessage(messageObject); break;
       default:
@@ -118,6 +120,21 @@ class AnswerGeneratorClient {
     const answer = WsMessage.clone(messageObject);
     answer.payload.chats = await serviceFabric.create('chat')
       .getChatsOfVirtualServer(this.virtualServerId);
+
+    return answer;
+  }
+
+  async fromCreateVoiceChannelMessage(messageObject) {
+    const answer = WsMessage.clone(messageObject);
+    const newChat = await serviceFabric.create('chat')
+      .create({ virtualServer: this.virtualServerId, name: messageObject.payload.name });
+    answer.payload.voiceChannel = await serviceFabric.create('voiceChannel')
+      .create({
+        virtualServer: this.virtualServerId,
+        name: messageObject.payload.name,
+        chat: newChat._id,
+      });
+    answer.payload.chat = newChat;
 
     return answer;
   }

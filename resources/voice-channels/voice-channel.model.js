@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const relations = require('../prototype/relation.types');
+const relationActionTypes = require('../prototype/relation-action.types');
 
 const modelType = {
   name: {
@@ -7,6 +8,7 @@ const modelType = {
     required: true,
     unique: true,
   },
+  chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat' },
   virtualServer: { type: mongoose.Schema.Types.ObjectId, ref: 'virtualServer', required: true },
 };
 
@@ -17,6 +19,14 @@ const modelName = 'voiceChannel';
 const voiceChannelModelConfig = {
   modelName: modelName,
   populatedProperties: [
+    {
+      name: 'chat',
+      modelName: 'chat',
+      relation: relations.oneToOne,
+      onDelete: relationActionTypes.cascade,
+      onUpdate: relationActionTypes.nothing,
+      relatedProperty: undefined,
+    },
     {
       name: 'virtualServer',
       modelName: 'virtualServer',
