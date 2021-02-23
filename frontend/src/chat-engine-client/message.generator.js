@@ -64,6 +64,14 @@ export default class MessageGenerator {
     return { token: this.token, action: ACTIONS.getVoiceChannels };
   }
 
+  createVoiceChannel(name) {
+    return {
+      name,
+      token: this.token,
+      action: ACTIONS.createVoiceChannel,
+    };
+  }
+
   contactsRequest() {
     return { token: this.token, action: ACTIONS.getContacts };
   }

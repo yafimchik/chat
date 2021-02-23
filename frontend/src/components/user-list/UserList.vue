@@ -1,6 +1,8 @@
 <template>
-  <div class="chat-list p-3">
-    <app-user-name v-for="(user, index) in users" :user="user" :key="index"></app-user-name>
+  <div class="user-list">
+    <app-user-name
+      v-for="user in users" :user="user" :key="user._id"
+    ></app-user-name>
   </div>
 </template>
 
@@ -9,21 +11,14 @@ import UserName from '@/components/user-list/UserName.vue';
 
 export default {
   name: 'UserList',
-  data() {
-    return {
-    };
+  props: {
+    users: Array,
   },
-  computed: {
-    users() {
-      return this.$store.getters.usersOnline;
-    },
+  data() {
+    return {};
   },
   components: {
     appUserName: UserName,
   },
 };
 </script>
-
-<style scoped lang="scss">
-
-</style>

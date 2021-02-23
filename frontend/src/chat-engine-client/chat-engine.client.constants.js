@@ -8,6 +8,7 @@ export const ACTIONS = {
   getHistory: 'get-history',
   getChats: 'get-chats',
   getVoiceChannels: 'get-voice-channels',
+  createVoiceChannel: 'create-voice-channel',
   getContacts: 'get-contacts',
   getContactsOnline: 'get-contacts-online',
   status: 'status',

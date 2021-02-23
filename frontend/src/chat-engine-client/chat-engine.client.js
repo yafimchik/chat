@@ -298,6 +298,13 @@ class ChatEngineClient {
     return result.voiceChannels;
   }
 
+  async createVoiceChannel(virtualServer, name) {
+    const message = this.messageGenerator.createVoiceChannel(name);
+    const result = await this.sendMessageAsync(virtualServer, message);
+    if (!result) return undefined;
+    return result;
+  }
+
   async getContacts(virtualServer) {
     const message = this.messageGenerator.contactsRequest();
     const result = await this.sendMessageAsync(virtualServer, message);

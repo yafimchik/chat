@@ -1,4 +1,4 @@
-import ChatEngineClient from '../chat-engine-client/chat-engine.client';
+import ChatEngineClient from '@/chat-engine-client/chat-engine.client';
 
 const DEFAULT_STATE = () => ({
   chatClient: undefined,
@@ -15,13 +15,8 @@ export default {
       onCloseConnectionCallback,
       onVoiceDetectionEventCallback,
     }) {
-      state.chatClient = new ChatEngineClient(
-        apiUrl,
-        onUpdateCallback,
-        onInputStreamCallback,
-        onCloseConnectionCallback,
-        onVoiceDetectionEventCallback,
-      );
+      state.chatClient = new ChatEngineClient(apiUrl, onUpdateCallback,
+        onInputStreamCallback, onCloseConnectionCallback, onVoiceDetectionEventCallback);
     },
     setToDefaultsAll(state) {
       const newState = DEFAULT_STATE();
@@ -45,11 +40,25 @@ export default {
     },
   },
   actions: {
-    switchMicrophone({ state }) {
-      if (state.chatClient) state.chatClient.switchMicrophone();
+    async switchMicrophone(
+      {
+        state,
+        commit,
+        dispatch,
+      },
+    ) {
+      if (state.chatClient) {
+        state.chatClient.switchMicrophone();
+        const muted = state.chatClient.microphoneMuted;
+        commit('updateUserMutedStatus', muted);
+        await dispatch('sendUserStatus');
+      }
     },
     async sendUserStatus({ state, getters }) {
       state.chatClient.sendStatus(getters.currentVirtualServerId, getters.userStatus);
+    },
+    async sendTextMessage({ state, getters }, text) {
+      await state.chatClient.sendText(getters.currentVirtualServerId, getters.currentChatId, text);
     },
     async updateUserChatStatus({ commit, dispatch }, chatId) {
       commit('updateUserChatStatus', chatId);
@@ -132,7 +141,6 @@ export default {
         getters,
         commit,
         dispatch,
-        rootState,
       },
       voiceChannel,
     ) {
@@ -142,13 +150,11 @@ export default {
         await dispatch('updateUserVoiceChannelStatus', undefined);
         if (voiceChannelId === voiceChannel) return;
       }
-      const contacts = getters.getVoiceChannelContacts(voiceChannel);
+      const contacts = getters.getVoiceChannelContacts(voiceChannel)
+        .map((user) => user._id);
 
-      const result = await state.chatClient.connectToVoiceChannel(
-        rootState.chatData.currentVirtualServerId,
-        voiceChannel,
-        contacts,
-      );
+      const result = await getters.chatEngine
+        .connectToVoiceChannel(getters.currentVirtualServerId, voiceChannel, contacts);
       const status = result ? voiceChannel : undefined;
 
       await dispatch('updateUserVoiceChannelStatus', status);

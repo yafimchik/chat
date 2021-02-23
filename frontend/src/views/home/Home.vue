@@ -1,42 +1,31 @@
 <template>
-  <main class="flex-grow-1 row">
-    <div class="col-3 p-2 list-column">
-      <app-chat-list class="chat-list-block"></app-chat-list>
-      <app-voice-channel-list class="voice-channel-list-block"></app-voice-channel-list>
-    </div>
-    <div class="col-7 p-2">
-      <router-view/>
-    </div>
-    <div class="col-2 p-2">
-      <app-user-list></app-user-list>
-    </div>
-  </main>
+  <div class="page home flex-grow-1">
+    <app-main-header></app-main-header>
+    <app-home-buttons></app-home-buttons>
+    <app-room-card-list></app-room-card-list>
+    <app-home-footer></app-home-footer>
+  </div>
 </template>
 
 <script>
-import ChatList from '@/components/chat-list/ChatList.vue';
-import UserList from '@/components/user-list/UserList.vue';
-import VoiceChannelList from '@/components/voice-channel-list/VoiceChannelList.vue';
+import MainHeader from '@/components/MainHeader.vue';
+import HomeButtons from '@/views/home/components/HomeButtons.vue';
+import RoomCardList from '@/views/home/components/room-card-list/RoomCardList.vue';
+import HomeFooter from '@/views/home/components/HomeFooter.vue';
 
 export default {
   name: 'Home',
   components: {
-    appChatList: ChatList,
-    appUserList: UserList,
-    appVoiceChannelList: VoiceChannelList,
+    appMainHeader: MainHeader,
+    appHomeButtons: HomeButtons,
+    appRoomCardList: RoomCardList,
+    appHomeFooter: HomeFooter,
+  },
+  data() {
+    return {};
   },
   async beforeMount() {
     await this.$store.dispatch('initializeAllChatUI');
   },
 };
 </script>
-
-<style scoped lang="scss">
-div.list-column {
-  .chat-list-block,
-  .voice-channel-list-block {
-    height: 50%;
-    width: 100%;
-  }
-}
-</style>

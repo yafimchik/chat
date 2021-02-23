@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store';
-import SignUp from '@/views/SignUp.vue';
-import SignIn from '@/views/SignIn.vue';
 import Home from '@/views/home/Home.vue';
-import Chat from '@/views/home/Chat.vue';
-import VoiceChannel from '@/views/home/VoiceChannel.vue';
+import Chat from '@/views/room/chat/Chat.vue';
+import SignIn from '@/views/sign-in/SignIn.vue';
+import SignUp from '@/views/sign-up/SignUp.vue';
+import FreeUsers from '@/views/free-users/FreeUsers.vue';
+import Room from '@/views/room/Room.vue';
+import CreateRoom from '@/views/create-room/CreateRoom.vue';
 
 Vue.use(VueRouter);
 
@@ -13,24 +15,9 @@ const routes = [
   {
     path: '',
     component: Home,
+    name: 'home',
     meta: { requiresAuth: true },
-    children: [
-      {
-        path: '',
-        name: 'home',
-        redirect: { name: 'chat' },
-      },
-      {
-        path: 'chat',
-        component: Chat,
-        name: 'chat',
-      },
-      {
-        path: 'voice-channel',
-        name: 'voiceChannel',
-        component: VoiceChannel,
-      },
-    ],
+
   },
   {
     path: '/sign-in',
@@ -41,6 +28,31 @@ const routes = [
     path: '/sign-up',
     name: 'signUp',
     component: SignUp,
+  },
+  {
+    path: '/free-users',
+    name: 'freeUsers',
+    component: FreeUsers,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/room',
+    component: Room,
+    name: 'room',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'chat',
+        component: Chat,
+        name: 'chat',
+      },
+    ],
+  },
+  {
+    path: '/create-room',
+    name: 'createRoom',
+    component: CreateRoom,
+    meta: { requiresAuth: true },
   },
   {
     path: '*',

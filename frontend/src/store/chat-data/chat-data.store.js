@@ -46,6 +46,12 @@ export default {
     updateChats(state, chats) {
       state.chats = { ...chats };
     },
+    addChat(state, { virtualServer, chat }) {
+      const newChats = { ...state.chats };
+      if (!newChats[virtualServer]) newChats[virtualServer] = [];
+      newChats[virtualServer].push(chat);
+      state.chats = newChats;
+    },
     updateChatHistory(state, chatHistory) {
       state.chatHistory = [...chatHistory];
     },
@@ -94,6 +100,9 @@ export default {
     },
   },
   getters: {
+    contactsOnlineOfCurrentServer(state) {
+      return state.contactsOnline[state.currentVirtualServerId];
+    },
     user(state) {
       return state.user;
     },
@@ -138,6 +147,7 @@ export default {
       };
     },
     currentVirtualServerStatus(state) {
+      if (!state.status[state.currentVirtualServerId]) return [];
       return state.status[state.currentVirtualServerId];
     },
     currentChatStatus(state) {

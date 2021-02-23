@@ -1,14 +1,22 @@
+import { APPLICATION_MAIN_TITLE } from '@/configs/view.config';
+
 const DEFAULT_STATE = () => ({
+  mainTitle: APPLICATION_MAIN_TITLE,
   online: false,
   userStatus: {
     chat: undefined,
     voiceChannel: undefined,
+    muted: true,
   },
   draft: {},
   unreadMessages: {},
   historyLoaded: {},
   notification: undefined,
   attachedFiles: [],
+  footerLinks: {
+    home: [],
+    room: [],
+  },
 });
 
 export default {
@@ -34,6 +42,11 @@ export default {
     updateUserVoiceChannelStatus(state, voiceChannelId) {
       const newUserStatus = { ...state.userStatus };
       newUserStatus.voiceChannel = voiceChannelId;
+      state.userStatus = newUserStatus;
+    },
+    updateUserMutedStatus(state, muted) {
+      const newUserStatus = { ...state.userStatus };
+      newUserStatus.muted = muted;
       state.userStatus = newUserStatus;
     },
     setUnreadMessagesCount(state, { count, chat }) {
@@ -70,6 +83,9 @@ export default {
     },
   },
   getters: {
+    mainTitle(state) {
+      return state.mainTitle;
+    },
     userStatus(state) {
       return state.userStatus;
     },

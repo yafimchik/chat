@@ -17,6 +17,18 @@ export async function onUpdateCallback({ message, virtualServer }) {
       contactsOnline: message.contactsOnline,
     });
   }
+  if (message.voiceChannel) {
+    store.commit('addVoiceChannel', {
+      virtualServer,
+      voiceChannel: message.voiceChannel,
+    });
+  }
+  if (message.chat) {
+    store.commit('addChat', {
+      virtualServer,
+      chat: message.chat,
+    });
+  }
   if ((message.text || message.files || message.audio) && message.date) {
     await store.dispatch('addMessage', message);
   }

@@ -20,6 +20,12 @@ export default {
     updateVoiceChannels(state, voiceChannels) {
       state.voiceChannels = { ...voiceChannels };
     },
+    addVoiceChannel(state, { virtualServer, voiceChannel }) {
+      const newVoiceChannels = { ...state.voiceChannels };
+      if (!newVoiceChannels[virtualServer]) newVoiceChannels[virtualServer] = [];
+      newVoiceChannels[virtualServer].push(voiceChannel);
+      state.voiceChannels = newVoiceChannels;
+    },
     setToDefaultsAll(state) {
       const newState = DEFAULT_STATE();
       Object.entries(newState).forEach(([key, value]) => {
@@ -46,6 +52,38 @@ export default {
     },
   },
   getters: {
+    speakers(state, getters) {
+      return getters.currentVirtualServerStatus
+        .filter(
+          (userStatus) => userStatus.value
+            && userStatus.value.voiceChannel === getters.currentVoiceChannelId,
+        )
+        .filter(
+          (userStatus) => !userStatus.value.muted,
+        )
+        .map((userStatus) => userStatus.user)
+        .map((id) => getters.userById(id));
+    },
+    listeners(state, getters) {
+      return getters.currentVirtualServerStatus
+        .filter(
+          (userStatus) => userStatus.value
+            && userStatus.value.voiceChannel === getters.currentVoiceChannelId,
+        )
+        .filter(
+          (userStatus) => userStatus.value.muted,
+        )
+        .map((userStatus) => userStatus.user)
+        .map((id) => getters.userById(id));
+    },
+    freeUsers(state, getters) {
+      const notFreeUsers = getters.currentVirtualServerStatus
+        .filter((status) => status.value && status.value.voiceChannel)
+        .map((status) => status.user);
+      const allUsers = getters.contactsOnlineOfCurrentServer;
+      if (!allUsers) return [];
+      return allUsers.filter((user) => !notFreeUsers.some((id) => id === user._id));
+    },
     getContactVoiceState(state) {
       return (contact) => !!state.contactVoiceStates[contact];
     },
@@ -65,9 +103,11 @@ export default {
       if (!result) return [];
       return result;
     },
-    currentVoiceChannel(state) {
-      const voiceChannel = state.voiceChannels[state.currentVoiceChannelId];
-      return { ...voiceChannel };
+    currentVoiceChannel(state, getters) {
+      const curVC = state.voiceChannels[getters.currentVirtualServerId]
+        .find((voiceChannel) => voiceChannel._id === state.currentVoiceChannelId);
+      if (!curVC) return curVC;
+      return { ...curVC };
     },
     voiceChannelStatus(state, getters) {
       return (voiceChannelId) => {
@@ -87,7 +127,8 @@ export default {
         .filter(
           (userStatus) => userStatus.value && userStatus.value.voiceChannel === voiceChannel,
         )
-        .map((userStatus) => userStatus.user);
+        .map((userStatus) => userStatus.user)
+        .map((id) => getters.userById(id));
     },
   },
   actions: {

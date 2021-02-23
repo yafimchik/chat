@@ -7,8 +7,7 @@ import chatEngineStore from './chat-engine.store';
 
 Vue.use(Vuex);
 
-const DEFAULT_STATE = () => ({
-});
+const DEFAULT_STATE = () => ({});
 
 export default new Vuex.Store({
   state: DEFAULT_STATE(),
