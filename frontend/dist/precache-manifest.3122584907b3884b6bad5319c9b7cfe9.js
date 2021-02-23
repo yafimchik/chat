@@ -44,7 +44,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/user.svg"
   },
   {
-    "revision": "178f0b1a48223981859cf7bf85d73f83",
+    "revision": "dcf9a24014d108f56bbd75eab21e9155",
     "url": "/index.html"
   },
   {
@@ -56,7 +56,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/js/chunk-vendors.426acc7c.js"
   },
   {
-    "revision": "a224424945aae13ec6d5ab13a844d543",
+    "revision": "c3f88516103a9022433a38a35451442d",
     "url": "/manifest.json"
   },
   {

@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.ec6da8fcd6fe60a8d2c1c5117db87e91.js"
+  "/precache-manifest.3122584907b3884b6bad5319c9b7cfe9.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "chat-frontend"});
+workbox.core.setCacheNameDetails({prefix: "voice-house"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
