@@ -3,11 +3,15 @@ import ChatEngineClient from '@/chat-engine-client/chat-engine.client';
 const DEFAULT_STATE = () => ({
   chatClient: undefined,
   voiceChannelOnline: false,
+  isChatDataInitialized: false,
 });
 
 export default {
   state: DEFAULT_STATE,
   mutations: {
+    setChatDataInitialized(state, value) {
+      state.isChatDataInitialized = value;
+    },
     createChatEngine(state, {
       apiUrl,
       onUpdateCallback,
@@ -173,6 +177,7 @@ export default {
         rootState,
       },
     ) {
+      if (state.isChatDataInitialized) return;
       const contacts = await state.chatClient.getContacts();
       if (contacts) commit('updateContacts', contacts);
 
@@ -192,6 +197,8 @@ export default {
       if (Object.values(virtualServers).length) {
         dispatch('setCurrentVirtualServer', Object.keys(virtualServers)[0]);
       }
+
+      commit('setChatDataInitialized', true);
     },
     disconnectContact({ state }, contact) {
       state.chatClient.onContactDisconnect(contact);
