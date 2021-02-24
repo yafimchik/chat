@@ -79,6 +79,7 @@ class ChatEngineClient {
     this.token = authResponse.token;
 
     this.initializeRequestInterface(this.token); // initialize interface mixin
+    this.voiceChannel.setUser(this.user);
 
     this.servers = {};
     authResponse.user.virtualServers.forEach((vs) => {

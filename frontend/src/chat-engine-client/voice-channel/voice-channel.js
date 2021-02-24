@@ -1,4 +1,5 @@
 import VoiceChannelConnection from '@/chat-engine-client/voice-channel/voice-channel.connection';
+import VoiceActivityDetector from '@/chat-engine-client/voice-channel/voice-activity-detector';
 
 const { ICE_SERVER_URLS } = require('@/chat-engine-client/chat-engine.client.constants');
 
@@ -32,6 +33,10 @@ export default class VoiceChannel {
     this.connections = [];
     this.mediaStream = undefined;
     this.microphoneState = true;
+  }
+
+  setUser(user) {
+    this.user = user;
   }
 
   get microphoneTrack() {
@@ -86,6 +91,8 @@ export default class VoiceChannel {
     this.connections = [];
 
     if (this.mediaStream) {
+      this.voiceDetector.stopListening();
+
       const tracks = this.mediaStream.getTracks();
       tracks.forEach((track) => {
         track.stop();
@@ -110,6 +117,16 @@ export default class VoiceChannel {
       this.mediaStream = await navigator.mediaDevices
         .getUserMedia({ video: false, audio: true });
       this.switchMicrophone(this.microphoneState);
+
+      this.voiceDetector = new VoiceActivityDetector({
+        onSpeaking: () => {
+          this.onVoiceDetectionEvent({ value: true, contact: this.user._id });
+        },
+        onStoppedSpeaking: () => {
+          this.onVoiceDetectionEvent({ value: false, contact: this.user._id });
+        },
+      });
+      this.voiceDetector.startListeningStream(this.mediaStream);
     } catch (error) {
       this.onError(error);
       this.mediaStream = null;
