@@ -1,7 +1,7 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "5e4b8e2b1a3ae8fe32fe",
-    "url": "/css/app.8d53266d.css"
+    "revision": "987bd67b00d488a72dd2",
+    "url": "/css/app.73b21a9d.css"
   },
   {
     "revision": "b2526ebd6f5e8c14ffd5",
@@ -24,6 +24,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/logo.png"
   },
   {
+    "revision": "1e32142942cc8cb1d589f97e64e9412a",
+    "url": "/img/minus.png"
+  },
+  {
     "revision": "a392ca21d0f068f102b67715daf7e372",
     "url": "/img/mute.png"
   },
@@ -36,6 +40,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/not-speak.png"
   },
   {
+    "revision": "f05ea7d0f63ad196cb34064d13cd1fdf",
+    "url": "/img/plus.png"
+  },
+  {
     "revision": "9c00ceb37a8231a0bcbaf4a658eb7ac9",
     "url": "/img/speak.png"
   },
@@ -44,12 +52,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/user.svg"
   },
   {
-    "revision": "53a4c9e4dc057341b184408920b62a23",
+    "revision": "d1cf8c868796d07ea16511de8b7cf2e3",
     "url": "/index.html"
   },
   {
-    "revision": "5e4b8e2b1a3ae8fe32fe",
-    "url": "/js/app.4533da6a.js"
+    "revision": "987bd67b00d488a72dd2",
+    "url": "/js/app.339a4cdc.js"
   },
   {
     "revision": "b2526ebd6f5e8c14ffd5",
