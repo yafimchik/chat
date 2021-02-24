@@ -8,7 +8,11 @@
           {{ voiceChannelContacts.length }}
         </div>
       </div>
-      <app-user-list :users="voiceChannelContacts.slice(0, 5)"></app-user-list>
+      <div class="d-flex justify-content-between w-100">
+        <app-user-list :users="voiceChannelContacts.slice(0, 5)"></app-user-list>
+        <app-close-room-button :voiceChannel="voiceChannel"></app-close-room-button>
+      </div>
+
     </button>
   </div>
 </template>
@@ -16,6 +20,7 @@
 <script>
 import UserList from '@/components/user-list/UserList.vue';
 import { mapGetters } from 'vuex';
+import CloseRoomButton from '@/components/buttons/CloseRoomButton.vue';
 
 export default {
   name: 'RoomCard',
@@ -27,6 +32,7 @@ export default {
   },
   components: {
     appUserList: UserList,
+    appCloseRoomButton: CloseRoomButton,
   },
   computed: {
     ...mapGetters({
