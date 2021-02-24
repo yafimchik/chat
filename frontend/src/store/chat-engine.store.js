@@ -64,18 +64,6 @@ export default {
     async sendTextMessage({ state, getters }, text) {
       await state.chatClient.sendText(getters.currentVirtualServerId, getters.currentChatId, text);
     },
-    async updateUserChatStatus({ commit, dispatch }, chatId) {
-      commit('updateUserChatStatus', chatId);
-      await dispatch('sendUserStatus');
-    },
-    async updateUserVoiceChannelStatus({ commit, dispatch }, voiceChannelId) {
-      commit('updateUserVoiceChannelStatus', voiceChannelId);
-      await dispatch('sendUserStatus');
-    },
-    async updateUserStatus({ commit, dispatch }, newStatus) {
-      commit('updateUserStatus', newStatus);
-      await dispatch('sendUserStatus');
-    },
     async initChatClient({ state, commit }, {
       apiUrl,
       onUpdateCallback,

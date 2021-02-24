@@ -1,4 +1,5 @@
 import voiceChannelStore from './voice-channel.store';
+import statusStore from './status.store';
 
 const DEFAULT_STATE = () => ({
   user: undefined,
@@ -6,7 +7,6 @@ const DEFAULT_STATE = () => ({
   virtualServers: {},
   chats: {},
   chatHistory: [],
-  status: {},
   contacts: [],
   contactsOnline: {},
   currentVirtualServerId: undefined,
@@ -65,11 +65,6 @@ export default {
       const newHistory = [...state.chatHistory];
       newHistory.unshift(message);
       state.chatHistory = newHistory;
-    },
-    updateStatus(state, { virtualServer, status }) {
-      const newStatus = { ...state.status };
-      newStatus[virtualServer] = status;
-      state.status = { ...newStatus };
     },
     updateContactsOnline(state, { virtualServer, contactsOnline }) {
       const newContactsOnline = { ...state.contactsOnline };
@@ -146,17 +141,6 @@ export default {
         return user ? user.username : '';
       };
     },
-    currentVirtualServerStatus(state) {
-      if (!state.status[state.currentVirtualServerId]) return [];
-      return state.status[state.currentVirtualServerId];
-    },
-    currentChatStatus(state) {
-      if (!state.status[state.currentVirtualServerId]) return [];
-      const status = state.status[state.currentVirtualServerId]
-        .filter((userStatus) => userStatus.value.chat === state.currentChatId)
-        .map((userStatus) => userStatus.user);
-      return status;
-    },
     userById(state) {
       return (userId) => state.contacts.find((user) => user._id === userId);
     },
@@ -172,20 +156,7 @@ export default {
         });
       }
     },
-    async updateStatus({ state, commit, dispatch }, { virtualServer, status }) {
-      commit('updateStatus', { virtualServer, status });
 
-      const userStatus = status.find((item) => item.user === state.user._id);
-      if (userStatus && userStatus.value) {
-        await dispatch('setCurrentVoiceChannel', userStatus.value.voiceChannel);
-      }
-
-      const contactsInVoiceChannel = status
-        .filter((item) => item.value.voiceChannel === userStatus.value.voiceChannel)
-        .map((item) => item.user);
-
-      await dispatch('updateStreamsByContactsOnline', contactsInVoiceChannel);
-    },
     setCurrentVirtualServer({ commit }, serverId) {
       commit('setCurrentVirtualServer', serverId);
       commit('setAttachedFiles', []);
@@ -204,5 +175,6 @@ export default {
   },
   modules: {
     voiceChannel: voiceChannelStore,
+    status: statusStore,
   },
 };

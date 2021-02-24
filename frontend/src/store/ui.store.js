@@ -3,11 +3,6 @@ import { APPLICATION_MAIN_TITLE } from '@/configs/view.config';
 const DEFAULT_STATE = () => ({
   mainTitle: APPLICATION_MAIN_TITLE,
   online: false,
-  userStatus: {
-    chat: undefined,
-    voiceChannel: undefined,
-    muted: true,
-  },
   draft: {},
   unreadMessages: {},
   historyLoaded: {},
@@ -33,25 +28,6 @@ export default {
     deleteDraft(state, chatId) {
       state.draft[chatId] = '';
       state.draft = { ...state.draft };
-    },
-    updateUserStatus(state, status) {
-      if (status) state.userStatus = { ...status };
-      else state.userStatus = status;
-    },
-    updateUserChatStatus(state, chatId) {
-      const newUserStatus = { ...state.userStatus };
-      newUserStatus.chat = chatId;
-      state.userStatus = newUserStatus;
-    },
-    updateUserVoiceChannelStatus(state, voiceChannelId) {
-      const newUserStatus = { ...state.userStatus };
-      newUserStatus.voiceChannel = voiceChannelId;
-      state.userStatus = newUserStatus;
-    },
-    updateUserMutedStatus(state, muted) {
-      const newUserStatus = { ...state.userStatus };
-      newUserStatus.muted = muted;
-      state.userStatus = newUserStatus;
     },
     setUnreadMessagesCount(state, { count, chat }) {
       const unreadMessages = { ...state.unreadMessages };
@@ -96,9 +72,6 @@ export default {
     },
     mainTitle(state) {
       return state.mainTitle;
-    },
-    userStatus(state) {
-      return state.userStatus;
     },
     isSystemOnline(state) {
       return state.online;
