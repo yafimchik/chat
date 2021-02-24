@@ -77,4 +77,8 @@ router.beforeEach((toR, fromR, next) => {
   }
 });
 
+router.afterEach((toR) => {
+  store.commit('pushRoute', toR);
+});
+
 export default router;
