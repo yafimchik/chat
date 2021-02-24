@@ -72,6 +72,14 @@ export default class MessageGenerator {
     };
   }
 
+  deleteVoiceChannel(voiceChannelId) {
+    return {
+      voiceChannelId,
+      token: this.token,
+      action: ACTIONS.deleteVoiceChannel,
+    };
+  }
+
   contactsRequest() {
     return { token: this.token, action: ACTIONS.getContacts };
   }

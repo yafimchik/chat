@@ -29,6 +29,12 @@ export async function onUpdateCallback({ message, virtualServer }) {
       chat: message.chat,
     });
   }
+  if (message.voiceChannelId) {
+    await store.dispatch('deleteVoiceChannel', {
+      virtualServer,
+      voiceChannelId: message.voiceChannelId,
+    });
+  }
   if ((message.text || message.files || message.audio) && message.date) {
     await store.dispatch('addMessage', message);
   }

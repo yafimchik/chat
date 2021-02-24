@@ -52,6 +52,11 @@ export default {
       newChats[virtualServer].push(chat);
       state.chats = newChats;
     },
+    deleteChat(state, { virtualServer, chatId }) {
+      if (!state.chats[virtualServer]) return;
+      state.chats[virtualServer] = state.chats[virtualServer].filter((chat) => chat._id !== chatId);
+      state.chats = { ...state.chats };
+    },
     updateChatHistory(state, chatHistory) {
       state.chatHistory = [...chatHistory];
     },
@@ -156,7 +161,12 @@ export default {
         });
       }
     },
-
+    deleteChat({ commit, getters }, chatId) {
+      if (getters.currentChatId === chatId) {
+        commit('setCurrentChat', undefined);
+      }
+      commit('deleteChat', chatId);
+    },
     setCurrentVirtualServer({ commit }, serverId) {
       commit('setCurrentVirtualServer', serverId);
       commit('setAttachedFiles', []);

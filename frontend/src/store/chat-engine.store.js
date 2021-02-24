@@ -150,6 +150,10 @@ export default {
       await dispatch('updateUserVoiceChannelStatus', undefined);
       commit('setVoiceChannelState', false);
     },
+    async deleteVoiceChannelOnServer({ state, getters, dispatch }, id) {
+      if (getters.currentVoiceChannelId === id) await dispatch('disconnectFromVoiceChannel');
+      await state.chatClient.deleteVoiceChannel(getters.currentVirtualServerId, id);
+    },
     async initializeAllChatUI(
       {
         commit,

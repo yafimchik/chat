@@ -26,6 +26,12 @@ export default {
       newVoiceChannels[virtualServer].push(voiceChannel);
       state.voiceChannels = newVoiceChannels;
     },
+    deleteVoiceChannel(state, { virtualServer, voiceChannelId }) {
+      if (!state.voiceChannels[virtualServer]) return;
+      state.voiceChannels[virtualServer] = state.voiceChannels[virtualServer]
+        .filter((voiceChannel) => voiceChannel._id !== voiceChannelId);
+      state.voiceChannels = { ...state.voiceChannels };
+    },
     setToDefaultsAll(state) {
       const newState = DEFAULT_STATE();
       Object.entries(newState).forEach(([key, value]) => {
@@ -62,6 +68,11 @@ export default {
     },
     getContactVoiceState(state) {
       return (contact) => !!state.contactVoiceStates[contact];
+    },
+    voiceChannelById(state) {
+      return (id) => Object.values(state.voiceChannels)
+        .flat()
+        .find((voiceChannel) => voiceChannel._id === id);
     },
     currentVoiceChannelId(state) {
       return state.currentVoiceChannelId;
@@ -108,6 +119,16 @@ export default {
     },
   },
   actions: {
+    async deleteVoiceChannel({ commit, dispatch, getters }, { virtualServer, voiceChannelId }) {
+      if (getters.currentVoiceChannelId === voiceChannelId) {
+        dispatch('disconnectFromVoiceChannel');
+      }
+      const voiceChannel = getters.voiceChannelById(voiceChannelId);
+      if (!voiceChannel) return;
+      const { chat } = voiceChannel;
+      await dispatch('deleteChat', { virtualServer, chat });
+      commit('deleteVoiceChannel', { virtualServer, voiceChannelId });
+    },
     async setCurrentVoiceChannel({ commit }, voiceChannelId) {
       commit('setCurrentVoiceChannel', voiceChannelId);
     },

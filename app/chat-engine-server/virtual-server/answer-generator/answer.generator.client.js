@@ -46,6 +46,8 @@ class AnswerGeneratorClient {
         answer = await this.fromGetChatsMessage(messageObject); break;
       case ACTIONS.getVoiceChannels:
         answer = await this.fromGetVoiceChannelsMessage(messageObject); break;
+      case ACTIONS.deleteVoiceChannel:
+        answer = await this.fromDeleteVoiceChannelMessage(messageObject); break;
       case ACTIONS.createVoiceChannel:
         answer = await this.fromCreateVoiceChannelMessage(messageObject); break;
       case ACTIONS.getHistory:
@@ -142,6 +144,12 @@ class AnswerGeneratorClient {
       });
     answer.payload.chat = newChat;
 
+    return answer;
+  }
+
+  async fromDeleteVoiceChannelMessage(messageObject) {
+    const answer = WsMessage.clone(messageObject);
+    await serviceFabric.create('voiceChannel').deleteById(messageObject.payload.voiceChannelId);
     return answer;
   }
 

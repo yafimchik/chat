@@ -9,6 +9,7 @@ const ACTIONS = {
   getChats: 'get-chats',
   getVoiceChannels: 'get-voice-channels',
   createVoiceChannel: 'create-voice-channel',
+  deleteVoiceChannel: 'delete-voice-channel',
   getContacts: 'get-contacts',
   getContactsOnline: 'get-contacts-online',
   status: 'status',
@@ -31,6 +32,7 @@ const BROADCAST_ANSWERS = [
   ACTIONS.callRequest,
   ACTIONS.callResponse,
   ACTIONS.createVoiceChannel,
+  ACTIONS.deleteVoiceChannel,
 ];
 
 module.exports = {

@@ -159,6 +159,13 @@ function ChatEngineClientRequestInterfaceMixin() {
     return result;
   };
 
+  this.deleteVoiceChannel = async function (virtualServer, id) {
+    const message = this.messageGenerator.deleteVoiceChannel(id);
+    const result = await this.sendMessageAsync(virtualServer, message);
+    if (!result) return undefined;
+    return result;
+  };
+
   this.getContacts = async function (virtualServer) {
     const message = this.messageGenerator.contactsRequest();
     const result = await this.sendMessageAsync(virtualServer, message);
