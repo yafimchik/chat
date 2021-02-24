@@ -148,7 +148,6 @@ export default {
     async updateUserRole({ commit, dispatch }, role) {
       commit('updateUserRoleStatus', role);
       await dispatch('sendUserStatus');
-      dispatch('switchMicrophone');
     },
     async setUserRoleToDefault({ commit, dispatch }) {
       commit('updateUserRoleStatus', VOICE_CHANNEL_USER_ROLES.listener);

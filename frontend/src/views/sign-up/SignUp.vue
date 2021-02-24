@@ -22,5 +22,8 @@ export default {
     appRegisterForm: RegisterForm,
     appMainFooter: MainFooter,
   },
+  async beforeDestroy() {
+    await this.$store.dispatch('initializeAllChatUI');
+  },
 };
 </script>

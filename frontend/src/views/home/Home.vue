@@ -24,8 +24,5 @@ export default {
   data() {
     return {};
   },
-  async beforeMount() {
-    await this.$store.dispatch('initializeAllChatUI');
-  },
 };
 </script>

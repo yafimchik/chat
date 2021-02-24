@@ -38,9 +38,6 @@ export default {
       return this.currentVoiceChannel ? this.currentVoiceChannel.name : '';
     },
   },
-  async beforeDestroy() {
-    await this.$store.dispatch('setUserRoleToDefault');
-  },
 };
 </script>
 
