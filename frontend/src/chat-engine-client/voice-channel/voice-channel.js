@@ -31,7 +31,7 @@ export default class VoiceChannel {
 
     this.connections = [];
     this.mediaStream = undefined;
-    this.microphoneState = false;
+    this.microphoneState = true;
   }
 
   get microphoneTrack() {

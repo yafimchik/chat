@@ -5,7 +5,7 @@ const DEFAULT_STATE = () => ({
   userStatus: {
     chat: undefined,
     voiceChannel: undefined,
-    muted: true,
+    muted: false,
     role: VOICE_CHANNEL_USER_ROLES.listener,
   },
 });

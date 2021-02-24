@@ -180,6 +180,7 @@ export default {
       }
 
       await dispatch('sendUserStatus');
+      await dispatch('switchMicrophone');
       commit('setChatDataInitialized', true);
     },
     disconnectContact({ state }, contact) {
