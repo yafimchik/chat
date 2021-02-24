@@ -74,7 +74,7 @@ class MongodbRepository extends Crud {
       const isRelationManyToMany = property.relation === relationTypes.manyToMany;
 
       if (isOnDeleteCascade) {
-        if (isRelationOneToMany || isRelationOneToOne) {
+        if (isRelationOneToMany) {
           if (!property.relatedProperty) throw new BadMongoModelError(this.modelName);
           const condition = {[property.relatedProperty]: id};
           const idsToDelete = (await relatedRepository.getWhere(condition, [])).map(rec => rec._id);
