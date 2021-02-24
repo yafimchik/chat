@@ -1,5 +1,5 @@
 <template>
-  <div class="m-2">
+  <div class="user-avatar m-2">
     <button class="avatar-button">
       <img class="avatar"
            src="https://avatars.githubusercontent.com/u/51411388?v=4"
@@ -51,5 +51,17 @@ export default {
   width: 25px;
   height: 25px;
   display: flex;
+}
+
+.user-avatar {
+  img.avatar {
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  &.active {
+    img.avatar {
+      box-shadow: 0 0 3px 5px #0b78e3;
+    }
+  }
 }
 </style>

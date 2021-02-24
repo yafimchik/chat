@@ -4,6 +4,7 @@
     <div class="d-flex align-items-start flex-wrap">
       <app-user-avatar
         v-for="user in speakers" :user="user" :key="user._id"
+        :class="getContactVoiceState(user._id) ? 'active' : ''"
       ></app-user-avatar>
       <app-speak-button></app-speak-button>
     </div>
@@ -25,6 +26,7 @@ export default {
     ...mapGetters([
       'speakers',
       'activeStreams',
+      'getContactVoiceState',
     ]),
   },
 };
