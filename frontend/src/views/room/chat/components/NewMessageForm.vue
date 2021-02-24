@@ -24,12 +24,10 @@ export default {
       chatClient: 'chatEngine',
       chat: 'currentChatId',
       virtualServer: 'currentVirtualServerId',
+      userChatStatus: 'userChatStatus',
     }),
     draft() {
       return this.$store.getters.currentDraft;
-    },
-    userChatStatus() {
-      return this.$store.state.ui.userStatus.chat;
     },
   },
   methods: {
