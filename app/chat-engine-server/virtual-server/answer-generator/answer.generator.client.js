@@ -83,7 +83,10 @@ class AnswerGeneratorClient {
     if (!this.fullMessageTemp) throw new BadRequestError();
     const answer = WsMessage.clone(messageObject);
 
-    answer.payload = await this.fullMessageTemp.save();
+    answer.payload = {
+      ...answer.payload,
+      ...(await this.fullMessageTemp.save()),
+    };
     this.fullMessageTemp = null;
 
     return answer;
@@ -93,7 +96,10 @@ class AnswerGeneratorClient {
     const answer = WsMessage.clone(messageObject);
 
     const textMessage = new FullMessage(messageObject.payload);
-    answer.payload = await textMessage.save();
+    answer.payload = {
+      ...answer.payload,
+      ...(await textMessage.save()),
+    };
 
     return answer;
   }

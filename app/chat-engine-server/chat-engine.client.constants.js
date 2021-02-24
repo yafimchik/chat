@@ -22,6 +22,7 @@ const ACTIONS = {
 
 const BROADCAST_ANSWERS = [
   ACTIONS.text,
+  ACTIONS.messageFooter,
   ACTIONS.status,
   ACTIONS.getContactsOnline,
   ACTIONS.voiceChannelIce,

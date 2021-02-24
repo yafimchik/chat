@@ -10,9 +10,9 @@
       @mousedown="onUserInput"
     >
       <app-message
-        v-for="(message, index) in chatHistory"
+        v-for="message in chatHistory"
         :message="message"
-        :key="index"
+        :key="message._id"
       ></app-message>
     </div>
   </div>
@@ -125,6 +125,9 @@ export default {
         }, scrollingDelay);
       }
     },
+  },
+  mounted() {
+    this.scrollHistoryToEnd();
   },
   destroyed() {
     if (this.userScrollingTimeout) clearTimeout(this.userScrollingTimeout);
