@@ -162,9 +162,15 @@ export default {
     },
   },
   actions: {
-    addMessage({ commit }, message) {
+    addMessage({ commit, getters }, message) {
       commit('addMessage', message);
       commit('addUnreadMessage', message.chat);
+      if (!getters.isChatOpened && message.chat === getters.currentChatId) {
+        commit('postNotification', {
+          title: `Room ${getters.currentVoiceChannel.name} : `,
+          message: `${getters.userById(message.user).username} : ${message.text}`,
+        });
+      }
     },
     async updateStatus({ state, commit, dispatch }, { virtualServer, status }) {
       commit('updateStatus', { virtualServer, status });

@@ -17,11 +17,15 @@ const DEFAULT_STATE = () => ({
     home: [],
     room: [],
   },
+  currentRoute: undefined,
 });
 
 export default {
   state: DEFAULT_STATE,
   mutations: {
+    pushRoute(state, route) {
+      state.currentRoute = route;
+    },
     updateDraft(state, draftText = '') {
       state.draft[state.currentChatId] = draftText.slice();
       state.draft = { ...state.draft };
@@ -83,6 +87,13 @@ export default {
     },
   },
   getters: {
+    isChatOpened(state) {
+      if (!state.currentRoute) return false;
+      return state.currentRoute.name === 'chat';
+    },
+    currentRoute(state) {
+      return state.currentRoute;
+    },
     mainTitle(state) {
       return state.mainTitle;
     },
