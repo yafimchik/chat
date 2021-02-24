@@ -63,6 +63,9 @@ export default {
     userStatus(state) {
       return state.userStatus;
     },
+    userChatStatus(state) {
+      return state.userStatus.chat;
+    },
     currentUserMutedStatus(state) {
       return state.userStatus.muted;
     },
