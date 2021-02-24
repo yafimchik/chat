@@ -8,6 +8,8 @@ import SignUp from '@/views/sign-up/SignUp.vue';
 import FreeUsers from '@/views/free-users/FreeUsers.vue';
 import Room from '@/views/room/Room.vue';
 import CreateRoom from '@/views/create-room/CreateRoom.vue';
+import Entry from '@/views/sign-in-up/Entry.vue';
+import { DEFAULT_NON_AUTH_PAGE_NAME, DEFAULT_REDIRECT_PAGE_NAME } from '@/configs/view.config';
 
 Vue.use(VueRouter);
 
@@ -18,6 +20,11 @@ const routes = [
     name: 'home',
     meta: { requiresAuth: true },
 
+  },
+  {
+    path: '/entry',
+    name: 'entry',
+    component: Entry,
   },
   {
     path: '/sign-in',
@@ -69,9 +76,9 @@ const router = new VueRouter({
 
 router.beforeEach((toR, fromR, next) => {
   if (toR.matched.some((route) => route.meta.requiresAuth) && (!store.getters.isLoggedIn)) {
-    next({ name: 'signIn' });
+    next({ name: DEFAULT_NON_AUTH_PAGE_NAME });
   } else if (toR.path === '/signIn' && store.getters.isLoggedIn) {
-    next({ name: 'home' });
+    next({ name: DEFAULT_REDIRECT_PAGE_NAME });
   } else {
     next();
   }

@@ -73,18 +73,18 @@ export default {
         onVoiceDetectionEventCallback,
       });
     },
-    async login({ state, commit, dispatch }, { user, password }) {
+    async login({ state, commit, dispatch }, { user, password, noNotification }) {
       if (!state.chatClient) return;
 
       try {
         const loginResult = await state.chatClient.login(user, password);
-        if (!loginResult) {
+        if (!loginResult && !noNotification) {
           commit('postNotification', { error: true, message: 'Wrong username or password!' });
           return;
         }
         await dispatch('saveUser', loginResult);
       } catch (e) {
-        commit('postNotification', { error: true });
+        if (!noNotification) commit('postNotification', { error: true });
       }
     },
     async connectToServer({ state, getters, commit }) {
@@ -99,19 +99,18 @@ export default {
         commit('postNotification', { error: true });
       }
     },
-    async register({ state, commit, dispatch }, { user, password }) {
+    async register({ state, commit, dispatch }, { user, password, noNotification }) {
       if (!state.chatClient) return;
 
       try {
         const registerResult = await state.chatClient.register(user, password);
-        if (!registerResult) {
+        if (!registerResult && !noNotification) {
           commit('postNotification', { error: true, message: 'Wrong username or password!' });
           return;
         }
         await dispatch('saveUser', registerResult);
       } catch (e) {
-        console.error(e);
-        commit('postNotification', { error: true });
+        if (!noNotification) commit('postNotification', { error: true });
       }
     },
     async logout({ state, commit }) {
