@@ -67,6 +67,10 @@ export default {
       if (!state.currentRoute) return false;
       return state.currentRoute.name === 'chat';
     },
+    isRoomOpened(state) {
+      if (!state.currentRoute) return false;
+      return state.currentRoute.name === 'chat' || state.currentRoute.name === 'room';
+    },
     currentRoute(state) {
       return state.currentRoute;
     },

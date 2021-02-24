@@ -31,8 +31,4 @@ export default {
   width: 70px;
   height: 70px;
 }
-
-.avatar-button {
-  position: relative;
-}
 </style>

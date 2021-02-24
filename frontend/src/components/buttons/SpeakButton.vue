@@ -9,22 +9,29 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import { VOICE_CHANNEL_USER_ROLES } from '@/chat-engine-client/chat-engine.client.constants';
+
 export default {
   name: 'SpeakButton',
   data() {
     return {
-      muted: this.$store.getters.chatEngine.microphoneMuted,
+
     };
   },
   computed: {
+    ...mapGetters([
+      'isSpeaker',
+    ]),
     imgSource() {
-      return this.muted ? '/img/speak.png' : '/img/not-speak.png';
+      return this.isSpeaker ? '/img/minus.png' : '/img/plus.png';
     },
   },
   methods: {
     async onClick() {
-      await this.$store.dispatch('switchMicrophone');
-      this.muted = this.$store.getters.chatEngine.microphoneMuted;
+      const newRole = this.isSpeaker
+        ? VOICE_CHANNEL_USER_ROLES.listener : VOICE_CHANNEL_USER_ROLES.speaker;
+      await this.$store.dispatch('updateUserRole', newRole);
     },
   },
 };

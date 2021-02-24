@@ -39,7 +39,7 @@ export default {
 }
 
 .avatar-button {
-  position: relative;
+
 }
 
 div.list-column {

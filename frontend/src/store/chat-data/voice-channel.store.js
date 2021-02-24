@@ -52,30 +52,6 @@ export default {
     },
   },
   getters: {
-    speakers(state, getters) {
-      return getters.currentVirtualServerStatus
-        .filter(
-          (userStatus) => userStatus.value
-            && userStatus.value.voiceChannel === getters.currentVoiceChannelId,
-        )
-        .filter(
-          (userStatus) => !userStatus.value.muted,
-        )
-        .map((userStatus) => userStatus.user)
-        .map((id) => getters.userById(id));
-    },
-    listeners(state, getters) {
-      return getters.currentVirtualServerStatus
-        .filter(
-          (userStatus) => userStatus.value
-            && userStatus.value.voiceChannel === getters.currentVoiceChannelId,
-        )
-        .filter(
-          (userStatus) => userStatus.value.muted,
-        )
-        .map((userStatus) => userStatus.user)
-        .map((id) => getters.userById(id));
-    },
     freeUsers(state, getters) {
       const notFreeUsers = getters.currentVirtualServerStatus
         .filter((status) => status.value && status.value.voiceChannel)
