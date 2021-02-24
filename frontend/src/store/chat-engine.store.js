@@ -44,14 +44,14 @@ export default {
     },
   },
   actions: {
-    async switchMicrophone({ state, getters, dispatch }, value) {
+    async switchMicrophone({ state, getters }, value) {
       if (state.chatClient) {
         const newValue = value === undefined ? !getters.currentUserMutedStatus : value;
         state.chatClient.switchMicrophone(getters.isSpeaker && newValue);
-        await dispatch('updateUserMutedStatus', !newValue);
       }
     },
-    async sendUserStatus({ state, getters }) {
+    async sendUserStatus({ state, getters, dispatch }) {
+      await dispatch('switchMicrophone');
       state.chatClient.sendStatus(getters.currentVirtualServerId, getters.userStatus);
     },
     async sendTextMessage({ state, getters }, text) {
@@ -146,6 +146,7 @@ export default {
     },
     async disconnectFromVoiceChannel({ state, commit, dispatch }) {
       await state.chatClient.disconnectFromVoiceChannel();
+      await dispatch('setUserRoleToDefault');
       await dispatch('updateUserVoiceChannelStatus', undefined);
       commit('setVoiceChannelState', false);
     },

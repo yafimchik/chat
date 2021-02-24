@@ -52,7 +52,7 @@ export default {
   methods: {
     async onClick() {
       if (this.isCurrentUser) {
-        await this.$store.dispatch('switchMicrophone', this.currentUserMutedStatus);
+        await this.$store.dispatch('updateUserMutedStatus', !this.currentUserMutedStatus);
       }
     },
   },
