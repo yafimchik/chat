@@ -1,6 +1,6 @@
 <template>
   <button title="Leave current room" @click="onClick">
-    <img src="img/leave.svg" width="24" height="24">
+    <img src="/img/leave.svg" width="24" height="24">
     <div>Leave</div>
   </button>
 </template>

@@ -2,7 +2,7 @@
   <button @click="onClick">
     <div class="d-flex justify-content-center">
       <div style="position: relative;">
-        <img src="img/chat.svg" width="24" height="24">
+        <img src="/img/chat.svg" width="24" height="24">
         <span class="new-message"></span>
       </div>
     </div>

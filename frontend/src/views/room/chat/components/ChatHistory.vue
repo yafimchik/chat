@@ -16,26 +16,6 @@
       ></app-message>
     </div>
   </div>
-<!--  <section-->
-<!--    class="flex-grow-1"-->
-<!--    id="chat-history"-->
-<!--  >-->
-<!--    <div-->
-<!--      ref="chatHistory"-->
-<!--      class="chat-history__wrapper h-100 w-100 p-4"-->
-<!--      :scrolltop="scrollTop"-->
-<!--      @scroll="onScroll"-->
-<!--      @wheel="onUserInput"-->
-<!--      @keydown="onUserInput"-->
-<!--      @mousedown="onUserInput"-->
-<!--    >-->
-<!--      <app-message-->
-<!--        v-for="(message, index) in chatHistory"-->
-<!--        :message="message"-->
-<!--        :key="index"-->
-<!--      ></app-message>-->
-<!--    </div>-->
-<!--  </section>-->
 </template>
 
 <script>

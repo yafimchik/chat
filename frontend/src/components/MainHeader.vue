@@ -1,6 +1,6 @@
 <template>
   <header class="d-flex justify-content-center align-items-center">
-    <div class="logo me-3"><img src="img/logo.png" alt="logo"></div>
+    <div class="logo me-3"><img src="/img/logo.png" alt="logo"></div>
     <div class="main-title">{{ mainTitle }}</div>
   </header>
 </template>
