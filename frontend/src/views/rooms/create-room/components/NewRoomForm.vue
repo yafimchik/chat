@@ -1,22 +1,19 @@
 <template>
   <b-form
-    class="h-100 w-100 d-flex flex-column justify-content-center align-items-stretch"
+    class="w-100 d-flex flex-column justify-content-center align-items-stretch"
     @submit="onSubmit"
-    @reset="onReset"
     v-if="show"
   >
-    <b-form-group id="input-group-2" label="Room Title:" label-for="input-2">
+    <b-form-group id="input-group-2" label="New room name:" label-for="input-2">
       <b-form-input
         id="input-2"
         v-model="roomTitle"
         placeholder="Enter title"
         required
+        v-focus
+        @keydown.esc="onEsc"
       ></b-form-input>
     </b-form-group>
-    <div class="my-1 buttons d-flex">
-      <b-button class="col-5" type="reset" variant="danger">Reset</b-button>
-      <b-button class="offset-2 col-5" type="submit" variant="primary">Create</b-button>
-    </div>
   </b-form>
 </template>
 
@@ -49,19 +46,13 @@ export default {
         await this.$router.push({ name: 'home' });
       }
     },
-    onReset(event) {
-      event.preventDefault();
-      this.roomTitle = '';
-      // Trick to reset/clear native browser form validation state
-      this.show = false;
-      this.$nextTick(() => {
-        this.show = true;
-      });
-    },
     async createRoom() {
       if (this.isOnline) {
         await this.chatClient.createVoiceChannel(this.virtualServer, this.roomTitle);
       }
+    },
+    async onEsc() {
+      await this.$router.push(this.$store.getters.previousRoute);
     },
   },
 };

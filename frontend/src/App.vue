@@ -1,6 +1,8 @@
 <template>
   <div id="app" class="container main-wrapper">
-    <router-view/>
+    <transition appear name="fade">
+      <router-view/>
+    </transition>
     <app-toaster></app-toaster>
     <app-player></app-player>
     <app-audio-stream
@@ -59,6 +61,32 @@ html, body {
 body {
   background-color: #1e1e1e;
   color: #ccc;
+}
+
+.sub-page-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(255,255,255,0.2);
+
+  & > .modal-form {
+    width: 550px;
+    max-height: 70vh;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    padding: 1em;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px 10px rgba(255,255,255,0.5);
+    border-radius: 10px;
+    background-color: rgba(25,25,25,0.9);
+
+    label {
+      color: rgb(128, 128, 128);
+    }
+  }
 }
 
 .main-wrapper {

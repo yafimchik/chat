@@ -6,7 +6,7 @@
            alt="avatar">
       <div class="user-name mt-2">{{ name }}</div>
       <div class="user-mute p-1" v-if="isRoomOpened && muted">
-        <img src="img/mute.svg" width="16" height="16">
+        <img src="/img/mute.svg" width="16" height="16">
       </div>
     </button>
   </div>
