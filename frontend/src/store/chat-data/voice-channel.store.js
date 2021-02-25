@@ -91,6 +91,7 @@ export default {
       return result;
     },
     currentVoiceChannel(state, getters) {
+      if (!state.voiceChannels[getters.currentVirtualServerId]) return undefined;
       const curVC = state.voiceChannels[getters.currentVirtualServerId]
         .find((voiceChannel) => voiceChannel._id === state.currentVoiceChannelId);
       if (!curVC) return curVC;

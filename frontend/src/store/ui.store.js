@@ -13,13 +13,15 @@ const DEFAULT_STATE = () => ({
     room: [],
   },
   currentRoute: undefined,
+  previousRoute: undefined,
 });
 
 export default {
   state: DEFAULT_STATE,
   mutations: {
     pushRoute(state, route) {
-      state.currentRoute = route;
+      state.previousRoute = { ...state.currentRoute };
+      state.currentRoute = { ...route };
     },
     updateDraft(state, draftText = '') {
       state.draft[state.currentChatId] = draftText.slice();
@@ -72,7 +74,10 @@ export default {
       return state.currentRoute.name === 'chat' || state.currentRoute.name === 'room';
     },
     currentRoute(state) {
-      return state.currentRoute;
+      return !state.currentRoute ? state.currentRoute : { ...state.currentRoute };
+    },
+    previousRoute(state) {
+      return !state.previousRoute ? state.previousRoute : { ...state.previousRoute };
     },
     mainTitle(state) {
       return state.mainTitle;

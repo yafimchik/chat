@@ -4,7 +4,7 @@
       <div class="d-flex">
         <div class="room-card-title">{{ voiceChannel.name }}</div>
         <div>
-          <img src="img/user.svg" width="24" height="24" alt="users" style="filter: invert(1)">
+          <img src="/img/user.svg" width="24" height="24" alt="users" style="filter: invert(1)">
           {{ voiceChannelContacts.length }}
         </div>
       </div>
@@ -50,8 +50,7 @@ export default {
       if (!this.isListening) {
         await this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
       }
-      await this.$store.dispatch('setCurrentChat', this.voiceChannel.chat);
-      await this.$router.push({ name: 'room' });
+      await this.$router.push({ name: 'room', params: { roomId: this.voiceChannel._id } });
     },
   },
 };

@@ -28,6 +28,7 @@ import {
   onUpdateCallback,
   onVoiceDetectionEventCallback,
 } from '@/vue-utils/chat-callbacks';
+import { DEFAULT_REDIRECT_PAGE_NAME } from '@/configs/view.config';
 
 export default {
   name: 'LoginForm',
@@ -53,7 +54,7 @@ export default {
       await this.signIn();
 
       if (this.isOnline) {
-        await this.$router.push({ name: 'home' });
+        await this.$router.push({ name: DEFAULT_REDIRECT_PAGE_NAME });
       }
     },
     onReset(event) {
@@ -79,8 +80,8 @@ export default {
       await this.$store
         .dispatch('login', { user: this.form.username, password: this.form.password });
 
-      await this.$store
-        .dispatch('connectToServer');
+      await this.$store.dispatch('connectToServer');
+      await this.$store.dispatch('initializeAllChatUI');
     },
   },
 };

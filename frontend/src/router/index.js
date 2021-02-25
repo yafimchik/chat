@@ -1,26 +1,15 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import store from '@/store';
-import Home from '@/views/home/Home.vue';
-import Chat from '@/views/room/chat/Chat.vue';
 import SignIn from '@/views/sign-in/SignIn.vue';
 import SignUp from '@/views/sign-up/SignUp.vue';
 import FreeUsers from '@/views/free-users/FreeUsers.vue';
-import Room from '@/views/room/Room.vue';
-import CreateRoom from '@/views/create-room/CreateRoom.vue';
 import Entry from '@/views/sign-in-up/Entry.vue';
-import { DEFAULT_NON_AUTH_PAGE_NAME, DEFAULT_REDIRECT_PAGE_NAME } from '@/configs/view.config';
+import { afterEachRoute, beforeEachRoute } from '@/router/router.hooks';
+import { roomsRoutes } from '@/router/rooms.routes';
 
 Vue.use(VueRouter);
 
 const routes = [
-  {
-    path: '',
-    component: Home,
-    name: 'home',
-    meta: { requiresAuth: true },
-
-  },
   {
     path: '/entry',
     name: 'entry',
@@ -43,23 +32,9 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/room',
-    component: Room,
-    name: 'room',
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'chat',
-        component: Chat,
-        name: 'chat',
-      },
-    ],
-  },
-  {
-    path: '/create-room',
-    name: 'createRoom',
-    component: CreateRoom,
-    meta: { requiresAuth: true },
+    path: '',
+    name: 'home',
+    redirect: { name: 'rooms' },
   },
   {
     path: '*',
@@ -71,21 +46,12 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
-
 });
 
-router.beforeEach((toR, fromR, next) => {
-  if (toR.matched.some((route) => route.meta.requiresAuth) && (!store.getters.isLoggedIn)) {
-    next({ name: DEFAULT_NON_AUTH_PAGE_NAME });
-  } else if (toR.path === '/signIn' && store.getters.isLoggedIn) {
-    next({ name: DEFAULT_REDIRECT_PAGE_NAME });
-  } else {
-    next();
-  }
-});
+router.addRoutes(roomsRoutes);
 
-router.afterEach((toR) => {
-  store.commit('pushRoute', toR);
-});
+router.beforeEach(beforeEachRoute);
+
+router.afterEach(afterEachRoute);
 
 export default router;

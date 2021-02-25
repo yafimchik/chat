@@ -12,7 +12,7 @@ import CreateRoomButton from '@/components/buttons/CreateRoomButton.vue';
 import MainFooterLinks from '@/components/MainFooterLinks.vue';
 
 export default {
-  name: 'HomeFooter',
+  name: 'RoomFooter',
   components: {
     appCreateRoomButton: CreateRoomButton,
     appMainFooterLinks: MainFooterLinks,

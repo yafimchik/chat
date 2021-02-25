@@ -14,7 +14,7 @@ import FreeUsersButton from '@/components/buttons/FreeUsersButton.vue';
 import UserButton from '@/components/buttons/UserButton.vue';
 
 export default {
-  name: 'HomeButtons',
+  name: 'RoomsButtons',
   components: {
     appFreeUsersButton: FreeUsersButton,
     appUserButton: UserButton,

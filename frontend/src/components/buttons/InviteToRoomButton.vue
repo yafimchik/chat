@@ -1,6 +1,6 @@
 <template>
   <button title="Invite users to room" @click="onClick">
-    <img src="img/invite.svg" width="24" height="24">
+    <img src="/img/invite.svg" width="24" height="24">
     <div>Invite</div>
   </button>
 </template>
@@ -13,7 +13,11 @@ export default {
   },
   methods: {
     async onClick() {
-      await this.$router.push({ name: 'inviteToRoom' });
+      await navigator.clipboard.writeText(window.location.href);
+      this.$store.commit('postNotification', {
+        title: 'Attention!',
+        message: 'Invitation Link saved in Buffer!',
+      });
     },
   },
 };

@@ -22,8 +22,5 @@ export default {
     appLoginForm: LoginForm,
     appMainFooter: MainFooter,
   },
-  async beforeDestroy() {
-    await this.$store.dispatch('initializeAllChatUI');
-  },
 };
 </script>

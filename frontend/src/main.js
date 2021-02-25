@@ -26,6 +26,12 @@ Vue.use(ToastPlugin);
 Vue.use(BadgePlugin);
 Vue.use(TooltipPlugin);
 
+Vue.directive('focus', {
+  inserted(el) {
+    el.focus();
+  },
+});
+
 Vue.config.productionTip = false;
 
 Vue.filter('myDate', (value) => {

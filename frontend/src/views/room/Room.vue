@@ -18,6 +18,7 @@ import RoomSpeakers from '@/views/room/components/RoomSpeakers.vue';
 import RoomListeners from '@/views/room/components/RoomListeners.vue';
 import RoomFooter from '@/views/room/components/RoomFooter.vue';
 import { mapGetters } from 'vuex';
+import { DEFAULT_REDIRECT_PAGE_NAME } from '@/configs/view.config';
 
 export default {
   name: 'Room',
@@ -30,6 +31,8 @@ export default {
   computed: {
     ...mapGetters([
       'currentVoiceChannel',
+      'currentVoiceChannelId',
+      'voiceChannelById',
     ]),
     withChat() {
       return this.$route.name === 'chat';
@@ -37,6 +40,17 @@ export default {
     roomTitle() {
       return this.currentVoiceChannel ? this.currentVoiceChannel.name : '';
     },
+  },
+  async beforeMount() {
+    const voiceChannel = this.voiceChannelById(this.$route.params.roomId);
+    if (!voiceChannel) {
+      await this.$router.push({ name: DEFAULT_REDIRECT_PAGE_NAME });
+      return;
+    }
+    if (voiceChannel._id !== this.currentVoiceChannelId) {
+      await this.$store.dispatch('connectToVoiceChannel', voiceChannel._id);
+      await this.$store.dispatch('setCurrentChat', voiceChannel.chat);
+    }
   },
 };
 </script>

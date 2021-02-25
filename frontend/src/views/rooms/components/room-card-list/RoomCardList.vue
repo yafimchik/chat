@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import RoomCard from '@/views/home/components/room-card-list/RoomCard.vue';
+import RoomCard from '@/views/rooms/components/room-card-list/RoomCard.vue';
 
 export default {
   name: 'RoomCardList',

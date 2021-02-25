@@ -25,6 +25,7 @@ import {
   onVoiceDetectionEventCallback,
 } from '@/vue-utils/chat-callbacks';
 import { mapGetters } from 'vuex';
+import { DEFAULT_REDIRECT_PAGE_NAME } from '@/configs/view.config';
 
 export default {
   name: 'EntryForm',
@@ -43,6 +44,7 @@ export default {
     ...mapGetters([
       'isLoggedIn',
       'isSystemOnline',
+      'previousRoute',
     ]),
   },
   methods: {
@@ -51,7 +53,14 @@ export default {
       await this.entry();
 
       if (this.isSystemOnline) {
-        await this.$router.push({ name: 'home' });
+        let nextRoute;
+        if (this.previousRoute && this.previousRoute.name === 'room') {
+          nextRoute = this.previousRoute;
+        } else {
+          nextRoute = { name: DEFAULT_REDIRECT_PAGE_NAME };
+        }
+
+        await this.$router.push(nextRoute);
       }
     },
     onReset(event) {
@@ -87,8 +96,10 @@ export default {
           .dispatch('register', loginData);
       }
 
-      await this.$store
-        .dispatch('connectToServer');
+      if (this.isLoggedIn) {
+        await this.$store.dispatch('connectToServer');
+        await this.$store.dispatch('initializeAllChatUI');
+      }
     },
   },
 };
