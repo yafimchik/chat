@@ -47,9 +47,6 @@ export default {
   },
   methods: {
     async onClick() {
-      if (!this.isListening) {
-        await this.$store.dispatch('connectToVoiceChannel', this.voiceChannel._id);
-      }
       await this.$router.push({ name: 'room', params: { roomId: this.voiceChannel._id } });
     },
   },
