@@ -28,13 +28,11 @@ export default class VoiceChannelConnection {
     };
 
     this.peerConnection.ontrack = (event) => {
-      if (!this.inputStream) this.inputStream = new MediaStream();
-
       if (!event.track) return;
+      if (!this.inputStream) this.inputStream = new MediaStream();
       this.inputStream.addTrack(event.track);
-      if (!this.voiceDetector.isListening) {
-        this.voiceDetector.startListeningStream(this.inputStream);
-      }
+
+      this.voiceDetector.startListeningStream(this.inputStream);
 
       this.voiceChannel.onInputStream(this.contact, this.inputStream);
     };

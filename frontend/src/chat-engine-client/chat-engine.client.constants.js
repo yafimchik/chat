@@ -40,6 +40,4 @@ export const VOICE_CHANNEL_USER_ROLES = {
   candidate: 'candidate',
 };
 
-export const ICE_SERVER_URLS = [
-  'stun:stun.l.google.com:19302',
-];
+

@@ -10,6 +10,8 @@ export default class VoiceActivityDetector {
   }
 
   startListeningStream(stream, options = this.options) {
+    if (this.isListening) return;
+    if (!stream) return;
     this.eventEmitter = this.voiceActivityDetector(stream, options);
 
     this.eventEmitter.on('speaking', this.onSpeaking);
@@ -17,6 +19,7 @@ export default class VoiceActivityDetector {
   }
 
   stopListening() {
+    if (!this.isListening) return;
     this.eventEmitter.stop();
     this.eventEmitter = undefined;
   }

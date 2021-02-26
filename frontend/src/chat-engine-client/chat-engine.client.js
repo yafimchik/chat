@@ -25,7 +25,6 @@ class ChatEngineClient {
     ChatEngineClientRequestInterfaceMixin.call(this); // interface mixin
 
     this.voiceChannel = new VoiceChannel(
-      undefined,
       this.sendIce.bind(this),
       this.sendOffer.bind(this),
       this.sendAnswer.bind(this),
@@ -80,6 +79,7 @@ class ChatEngineClient {
 
     this.initializeRequestInterface(this.token); // initialize interface mixin
     this.voiceChannel.setUser(this.user);
+    this.voiceChannel.setConnectionConfig(authResponse.config.webRTCConfig);
 
     this.servers = {};
     authResponse.user.virtualServers.forEach((vs) => {

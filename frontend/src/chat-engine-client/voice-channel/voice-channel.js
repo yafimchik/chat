@@ -1,17 +1,9 @@
 import VoiceChannelConnection from '@/chat-engine-client/voice-channel/voice-channel.connection';
 import VoiceActivityDetector from '@/chat-engine-client/voice-channel/voice-activity-detector';
-
-const { ICE_SERVER_URLS } = require('@/chat-engine-client/chat-engine.client.constants');
+import { ICE_SERVERS } from '@/chat-engine-client/chat-engine.client.constants';
 
 export default class VoiceChannel {
   constructor(
-    connectionConfig = {
-      iceServers: [
-        {
-          urls: ICE_SERVER_URLS,
-        },
-      ],
-    },
     sendIceCallback = () => {},
     sendOfferCallback = () => {},
     sendAnswerCallback = () => {},
@@ -20,7 +12,7 @@ export default class VoiceChannel {
     onErrorCallback = () => {},
     onVoiceDetectionEventCallback = () => {},
   ) {
-    this.connectionConfig = connectionConfig;
+    this.connectionConfig = undefined;
 
     this.sendOffer = sendOfferCallback.bind(undefined, this.virtualServer, this.voiceChannel);
     this.sendIce = sendIceCallback.bind(undefined, this.virtualServer, this.voiceChannel);
@@ -33,6 +25,11 @@ export default class VoiceChannel {
     this.connections = [];
     this.mediaStream = undefined;
     this.microphoneState = true;
+  }
+
+  setConnectionConfig(config) {
+    if (!config) return;
+    this.connectionConfig = { ...config };
   }
 
   setUser(user) {

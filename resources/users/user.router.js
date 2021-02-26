@@ -3,6 +3,7 @@ const loginService = require('../../common/login.service');
 const BadLoginError = require('../../errors/bad-login.error');
 const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
+const FRONTEND_CONFIG = require('../../configs/frontend.config');
 
 userRouter.route('/login').post(
   asyncHandler(
@@ -21,7 +22,7 @@ userRouter.route('/login').post(
         user.virtualServers = await serviceFabric.create('virtualServer')
           .getMany(user.virtualServers);
       }
-      res.json({ user, token });
+      res.json({ user, token, config: FRONTEND_CONFIG });
     },
   ),
 );
@@ -48,7 +49,7 @@ userRouter.route('/register').post(
         user.virtualServers = await serviceFabric.create('virtualServer')
           .getMany(user.virtualServers);
       }
-      res.json({ user, token });
+      res.json({ user, token, config: FRONTEND_CONFIG });
     },
   ),
 );
