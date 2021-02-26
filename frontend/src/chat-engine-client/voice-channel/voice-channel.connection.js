@@ -62,6 +62,7 @@ export default class VoiceChannelConnection {
   }
 
   close() {
+    this.iceQueue = [];
     this.voiceDetector.stopListening();
     this.voiceChannel.onCloseConnection(this.contact);
     if (this.inputStream) {
