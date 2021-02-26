@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.43f6297fa7920b4b1c74a8407e06d637.js"
+  "/precache-manifest.af5deb26349934082a8c18f47bc8878b.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "VoiceHouse"});
