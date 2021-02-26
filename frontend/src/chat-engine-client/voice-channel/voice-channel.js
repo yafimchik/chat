@@ -127,6 +127,7 @@ export default class VoiceChannel {
         },
       });
       this.voiceDetector.startListeningStream(this.mediaStream);
+      console.log('output stream ', this.mediaStream);
     } catch (error) {
       this.onError(error);
       this.mediaStream = null;

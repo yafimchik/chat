@@ -36,6 +36,7 @@ export default class VoiceChannelConnection {
         this.voiceDetector.startListeningStream(this.inputStream);
       }
 
+      console.log('input stream ', this.inputStream);
       this.voiceChannel.onInputStream(this.contact, this.inputStream);
     };
 

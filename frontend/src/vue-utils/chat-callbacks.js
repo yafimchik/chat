@@ -39,6 +39,7 @@ export async function onUpdateCallback({ message, virtualServer }) {
     await store.dispatch('addMessage', message);
   }
   if (message.status) {
+    console.log('status ', message.status);
     await store.dispatch('updateStatus', {
       virtualServer,
       status: message.status,
