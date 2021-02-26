@@ -1,6 +1,6 @@
 <template>
   <button class="close-form-button" type="button" @click="onClick">
-    <b-icon icon="x" class="text-light"></b-icon>
+    <b-icon font-scale="2" icon="x" class="text-light"></b-icon>
   </button>
 </template>
 
