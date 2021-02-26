@@ -51,7 +51,7 @@ export default class VoiceChannelConnection {
         await this.onOffer(offer, uniqueMessageId);
       } else {
         const newOffer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(newOffer);
+        await this.peerConnection.setLocalDescription(new RTCSessionDescription(newOffer));
         const result = await this.voiceChannel.sendOffer(this.contact, newOffer);
         if (!result.answer) throw new Error('No answer from voice channel client!');
         await this.onAnswer(result.answer);
@@ -63,9 +63,7 @@ export default class VoiceChannelConnection {
 
   close() {
     this.voiceDetector.stopListening();
-    this.voiceChannel.onCloseConnection();
-    this.peerConnection.close();
-
+    this.voiceChannel.onCloseConnection(this.contact);
     if (this.inputStream) {
       const tracks = this.inputStream.getTracks();
       tracks.forEach((track) => {
@@ -73,12 +71,14 @@ export default class VoiceChannelConnection {
       });
       this.inputStream = undefined;
     }
+    this.peerConnection.close();
+    this.peerConnection = undefined;
   }
 
   async onOffer(offer, uniqueMessageId) {
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await this.peerConnection.createAnswer();
-    await this.peerConnection.setLocalDescription(answer);
+    await this.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
     await this.voiceChannel.sendAnswer(this.contact, answer, uniqueMessageId);
   }
 
