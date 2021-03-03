@@ -26,6 +26,8 @@ const CONFIG = {
   TURN_2_URL: process.env.TURN_2_URL,
   TURN_2_USER: process.env.TURN_2_USER,
   TURN_2_PASSWORD: process.env.TURN_2_PASSWORD,
+  TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN,
+  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
 };
 
 module.exports = CONFIG;

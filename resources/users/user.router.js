@@ -4,6 +4,7 @@ const BadLoginError = require('../../errors/bad-login.error');
 const asyncHandler = require('../../app/middlewares/async-handler.middleware');
 const serviceFabric = require('../service.fabric');
 const FRONTEND_CONFIG = require('../../configs/frontend.config');
+const turnService = require('../../common/turn.service');
 
 userRouter.route('/login').post(
   asyncHandler(
@@ -22,7 +23,16 @@ userRouter.route('/login').post(
         user.virtualServers = await serviceFabric.create('virtualServer')
           .getMany(user.virtualServers);
       }
-      res.json({ user, token, config: FRONTEND_CONFIG });
+
+      const config = {
+        webRTCConfig: {
+          iceServers: await turnService.getIceServers(),
+        },
+      };
+
+      console.log('config ', config);
+
+      res.json({ user, token, config });
     },
   ),
 );
@@ -49,7 +59,14 @@ userRouter.route('/register').post(
         user.virtualServers = await serviceFabric.create('virtualServer')
           .getMany(user.virtualServers);
       }
-      res.json({ user, token, config: FRONTEND_CONFIG });
+
+      const config = {
+        webRTCConfig: {
+          iceServers: await turnService.getIceServers(),
+        },
+      };
+
+      res.json({ user, token, config });
     },
   ),
 );
