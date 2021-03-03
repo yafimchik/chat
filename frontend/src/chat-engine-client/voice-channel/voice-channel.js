@@ -1,6 +1,5 @@
 import VoiceChannelConnection from '@/chat-engine-client/voice-channel/voice-channel.connection';
 import VoiceActivityDetector from '@/chat-engine-client/voice-channel/voice-activity-detector';
-import { ICE_SERVERS } from '@/chat-engine-client/chat-engine.client.constants';
 
 export default class VoiceChannel {
   constructor(

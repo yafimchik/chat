@@ -39,5 +39,3 @@ export const VOICE_CHANNEL_USER_ROLES = {
   speaker: 'speaker',
   candidate: 'candidate',
 };
-
-
