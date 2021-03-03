@@ -18,7 +18,7 @@ class TurnService {
         return this.lastClientToken.ice_servers;
     }
     this.lastClientToken = await this.serverConnection.tokens.create();
-    return this.lastClientToken;
+    return this.lastClientToken.iceServers;
   }
 }
 
