@@ -4,6 +4,7 @@ const serviceFabric = require('../../../resources/service.fabric');
 const loginService = require('../../../common/login.service');
 const WsMessage = require('./ws-message');
 const Status = require('./status');
+const VoiceChannelServer = require('./voice-channel-server/voice-channel.server');
 
 class VirtualServerClient {
   constructor(wsConnection, virtualServer) {
@@ -64,14 +65,12 @@ class VirtualServerClient {
         await this.virtualServer.broadcastContactsOnline();
       }
 
+      if (await this.virtualServer.processMessageByVirtualServer(messageObject)) return;
+
       const answer = await this.answerGenerator.fromMessage(messageObject);
 
       if (this.answerGenerator.constructor.isBroadcast(answer)) {
-        let contacts = answer.payload.to;
-        if (answer.payload.to) {
-          contacts = (contacts instanceof Array) ? answer.payload.to : [ answer.payload.to ];
-        }
-        this.virtualServer.broadcastMessage(answer, contacts);
+        this.virtualServer.broadcastMessage(answer);
       } else {
         this.sendToClient(answer);
       }

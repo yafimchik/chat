@@ -14,11 +14,8 @@ const ACTIONS = {
   getContactsOnline: 'get-contacts-online',
   status: 'status',
   userInfo: 'user-info',
-  voiceChannelIce: 'voice-channel-ice',
-  voiceChannelOffer: 'voice-channel-offer',
-  voiceChannelAnswer: 'voice-channel-answer',
-  callRequest: 'call-request',
-  callResponse: 'call-response',
+  voiceChannelServiceMessage: 'voice-channel-service-message',
+  webrtcServiceMessage: 'webrtc-service-message',
 };
 
 const BROADCAST_ANSWERS = [
@@ -26,11 +23,6 @@ const BROADCAST_ANSWERS = [
   ACTIONS.messageFooter,
   ACTIONS.status,
   ACTIONS.getContactsOnline,
-  ACTIONS.voiceChannelIce,
-  ACTIONS.voiceChannelOffer,
-  ACTIONS.voiceChannelAnswer,
-  ACTIONS.callRequest,
-  ACTIONS.callResponse,
   ACTIONS.createVoiceChannel,
   ACTIONS.deleteVoiceChannel,
 ];
