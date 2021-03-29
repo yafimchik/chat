@@ -43,22 +43,6 @@ export default class VoiceChannelConnection {
     });
   }
 
-  async connectToClient(offer, uniqueMessageId) {
-    try {
-      if (offer) {
-        await this.onOffer(offer, uniqueMessageId);
-      } else {
-        const newOffer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(new RTCSessionDescription(newOffer));
-        const result = await this.voiceChannel.sendOffer(this.contact, newOffer);
-        if (!result.answer) throw new Error('No answer from voice channel client!');
-        await this.onAnswer(result.answer);
-      }
-    } catch (e) {
-      this.voiceChannel.onError(e);
-    }
-  }
-
   close() {
     this.iceQueue = [];
     this.voiceDetector.stopListening();
@@ -74,35 +58,4 @@ export default class VoiceChannelConnection {
     this.peerConnection = undefined;
   }
 
-  async onOffer(offer, uniqueMessageId) {
-    await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await this.peerConnection.createAnswer();
-    await this.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
-    await this.voiceChannel.sendAnswer(this.contact, answer, uniqueMessageId);
-  }
-
-  async onAnswer(answer) {
-    await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-    if (this.iceQueue.length) {
-      let tasksChain = Promise.resolve();
-      this.iceQueue.forEach((ice) => {
-        tasksChain = tasksChain.then(() => this.onIce(ice, true));
-      });
-
-      await tasksChain;
-    }
-  }
-
-  async onIce(ice, fromQueue = false) {
-    if (
-      !this.peerConnection
-      || !this.peerConnection.remoteDescription
-      || !this.peerConnection.remoteDescription.type
-    ) {
-      if (!fromQueue) this.iceQueue.push(ice);
-      return false;
-    }
-    await this.peerConnection.addIceCandidate(new RTCIceCandidate(ice));
-    return true;
-  }
 }

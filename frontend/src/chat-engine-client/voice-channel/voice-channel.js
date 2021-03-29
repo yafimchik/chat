@@ -1,38 +1,37 @@
 import VoiceChannelConnection from '@/chat-engine-client/voice-channel/voice-channel.connection';
 import VoiceActivityDetector from '@/chat-engine-client/voice-channel/voice-activity-detector';
+import P2PClient from '@/chat-engine-client/voice-channel/p2p.client';
+import Media from '@/chat-engine-client/voice-channel/media';
 
 export default class VoiceChannel {
-  constructor(
-    sendIceCallback = () => {},
-    sendOfferCallback = () => {},
-    sendAnswerCallback = () => {},
-    onInputStreamCallback = () => {},
-    onCloseConnectionCallback = () => {},
-    onErrorCallback = () => {},
-    onVoiceDetectionEventCallback = () => {},
-  ) {
-    this.connectionConfig = undefined;
-
-    this.sendOffer = sendOfferCallback.bind(undefined, this.virtualServer, this.voiceChannel);
-    this.sendIce = sendIceCallback.bind(undefined, this.virtualServer, this.voiceChannel);
-    this.sendAnswer = sendAnswerCallback.bind(undefined, this.virtualServer, this.voiceChannel);
-    this.onInputStream = onInputStreamCallback;
-    this.onCloseConnection = onCloseConnectionCallback;
-    this.onError = onErrorCallback;
-    this.onVoiceDetectionEvent = onVoiceDetectionEventCallback;
-
-    this.connections = [];
+  constructor(engineInterface) {
+    this.engineInteface = engineInterface;
     this.mediaStream = undefined;
     this.microphoneState = true;
+
+    this.mediaDevice = new Media();
+    this.mediaDevice;
   }
 
   setConnectionConfig(config) {
-    if (!config) return;
-    this.connectionConfig = { ...config };
+    this.p2pClient = new P2PClient(this, config);
   }
 
   setUser(user) {
     this.user = user;
+  }
+
+  setCallbacks(
+    {
+      onInputStream = () => {},
+      onCloseConnection = () => {},
+      onError = () => {},
+      onVoiceDetection = () => {},
+    }) {
+    this.onInputStream = onInputStream;
+    this.onCloseConnection = onCloseConnection;
+    this.onError = onError;
+    this.onVoiceDetection = onVoiceDetection;
   }
 
   get microphoneTrack() {
