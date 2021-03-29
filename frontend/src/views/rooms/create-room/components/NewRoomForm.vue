@@ -33,8 +33,6 @@ export default {
   computed: {
     ...mapGetters({
       isOnline: 'isSystemOnline',
-      chatClient: 'chatEngine',
-      virtualServer: 'currentVirtualServerId',
     }),
   },
   methods: {
@@ -48,7 +46,7 @@ export default {
     },
     async createRoom() {
       if (this.isOnline) {
-        await this.chatClient.createVoiceChannel(this.virtualServer, this.roomTitle);
+        await this.$store.dispatch('createVoiceChannelOnServer', this.roomTitle);
       }
     },
     async onEsc() {
