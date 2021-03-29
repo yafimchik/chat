@@ -1,11 +1,12 @@
 import { VOICE_CHANNEL_SERVICE_ACTIONS } from '@/chat-engine-client/chat-engine.client.constants';
 import VoiceChannel from '@/chat-engine-client/voice-channel/voice-channel';
-import ChatEngineClientRequestInterfaceMixin
-  from '@/chat-engine-client/chat-engine.client.request-interface.mixin';
 import ClientError from './errors/client.error';
 import ChatEngineClientConnection from './chat-engine.client.connection';
 import ServerError from './errors/server.error';
 import ConnectionError from './errors/connection.error';
+import SendMessageError from "@/chat-engine-client/errors/send.message.error";
+import ChatInterface from '@/chat-engine-client/chat/chat.interface';
+import VoiceChannelInterface from "@/chat-engine-client/voice-channel/voice-channel.interface";
 
 class ChatEngineClient {
   constructor(
@@ -22,12 +23,7 @@ class ChatEngineClient {
     this.token = undefined;
     this.onUpdateCallback = onUpdateCallback;
 
-    ChatEngineClientRequestInterfaceMixin.call(this); // interface mixin
-
     this.voiceChannel = new VoiceChannel(
-      this.sendIce.bind(this),
-      this.sendOffer.bind(this),
-      this.sendAnswer.bind(this),
       onInputStreamCallback,
       onCloseConnectionCallback,
       this.onException.bind(this),
@@ -77,7 +73,20 @@ class ChatEngineClient {
     this.user = { ...authResponse.user };
     this.token = authResponse.token;
 
-    this.initializeRequestInterface(this.token); // initialize interface mixin
+    this.chatInterface = new ChatInterface(
+      this.token,
+      this.sendMessage.bind(this),
+      this.sendMessageAsync.bind(this),
+      this.sendBinaryAsync.bind(this),
+      this.getVirtualServers.bind(this),
+    );
+
+    this.voiceChannelInterface = new VoiceChannelInterface(
+      this.token,
+      this.sendMessage.bind(this),
+      this.sendMessageAsync.bind(this),
+    );
+
     this.voiceChannel.setUser(this.user);
     this.voiceChannel.setConnectionConfig(authResponse.config.webRTCConfig);
 
@@ -154,7 +163,7 @@ class ChatEngineClient {
   }
 
   sendMessage(virtualServer, message) {
-    const connection = this.getClient(virtualServer);
+    const connection = this.getConnection(virtualServer);
     if (!connection) {
       this.onException(new Error('There is not any connection to server!'));
     }
@@ -162,7 +171,7 @@ class ChatEngineClient {
   }
 
   async sendMessageAsync(virtualServer, message, defaultValue) {
-    const connection = this.getClient(virtualServer);
+    const connection = this.getConnection(virtualServer);
     if (!connection) {
       this.onException(new ClientError('There is not any connection to server!'));
       return defaultValue;
@@ -175,13 +184,41 @@ class ChatEngineClient {
     }
   }
 
+  async sendMessageAsync(virtualServer, message, defaultValue) {
+    const connection = this.getConnection(virtualServer);
+    if (!connection) {
+      this.onException(new ClientError('There is not any connection to server!'));
+      return defaultValue;
+    }
+    try {
+      return await (connection.socket.sendAsync(message));
+    } catch (e) {
+      this.onException(e);
+      return defaultValue;
+    }
+  }
+
+  async sendBinaryAsync(virtualServer, data) {
+    const connection = this.getConnection(virtualServer);
+    if (!connection) throw new SendMessageError();
+    const binaryResult = await connection.socket.sendBinaryAsync(data);
+    if (binaryResult.error) throw new SendMessageError();
+    return binaryResult;
+  }
+
+  getVirtualServers() {
+    if (!this.user) return [];
+    if (!this.user.virtualServers) return [];
+    return this.user.virtualServers.map((vs) => vs._id);
+  }
+
   get virtualServers() {
     if (!this.user) return [];
     if (!this.user.virtualServers) return [];
     return this.user.virtualServers.map((vs) => vs._id);
   }
 
-  getClient(virtualServer) {
+  getConnection(virtualServer) {
     const serversArray = Object.values(this.servers);
     if (!serversArray || !serversArray.length) return undefined;
 

@@ -1,11 +1,7 @@
 import { ACTIONS } from '@/chat-engine-client/chat-engine.client.constants';
 
-export default class MessageGenerator {
+export default class ChatMessageGenerator {
   constructor(token) {
-    this.token = token;
-  }
-
-  initToken(token) {
     this.token = token;
   }
 
@@ -82,36 +78,5 @@ export default class MessageGenerator {
 
   contactsRequest() {
     return { token: this.token, action: ACTIONS.getContacts };
-  }
-
-  offer(voiceChannel, contact, offer) {
-    return {
-      voiceChannel,
-      offer,
-      token: this.token,
-      action: ACTIONS.voiceChannelOffer,
-      to: contact,
-    };
-  }
-
-  answer(voiceChannel, contact, answer, uniqueMessageId) {
-    return {
-      uniqueMessageId,
-      voiceChannel,
-      answer,
-      token: this.token,
-      action: ACTIONS.voiceChannelAnswer,
-      to: contact,
-    };
-  }
-
-  ice(voiceChannel, contact, ice) {
-    return {
-      voiceChannel,
-      ice,
-      token: this.token,
-      action: ACTIONS.voiceChannelIce,
-      to: contact,
-    };
   }
 }

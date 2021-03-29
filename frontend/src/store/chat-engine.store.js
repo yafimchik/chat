@@ -52,10 +52,12 @@ export default {
     },
     async sendUserStatus({ state, getters, dispatch }) {
       await dispatch('switchMicrophone');
-      state.chatClient.sendStatus(getters.currentVirtualServerId, getters.userStatus);
+      state.chatClient.chatInterface
+        .sendStatus(getters.currentVirtualServerId, getters.userStatus);
     },
     async sendTextMessage({ state, getters }, text) {
-      await state.chatClient.sendText(getters.currentVirtualServerId, getters.currentChatId, text);
+      await state.chatClient.chatInterface
+        .sendText(getters.currentVirtualServerId, getters.currentChatId, text);
     },
     async initChatClient({ state, commit }, {
       apiUrl,
@@ -150,9 +152,13 @@ export default {
       await dispatch('updateUserVoiceChannelStatus', undefined);
       commit('setVoiceChannelState', false);
     },
+    async createVoiceChannelOnServer({ state, getters, dispatch }, title) {
+      await state.chatClient.chatInterface
+        .createVoiceChannel(getters.currentVirtualServerId, title);
+    },
     async deleteVoiceChannelOnServer({ state, getters, dispatch }, id) {
       if (getters.currentVoiceChannelId === id) await dispatch('disconnectFromVoiceChannel');
-      await state.chatClient.deleteVoiceChannel(getters.currentVirtualServerId, id);
+      await state.chatClient.chatInterface.deleteVoiceChannel(getters.currentVirtualServerId, id);
     },
     async initializeAllChatUI(
       {
@@ -163,19 +169,19 @@ export default {
       },
     ) {
       if (state.isChatDataInitialized) return;
-      const contacts = await state.chatClient.getContacts();
+      const contacts = await state.chatClient.chatInterface.getContacts();
       if (contacts) commit('updateContacts', contacts);
 
-      const chats = await state.chatClient.getAllChats();
+      const chats = await state.chatClient.chatInterface.getAllChats();
 
       if (chats) {
         commit('updateChats', chats);
         const chatsArray = Object.values(chats).flat();
-        const chatHistory = await state.chatClient.getAllHistory(chatsArray);
+        const chatHistory = await state.chatClient.chatInterface.getAllHistory(chatsArray);
         if (chatHistory) commit('updateChatHistory', chatHistory);
       }
 
-      const voiceChannels = await state.chatClient.getAllVoiceChannels();
+      const voiceChannels = await state.chatClient.chatInterface.getAllVoiceChannels();
       if (voiceChannels) commit('updateVoiceChannels', voiceChannels);
 
       const { virtualServers } = rootState.chatData;
@@ -195,7 +201,7 @@ export default {
       const curServer = getters.currentVirtualServerId;
       const historySize = getters.currentHistorySize;
       try {
-        const historyChunk = await state.chatClient
+        const historyChunk = await state.chatClient.chatInterface
           .getHistory(curServer, curChat, historySize);
         if (!historyChunk || !historyChunk.length) {
           commit('setHistoryLoaded', curChat);

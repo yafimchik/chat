@@ -19,6 +19,7 @@ export const ACTIONS = {
   voiceChannelAnswer: 'voice-channel-answer',
   callRequest: 'call-request',
   callResponse: 'call-response',
+  voiceChannelServiceMessage: 'voice-channel-service-message',
 };
 
 export const VOICE_CHANNEL_SERVICE_ACTIONS = [
@@ -38,4 +39,5 @@ export const VOICE_CHANNEL_USER_ROLES = {
   listener: 'listener',
   speaker: 'speaker',
   candidate: 'candidate',
+  moderator: 'moderator',
 };
