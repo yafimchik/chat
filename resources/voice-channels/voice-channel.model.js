@@ -8,6 +8,8 @@ const modelType = {
     required: true,
     unique: true,
   },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+  admins: [ { type: mongoose.Schema.Types.ObjectId, ref: 'user' } ],
   chat: { type: mongoose.Schema.Types.ObjectId, ref: 'chat' },
   virtualServer: { type: mongoose.Schema.Types.ObjectId, ref: 'virtualServer', required: true },
 };
@@ -32,6 +34,16 @@ const voiceChannelModelConfig = {
       modelName: 'virtualServer',
       relation: relations.manyToOne,
       relatedProperty: undefined,
+    },
+    {
+      name: 'owner',
+      modelName: 'user',
+      relation: relations.manyToOne,
+    },
+    {
+      name: 'admins',
+      modelName: 'user',
+      relation: relations.manyToMany,
     },
   ],
   Model: mongoose.model(modelName, modelSchema),
